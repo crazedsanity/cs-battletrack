@@ -31,6 +31,17 @@ abstract class abstractFileHandler {
 	 * @return (int)	PASS: indicates number of bytes written (0 is okay if $data is null).
 	 */
 	protected function create_file($filename, $data=NULL) {
+		$retval = NULL;
+		if($this->fs->create_file($filename, TRUE)) {
+			$retval = 0;
+			if(!is_null($data) && strlen($data)) {
+				$retval = $this->fs->write($data);
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": failed to create (". $filename .")");
+		}
+		return($retval);
 	}//end create_file()
 	//=========================================================================
 	
@@ -45,6 +56,7 @@ abstract class abstractFileHandler {
 	 * @return (str)		Contains all data from within the given filename
 	 */
 	protected function read_file($filename) {
+		return($this->fs->read($filename));
 	}//end read_file()
 	//=========================================================================
 }
