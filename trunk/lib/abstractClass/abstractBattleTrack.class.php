@@ -1,6 +1,6 @@
 <?php
 
-abstract class abstractBattleTrack {
+abstract class abstractBattleTrack extends abstractFileHandler {
 	
 	protected $fs;
 	protected $gf;
