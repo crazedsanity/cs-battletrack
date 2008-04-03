@@ -3,8 +3,8 @@
 class chat extends battletrack {
 	
 	//=========================================================================
-    function __construct() {
-    }//end __construct()
+	function __construct() {
+	}//end __construct()
 	//=========================================================================
 }
 ?>
