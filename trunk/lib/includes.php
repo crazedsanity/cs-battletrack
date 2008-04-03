@@ -6,6 +6,9 @@
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 
+
+define(BT_BASEDIR, dirname(__FILE__ .'/../'));
+
 function __autoload($className) {
 	$retval = FALSE;
 	$possible = array(
