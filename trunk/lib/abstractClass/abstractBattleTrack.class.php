@@ -1,6 +1,6 @@
 <?php
 
-class battletrack {
+abstract class abstractBattleTrack {
 	
 	protected $fs;
 	protected $gf;
