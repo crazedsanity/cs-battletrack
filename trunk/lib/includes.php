@@ -15,7 +15,7 @@ function __autoload($className) {
 		dirname(__FILE__) .'/'. $className .'.php',
 		dirname(__FILE__) .'/'. $className .'Class.php',
 		dirname(__FILE__) .'/'. $className .'.class.php',
-		dirname(__FILE__) .'/abstractClasses/'. $className .'.abstract.php'
+		dirname(__FILE__) .'/abstractClass/'. $className .'.class.php'
 	);
 	
 	foreach($possible as $fileName) {

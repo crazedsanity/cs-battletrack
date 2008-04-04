@@ -1,5 +1,9 @@
 <?php
 
+
+require_once(dirname(__FILE__) ."/../cs-content/contentSystemClass.php");
+
+
 abstract class abstractFileHandler {
 	
 	protected $fs;
