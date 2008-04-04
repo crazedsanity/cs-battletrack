@@ -7,6 +7,8 @@ abstract class abstractBattleTrack extends abstractFileHandler {
 	protected $fs;
 	protected $gf;
 	
+	protected $lastCheckin;
+	
 	//=========================================================================
 	public function __construct() {
 		
@@ -28,6 +30,8 @@ abstract class abstractBattleTrack extends abstractFileHandler {
 		try {
 			$xmlParser = new XMLParser($this->read_file($filename));
 			$oldData = $xmlParser->get_tree(TRUE);
+			
+			$this->lastCheckin = $oldData['CHECKIN']['LAST_CHECKIN'];
 			
 			$xmlCreator = new xmlCreator('checkin');
 			$xmlCreator->add_tag('username', $this->username);
