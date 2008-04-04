@@ -16,19 +16,5 @@ abstract class abstractBattleTrack extends abstractFileHandler {
 		$this->gf = new cs_globalFunctions;
 	}//end __construct()
 	//=========================================================================
-	
-	
-	
-	//=========================================================================
-	protected function create_file(array $data) {
-	}//end create_file()
-	//=========================================================================
-	
-	
-	
-	//=========================================================================
-	protected function read_file(array $filename) {
-	}//end read_file()
-	//=========================================================================
 }
 ?>
