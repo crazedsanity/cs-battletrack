@@ -26,28 +26,28 @@ body {
 
           <table id="info" cellspacing="0">
             <tbody><tr>
-              <td colspan="2"><input name="info[name]" title="Your character's name" value="{character_name}" type="text"><br>Character Name</td>
+              <td colspan="2"><input name="main[name]" title="Your character's name" value="{character_name}" type="text"><br>Character Name</td>
               <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" value="{user_display_name}"><br>Player</td>
-              <td><input name="info[alignment]" title="Alignment" value="{alignment}" type="text"><br>Alignment</td>
-              <td><input name="generated[xp_current]" title="Current XP" value="{xp_current}" type="text"><br>Current XP</td>
-              <td><input name="generated[xp_next]" title="XP to next level" value="{xp_next}" type="text"><br>Next Level XP</td>
-              <td><input name="generated[xp_change]" title="Add this XP..." value="{xp_change}" type="text"><br>XP Change</td>
+              <td><input name="generic[alignment]" title="Alignment" value="{alignment}" type="text"><br>Alignment</td>
+              <td><input name="xp[current]" title="Current XP" value="{xp_current}" type="text"><br>Current XP</td>
+              <td><input name="xp[next]" title="XP to next level" value="{xp_next}" type="text"><br>Next Level XP</td>
+              <td><input name="xp[change]" title="Add this XP..." value="{xp_change}" type="text"><br>XP Change</td>
             </tr>
             <tr>
-              <td colspan="2"><input name="generated[class]" title="CURRENT class" value="{class_display}" type="text"><br>Class</td>
-              <td colspan="2"><input name="info[race]" title="Race" value="{character_race}" type="text"><br>Race</td>
-              <td colspan="2"><input name="generated[campaign]" title="Campaign" value="{campaign}" type="text"><br>Campaign</td>
-              <td colspan="2"><input name="info[deity]" title="Deity" value="{character_deity}" type="text"><br>Deity</td>
+              <td colspan="2"><input name="generic[class]" title="CURRENT class" value="{class_display}" type="text"><br>Class</td>
+              <td colspan="2"><input name="generic[race]" title="Race" value="{character_race}" type="text"><br>Race</td>
+              <td colspan="2"><input name="generic[campaign]" title="Campaign" value="{campaign}" type="text"><br>Campaign</td>
+              <td colspan="2"><input name="generic[deity]" title="Deity" value="{character_deity}" type="text"><br>Deity</td>
             </tr>
             <tr>
-              <td class="unit"><input name="generated[level]" title="Level" value="{character_level}" type="text"><br>Level</td>
-              <td class="unit"><input name="generated[size]" title="Size" value="{character_size}" type="text"><br>Size</td>
-              <td class="unit"><input name="info[age]" title="Age" value="{character_age}" type="text"><br>Age</td>
-              <td class="unit"><input name="info[gender]" title="Gender" value="{character_gender}" type="text"><br>Gender</td>
-              <td class="unit"><input name="info[height]" title="Height" value="{character_height}" type="text"><br>Height</td>
-              <td class="unit"><input name="info[weight]" title="Weight" value="{character_weight}" type="text"><br>Weight</td>
-              <td class="unit"><input name="info[eyes]" title="Eye color" value="{character_eyecolor}" type="text"><br>Eyes</td>
-              <td class="unit"><input name="info[hair]" title="Hair color" value="{character_haircolor}" type="text"><br>Hair</td>
+              <td class="unit"><input name="class_total[level]" title="Level" value="{class_total-level}" type="text"><br>Level</td>
+              <td class="unit"><input name="generic[size]" title="Size" value="{character_size}" type="text"><br>Size</td>
+              <td class="unit"><input name="generic[age]" title="Age" value="{character_age}" type="text"><br>Age</td>
+              <td class="unit"><input name="generic[gender]" title="Gender" value="{character_gender}" type="text"><br>Gender</td>
+              <td class="unit"><input name="generic[height]" title="Height" value="{character_height}" type="text"><br>Height</td>
+              <td class="unit"><input name="generic[weight]" title="Weight" value="{character_weight}" type="text"><br>Weight</td>
+              <td class="unit"><input name="generic[eyes]" title="Eye color" value="{character_eyecolor}" type="text"><br>Eyes</td>
+              <td class="unit"><input name="generic[hair]" title="Hair color" value="{character_haircolor}" type="text"><br>Hair</td>
             </tr>
           </tbody></table>
 
@@ -110,7 +110,7 @@ body {
                 <table id="init"> <!-- This is Action Points -->
                 	<tbody><tr>
                     	<td class="tag">Action Points</td>
-                        <td class="unit"><input name="info[action_points]" title="Action points" value="{extra_action_points}" type="text"></td>
+                        <td class="unit"><input name="generic[action_points]" title="Action points" value="{extra_action_points}" type="text"></td>
                     </tr>
                 </tbody></table>
                 
@@ -132,35 +132,35 @@ body {
                   </tr>
                   <tr>
                     <td class="tag"><span title="Hit Points" class="help">HP</span></td>
-                    <td><input name="info[hp]" title="Hit points" value="{info_hp}" type="text"></td>
+                    <td><input name="generic[hp]" title="Hit points" value="{info_hp}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="info[current_hp]" title="Current hit points" value="{info_current_hp}" type="text"></td>
+                    </td><td colspan="3"><input name="status[current_hp]" title="Current hit points" value="{info_current_hp}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="info[nonlethal_damage]" title="Nonlethal damage" value="{info_nonlethal_damage}" type="text"></td>
+                    </td><td colspan="3"><input name="status[nonlethal_damage]" title="Nonlethal damage" value="{info_nonlethal_damage}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="generated[hit_dice]" title="	" value="d8" type="text"></td>
+                    </td><td colspan="3"><input name="current_class[hit_dice]" title="	" value="d8" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="DamageRed" title="DamageRed" value="" type="text"></td>
+                    </td><td colspan="3"><input name="special[damage_reduction]" title="DamageRed" value="" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Armor Class" class="help">AC</span></td>
-                    <td class="unit"><input name="AC" title="AC" value="15" type="text"></td>
+                    <td class="unit"><input name="ac[total]" title="AC" value="15" type="text"></td>
                     <td class="char">=</td>
                     <td class="basenum"><span>10</span></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACArmor" title="ACArmor" value="2" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[armor]" title="Armor class (add AC bonus from all worn protective items)" value="2" type="text"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACShield" title="ACShield" value="0" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[shield]" title="AC bonus from shield" value="0" type="text"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACDex" title="ACDex" value="3" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input title="Dexterity modifier" value="{ability_dex_mod}" type="text" readonly="readonly"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACSize" title="ACSize" value="0" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[size_modifier]" title="Size modifier for AC" value="0" type="text"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACDeflect" title="ACDeflect" value="0" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[deflect]" title="Deflection bonus to AC" value="0" type="text"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input name="ACNat" title="ACNat" value="0" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[natural]" title="Natural armor bonus" value="0" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input name="ACMisc" title="ACMisc" value="0" onchange="ACCalc()" type="text"></td>
+                    <td class="unit"><input name="ac[misc]" title="Misc. modifier to AC" value="0" type="text"></td>
                   </tr>
                   <tr>
                     <td>
@@ -192,10 +192,10 @@ body {
                 <table id="init"> <!-- This is Touch and Flat-footed AC -->
                 	<tbody><tr>
                     	<td class="tag">Touch</td>
-                        <td class="unit"><input title="Touch AC" value="{ac_touch}" type="text"></td>
+                        <td class="unit"><input name="ac[touch]" title="Touch AC" value="{ac_touch}" type="text"></td>
                         <td>
                         </td><td class="tag">Flat-footed</td>
-                        <td class="unit"><input title="Flat-footed AC" value="{ac_flatfooted}" type="text"></td>
+                        <td class="unit"><input name="ac[flat_footed]" title="Flat-footed AC" value="{ac_flatfooted}" type="text"></td>
                     </tr>
                 </tbody></table>
                 
@@ -212,16 +212,16 @@ body {
                     <td class="tag"><span class="help" title="Initiative">INIT</span></td>
                     <td class="unit"><input title="Initiative" value="{initiative}" type="text"></td>
                     <td class="char">=</td>
-                    <td class="unit"><input title="Dex modifier" value="{ability_dex_mod}" type="text"></td>
+                    <td class="unit"><input title="Dex modifier" value="{ability_dex_mod}" type="text" readonly="readonly"></td>
                     <td class="char">+</td>
-                    <td class="unit"><input title="Miscellaneous modifier for initiative" value="{initiative_miscmod}" type="text"></td>
+                    <td class="unit"><input name="init[misc]" title="Miscellaneous modifier for initiative" value="{initiative_miscmod}" type="text"></td>
                   </tr>
                 </tbody></table>
 
                 <table id="speed">
                   <tbody><tr>
-                    <td><input name="Speed" title="Speed" value="{speed}" type="text"></td>
-                    <td><input title="Armor (and protective items) currently worn" value="This is GHEY" type="text" readonly="readonly"></td>
+                    <td><input name="speed[total]" title="Speed" value="{speed}" type="text"></td>
+                    <td><input name="misc[armor_worn]" title="Armor (and protective items) currently worn" value="{misc-armor_worn}" type="text" readonly="readonly"></td>
                   </tr>
                   <tr>
                     <td class="footer">Speed</td>
@@ -236,27 +236,27 @@ body {
                   <tbody><tr>
                     <td rowspan="6" class="piccell"><img id="pic" src="/images/clear.gif" alt="Character Portrait"></td>
                     <td class="loadtext title">Light<br>Load</td>
-                    <td class="loadinputs"><input name="generated[load_light]" title="Light load" value="{load_light}" type="text"></td>
+                    <td class="loadinputs"><input name="weight[light_load]" title="Light load" value="{load_light}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="loadtext title">Med<br>Load</td>
-                    <td><input name="generated[load_medium]" title="Medium load" value="{load_medium}" type="text"></td>
+                    <td><input name="weight[medium_load]" title="Medium load" value="{load_medium}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="loadtext title">Max<br>Load</td>
-                    <td><input name="generated[load_load]" title="Heavy load" value="{load_heavy}" type="text"></td>
+                    <td><input name="weight[heavy_load]" title="Heavy load" value="{load_heavy}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="loadtext title">Over<br>Head</td>
-                    <td><input name="generated[lift_over_head]" title="Lift over head" value="{load_overhead}" type="text"></td>
+                    <td><input name="weight[lift_over_head]" title="Lift over head" value="{load_overhead}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="loadtext title">Off<br>Ground</td>
-                    <td><input name="generated[lift_off_ground]" title="Lift off ground" value="{load_offground}" type="text"></td>
+                    <td><input name="weight[lift_off_ground]" title="Lift off ground" value="{load_offground}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="loadtext title">Push/<br>Drag</td>
-                    <td><input name="generated[lift_push_drag]" title="Lift, push, or drag" value="{load_liftpushdrag}" type="text"></td>
+                    <td><input name="weight[lift_push_drag]" title="Lift, push, or drag" value="{load_liftpushdrag}" type="text"></td>
                   </tr>
                 </tbody></table>
               
@@ -285,47 +285,47 @@ body {
                     <td class="tag"><span class="help" title="Fortitude: Based on Constitution">FORTITUDE</span></td>
                     <td>
                     </td>
-                    <td class="unit"><input name="generated[Fort]" title="Total fortitude save" value="{save_fort}" type="text"></td>
+                    <td class="unit"><input name="save[fort][total]" title="Total fortitude save" value="{save_fort}" type="text"></td>
                     <td class="char"><span class="dark">=</span></td>
-                    <td class="unit"><input title="Fortitude base save -- USE HIGHEST FROM CHOSEN CLASSES" value="{save_fort_base}" type="text"></td>
+                    <td class="unit"><input name="save[fort][base]" title="Fortitude base save -- USE HIGHEST FROM CHOSEN CLASSES" value="{save_fort_base}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Ability modifier (strength)" value="{ability_str_mod}" type="text"></td>
+                    <td class="unit"><input title="Ability modifier (strength)" value="{ability_str_mod}" type="text" readonly="readonly"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Magic modifier -- CLICK TO EDIT MODIFIERS" value="{save_fort_magicmod}" type="text"></td>
+                    <td class="unit"><input name="save[fort][magic]" title="Magic modifier" value="{save_fort_magicmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Misc. modifier -- CLICK TO EDIT MODIFIERS" value="{save_fort_miscmod}" type="text"></td>
+                    <td class="unit"><input name="save[fort][misc]" title="Misc. modifier" value="{save_fort_miscmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input class="temp" title="Temporary modifier -- CLICK TO EDIT MODIFIERS" value="{save_fort_tempmod}" type="text"></td>
+                    <td class="unit"><input name="save[fort][temp]" class="temp" title="Temporary modifier" value="{save_fort_tempmod}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span class="help" title="Reflex: Based on Dexterity">REFLEX</span></td>
                     <td>
-                    </td><td><input name="generated[Reflex]" title="Reflex" value="{save_ref}" type="text"></td>
+                    </td><td><input name="save[reflex][total]" title="Reflex" value="{save_ref}" type="text"></td>
                     <td class="char"><span class="dark">=</span></td>
-                    <td><input name="generated[ReflexBase]" title="ReflexBase" value="{save_ref_base}" type="text"></td>
+                    <td><input name="save[reflex][base]" title="ReflexBase" value="{save_ref_base}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[ReflexAbility]" title="ReflexAbility" value="{save_ref_abmod}" type="text"></td>
+                    <td><input name="save[reflex][ability]" title="ReflexAbility" value="{save_ref_abmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[ReflexMagic]" title="ReflexMagic" value="{save_ref_magicmod}" type="text"></td>
+                    <td><input name="save[reflex][magic]" title="ReflexMagic" value="{save_ref_magicmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[ReflexMisc]" title="ReflexMisc" value="{save_ref_miscmod}" type="text"></td>
+                    <td><input name="save[reflex][misc]" title="ReflexMisc" value="{save_ref_miscmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input class="temp" name="generated[ReflexTemp]" title="ReflexTemp" value="{save_ref_tempmod}" type="text"></td>
+                    <td><input class="temp" name="save[reflex][temp]" title="ReflexTemp" value="{save_ref_tempmod}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span class="big help" title="Will: Based on Wisdom">WILL</span></td>
                     <td>
-                    </td><td><input name="generated[Will]" title="Will" value="{save_will}" type="text"></td>
+                    </td><td><input name="save[will][total]" title="Will" value="{save_will}" type="text"></td>
                     <td class="char"><span class="dark">=</span></td>
-                    <td><input name="generated[WillBase]" title="WillBase" value="{save_will_base}" type="text"></td>
+                    <td><input name="save[will][base]" title="WillBase" value="{save_will_base}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[WillAbility]" title="WillAbility" value="{save_will_ref_abmod}" type="text"></td>
+                    <td><input name="save[will][ability]" title="WillAbility" value="{save_will_ref_abmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[WillMagic]" title="WillMagic" value="{save_will_magicmod}" type="text"></td>
+                    <td><input name="save[will][magic]" title="WillMagic" value="{save_will_magicmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input name="generated[WillMisc]" title="WillMisc" value="{save_will_miscmod}" type="text"></td>
+                    <td><input name="save[will][misc]" title="WillMisc" value="{save_will_miscmod}" type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td><input class="temp" name="generated[WillTemp]" title="WillTemp" value="{save_will_tempmod}" type="text"></td>
+                    <td><input class="temp" name="save[will][temp]" title="WillTemp" value="{save_will_tempmod}" type="text"></td>
                   </tr>
                 </tbody></table>
 
@@ -372,7 +372,7 @@ body {
               <td class="char">=</td>
               <td class="wide"><input title="Base attack bonus" value="{base_attack_bonus}" type="text"></td>
               <td class="char">+</td>
-              <td class="unit"><input name="Dexterity modifier" title="Dexterity modifier" value="{ability_dex_mod}" type="text"></td>
+              <td class="unit"><input title="Dexterity modifier" value="{ability_dex_mod}" type="text"></td>
               <td class="char">+</td>
               <td class="unit"><input title="Size modifier" value="{attack_size_modifier}" type="text"></td>
               <td class="char">+</td>
@@ -591,7 +591,7 @@ body {
               <td>Notes</td>
             </tr>
             <tr>
-              <td><textarea name="Notes" title="Notes" cols="10" rows="10"></textarea></td>
+              <td><textarea name="misc[notes]" title="Notes" cols="10" rows="10"></textarea></td>
             </tr>
           </tbody></table>
    

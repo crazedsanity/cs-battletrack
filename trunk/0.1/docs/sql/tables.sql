@@ -20,10 +20,11 @@ CREATE TABLE csbt_character_table (
 
 CREATE TABLE csbt_character_attribute_table (
 	character_attribute_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	attribute_type text NOT NULL,
 	attribute_subtype text NOT NULL,
-	attribute_name text,
-	attribute_value text
+	attribute_name text NOT NULL,
+	attribute_value text NOT NULL
 );
 
 /*
