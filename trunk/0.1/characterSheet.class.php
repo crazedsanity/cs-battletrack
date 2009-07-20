@@ -13,7 +13,7 @@ class characterSheet {
 	private $dataCache=array();
 	
 	//-------------------------------------------------------------------------
-	public function __construct($characterId) {
+	public function __construct($characterId=null) {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
@@ -72,6 +72,25 @@ class characterSheet {
 	
 	//-------------------------------------------------------------------------
 	public function get_character_data() {
+		if(is_numeric($this->characterId)) {
+			$data = $this->dbObj->run_query("SELECT * FROM csbt_character_attribute_table ".
+					"WHERE character_id=". $this->characterId, 'character_attribute_id');
+			
+			$this->dataCache = array();
+			if(is_array($data)) {
+				foreach($data as $id=>$attribs) {
+					$this->dataCache[$this->get_attribute_key($attribs)] = array(
+						'value'	=> $attribs['attribute_value'],
+						'id'	=> $id
+					);
+				}
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid internal characterId");
+		}
+		
+		return($this->dataCache);
 	}//end get_character_data()
 	//-------------------------------------------------------------------------
 	
@@ -107,6 +126,8 @@ class characterSheet {
 				throw new exception(__METHOD__ .": invalid data under (". $type ."):: ". $attribs);
 			}
 		}
+		
+		$this->get_character_data();
 		
 		$this->dbObj->commitTrans();
 		
@@ -157,6 +178,16 @@ class characterSheet {
 		
 		return($result);
 	}//end get_attrib()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function get_attribute_key(array $data) {
+		$key = $data['attribute_type'] .'-'. $data['attribute_subtype'] 
+				.'-'. $data['attribute_name'];
+		return($key);
+	}//end get_attribute_key()
 	//-------------------------------------------------------------------------
 	
 }
