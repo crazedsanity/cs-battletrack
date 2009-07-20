@@ -26,28 +26,28 @@ body {
 
           <table id="info" cellspacing="0">
             <tbody><tr>
-              <td colspan="2"><input name="main[name]" title="Your character's name" value="{character_name}" type="text"><br>Character Name</td>
-              <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" value="{user_display_name}"><br>Player</td>
-              <td><input name="generic[alignment]" title="Alignment" value="{alignment}" type="text"><br>Alignment</td>
-              <td><input name="xp[current]" title="Current XP" value="{xp_current}" type="text"><br>Current XP</td>
-              <td><input name="xp[next]" title="XP to next level" value="{xp_next}" type="text"><br>Next Level XP</td>
-              <td><input name="xp[change]" title="Add this XP..." value="{xp_change}" type="text"><br>XP Change</td>
+              <td colspan="2"><input name="main[name]" title="Your character's name" value="{main-name-NULL}" type="text"><br>Character Name</td>
+              <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" value="{generated-player-NULL}"><br>Player</td>
+              <td><input name="generic[alignment]" title="Alignment" value="{generic-alignment}" type="text"><br>Alignment</td>
+              <td><input name="xp[current]" title="Current XP" value="{xp-current-NULL}" type="text"><br>Current XP</td>
+              <td><input name="xp[next]" title="XP to next level" value="{xp-next-NULL}" type="text"><br>Next Level XP</td>
+              <td><input name="xp[change]" title="Add this XP..." value="{xp-change-NULL}" type="text"><br>XP Change</td>
             </tr>
             <tr>
-              <td colspan="2"><input name="generic[class]" title="CURRENT class" value="{class_display}" type="text"><br>Class</td>
-              <td colspan="2"><input name="generic[race]" title="Race" value="{character_race}" type="text"><br>Race</td>
-              <td colspan="2"><input name="generic[campaign]" title="Campaign" value="{campaign}" type="text"><br>Campaign</td>
-              <td colspan="2"><input name="generic[deity]" title="Deity" value="{character_deity}" type="text"><br>Deity</td>
+              <td colspan="2"><input name="generic[class]" title="CURRENT class" value="{generic-class-NULL}" type="text"><br>Class</td>
+              <td colspan="2"><input name="generic[race]" title="Race" value="{generic-race-NULL}" type="text"><br>Race</td>
+              <td colspan="2"><input name="generic[campaign]" title="Campaign" value="{generic-campaign-NULL}" type="text"><br>Campaign</td>
+              <td colspan="2"><input name="generic[deity]" title="Deity" value="{generic-deity-NULL}" type="text"><br>Deity</td>
             </tr>
             <tr>
-              <td class="unit"><input name="class_total[level]" title="Level" value="{class_total-level}" type="text"><br>Level</td>
-              <td class="unit"><input name="generic[size]" title="Size" value="{character_size}" type="text"><br>Size</td>
-              <td class="unit"><input name="generic[age]" title="Age" value="{character_age}" type="text"><br>Age</td>
-              <td class="unit"><input name="generic[gender]" title="Gender" value="{character_gender}" type="text"><br>Gender</td>
-              <td class="unit"><input name="generic[height]" title="Height" value="{character_height}" type="text"><br>Height</td>
-              <td class="unit"><input name="generic[weight]" title="Weight" value="{character_weight}" type="text"><br>Weight</td>
-              <td class="unit"><input name="generic[eyes]" title="Eye color" value="{character_eyecolor}" type="text"><br>Eyes</td>
-              <td class="unit"><input name="generic[hair]" title="Hair color" value="{character_haircolor}" type="text"><br>Hair</td>
+              <td class="unit"><input name="class_total[level]" title="Level" value="{class_total-level-NULL}" type="text"><br>Level</td>
+              <td class="unit"><input name="generic[size]" title="Size" value="{generic-size-NULL}" type="text"><br>Size</td>
+              <td class="unit"><input name="generic[age]" title="Age" value="{generic-age-NULL}" type="text"><br>Age</td>
+              <td class="unit"><input name="generic[gender]" title="Gender" value="{generic-gender-NULL}" type="text"><br>Gender</td>
+              <td class="unit"><input name="generic[height]" title="Height" value="{generic-height-NULL}" type="text"><br>Height</td>
+              <td class="unit"><input name="generic[weight]" title="Weight" value="{generic-weight-NULL}" type="text"><br>Weight</td>
+              <td class="unit"><input name="generic[eyes]" title="Eye color" value="{generic-eyecolor-NULL}" type="text"><br>Eyes</td>
+              <td class="unit"><input name="generic[hair]" title="Hair color" value="{generic-haircolor-NULL}" type="text"><br>Hair</td>
             </tr>
           </tbody></table>
 
@@ -65,45 +65,45 @@ body {
                   </tr>
                   <tr>
                     <td class="tag"><span title="Strength" class="help">STR</span></td>
-                    <td><input name="abilities[str][base]" title="Strength" value="{ability_str}" class="mod" type="text"></td>
-                    <td><input name="abilities[str][mod]" title="Strength bonus" value="{ability_str_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[str][temp]" title="TEMPORARY strength (total)" value="{ability_str_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[str][temp_mod]" title="TEMPORARY strength bonus" value="{ability_str_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[str][base]" title="Strength" value="{abilities-str-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[str][mod]" title="Strength bonus" value="{abilities-str-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[str][temp]" title="TEMPORARY strength (total)" value="{abilities-str-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[str][temp_mod]" title="TEMPORARY strength bonus" value="{abilities-str-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Dexterity" class="help">DEX</span></td>
-                    <td><input name="abilities[dex][base]" title="Dexterity" value="{ability_dex}" class="mod" type="text"></td>
-                    <td><input name="abilities[dex][mod]" title="Dexterity bonus" value="{ability_dex_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[dex][temp]" title="TEMPORARY dexterity (total)" value="{ability_dex_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[dex][temp_mod]" title="TEMPORARY dexterity bonus" value="{ability_dex_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[dex][base]" title="Dexterity" value="{abilities-dex-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[dex][mod]" title="Dexterity bonus" value="{abilities-dex-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[dex][temp]" title="TEMPORARY dexterity (total)" value="{abilities-dex-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[dex][temp_mod]" title="TEMPORARY dexterity bonus" value="{abilities-dex-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Constitution" class="help">CON</span></td>
-                    <td><input name="abilities[con][base]" title="Constution" value="{ability_con}" class="mod" type="text"></td>
-                    <td><input name="abilities[con][mod]" title="Constitution bonus" value="{ability_con_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[con][temp]" title="TEMPORARY constitution (total)" value="{ability_con_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[con][temp_mod]" title="TEMPORARY constitution bonus" value="{ability_con_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[con][base]" title="Constution" value="{abilities-con-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[con][mod]" title="Constitution bonus" value="{abilities-con-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[con][temp]" title="TEMPORARY constitution (total)" value="{abilities-con-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[con][temp_mod]" title="TEMPORARY constitution bonus" value="{abilities-con-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Intelligence" class="help">INT</span></td>
-                    <td><input name="abilities[int][base]" title="Intelligence" value="{ability_int}" class="mod" type="text"></td>
-                    <td><input name="abilities[int][mod]" title="Intelligence bonus" value="{ability_int_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[int][temp]" title="TEMPORARY intelligence (total)" value="{ability_int_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[int][temp_mod]" title="TEMPORARY intelligence bonus" value="{ability_int_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[int][base]" title="Intelligence" value="{abilities-int-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[int][mod]" title="Intelligence bonus" value="{abilities-int-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[int][temp]" title="TEMPORARY intelligence (total)" value="{abilities-int-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[int][temp_mod]" title="TEMPORARY intelligence bonus" value="{abilities-int-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Wisdom" class="help">WIS</span></td>
-                    <td><input name="abilities[wis][base]" title="Wisdom" value="{ability_wis}" class="mod" type="text"></td>
-                    <td><input name="abilities[wis][mod]" title="Wisdom bonus" value="{ability_wis_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[wis][temp]" title="TEMPORARY wisdom (total)" value="{ability_wis_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[wis][temp_mod]" title="TEMPORARY wisdom bonus" value="{ability_wis_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[wis][base]" title="Wisdom" value="{abilities-wis-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[wis][mod]" title="Wisdom bonus" value="{abilities-wis-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[wis][temp]" title="TEMPORARY wisdom (total)" value="{abilities-wis-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[wis][temp_mod]" title="TEMPORARY wisdom bonus" value="{abilities-wis-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Charisma" class="help">CHA</span></td>
-                    <td><input name="abilities[cha][base]" title="Charisma" value="{ability_cha}" class="mod" type="text"></td>
-                    <td><input name="abilities[cha][mod]" title="Charisma bonus" value="{ability_cha_mod}" class="mod" type="text"></td>
-                    <td><input name="abilities[cha][temp]" title="TEMPORARY charisma (total)" value="{ability_cha_temp}" class="tempmod" type="text"></td>
-                    <td><input name="abilities[cha][temp_mod]" title="TEMPORARY charisma bonus" value="{ability_cha_tempmod}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[cha][base]" title="Charisma" value="{abilities-cha-base}" class="mod" type="text"></td>
+                    <td><input name="abilities[cha][mod]" title="Charisma bonus" value="{abilities-cha-mod}" class="mod" type="text"></td>
+                    <td><input name="abilities[cha][temp]" title="TEMPORARY charisma (total)" value="{abilities-cha-temp}" class="tempmod" type="text"></td>
+                    <td><input name="abilities[cha][temp_mod]" title="TEMPORARY charisma bonus" value="{abilities-cha-temp_mod}" class="tempmod" type="text"></td>
                   </tr>
                 </tbody></table>
                 
@@ -550,7 +550,7 @@ body {
                         It's easier to do this rather than specify the tab order of
                         each of the thousand or so inputs.
                       -->
-                      <input name="featsAbilities[]" title="This is a feat (or a special ability)" value="" type="text">
+                      <input name="featsAbilities[list][]" title="This is a feat (or a special ability)" value="" type="text">
 
                     </td>
 
