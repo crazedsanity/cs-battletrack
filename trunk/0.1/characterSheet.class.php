@@ -34,6 +34,10 @@ class characterSheet {
 		
 		$this->characterId = $characterId;
 		
+		if(is_numeric($this->characterId)) {
+			$this->get_character_data();
+		}
+		
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -43,6 +47,7 @@ class characterSheet {
 	public function set_character_id($id) {
 		if(is_numeric($id)) {
 			$this->characterId = $id;
+			$this->get_character_data();
 		}
 		else {
 			throw new exception(__METHOD__ .": invalid characterId (". $id .")");
@@ -65,6 +70,8 @@ class characterSheet {
 		else {
 			throw new exception(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
 		}
+		
+		return($this->characterId);
 	}//end create_character()
 	//-------------------------------------------------------------------------
 	
@@ -104,19 +111,43 @@ class characterSheet {
 		foreach($attribs as $type=>$subData) {
 			if(is_array($subData)) {
 				foreach($subData as $subtype=>$finalBit) {
-					#$this->gfObj->debug_print(__METHOD__ .": type=(". $type ."), subtype=(". $subtype ."), finalBit::: "
-					#		. $this->gfObj->debug_print($finalBit,0),1);
 					if(is_array($finalBit)) {
 						foreach($finalBit as $name=>$value) {
 							$updateAttrib = $this->get_attrib($type, $subtype, $name, $value);
-							$this->insert_attrib($type, $subtype, $name, $value);
+							if(is_numeric($updateAttrib)) {
+								$this->update_attrib(
+									$updateAttrib, 
+									array(
+										'attribute_type'	=> $type,
+										'attribute_subtype'	=> $subtype,
+										'attribute_name'	=> $name,
+										'attribute_value'	=> $value
+									)
+								);
+							}
+							else {
+								$this->insert_attrib($type, $subtype, $name, $value);
+							}
 							$finalCount++;
 						}
 					}
 					else {
 						$name = null;
 						$updateAttrib = $this->get_attrib($type, $subtype, $name, $finalBit);
-						$this->insert_attrib($type, $subtype, $name, $finalBit);
+						if(is_numeric($updateAttrib)) {
+							$this->update_attrib(
+								$updateAttrib, 
+								array(
+									'attribute_type'	=> $type,
+									'attribute_subtype'	=> $subtype,
+									'attribute_name'	=> $name,
+									'attribute_value'	=> $finalBit
+								)
+							);
+						}
+						else {
+							$this->insert_attrib($type, $subtype, $name, $finalBit);
+						}
 						$finalCount++;
 					}
 				}
@@ -139,6 +170,9 @@ class characterSheet {
 	
 	//-------------------------------------------------------------------------
 	private function insert_attrib($type, $subtype, $name, $value) {
+		if(is_null($name) || !strlen($name)) {
+			$name = "";
+		}
 		$sql = "INSERT INTO csbt_character_attribute_table ".
 			$this->gfObj->string_from_array(array(
 				'character_id'		=> $this->characterId,
@@ -147,10 +181,14 @@ class characterSheet {
 				'attribute_name'	=> $name,
 				'attribute_value'	=> $value
 			), 'insert');
-			
-		$retval = $this->dbObj->run_insert($sql, 'csbt_character_attribute_table_character_attribute_id_seq');
-		if(!is_numeric($retval) || $retval < 1) {
-			throw new exception(__METHOD__ .": failed to create attribute for data::: ". $this->gfObj->debug_print(func_get_args(),0));
+		try {
+			$retval = $this->dbObj->run_insert($sql, 'csbt_character_attribute_table_character_attribute_id_seq');
+			if(!is_numeric($retval) || $retval < 1) {
+				throw new exception(__METHOD__ .": failed to create attribute for data::: ". $this->gfObj->debug_print(func_get_args(),0));
+			}
+		}
+		catch(exception $e) {
+			throw new exception(__METHOD__ .": error encountered::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end insert_attrib()
@@ -160,20 +198,31 @@ class characterSheet {
 	
 	//-------------------------------------------------------------------------
 	private function get_attrib($type, $subtype, $name, $value) {
+		//check the internal cache before going to the database (saves time)
 		$dataArr = array(
 			'character_id'		=> $this->characterId,
 			'attribute_type'	=> $type,
 			'attribute_subtype'	=> $subtype,
 			'attribute_name'	=> $name
 		);
-		$sql = "SELECT * FROM csbt_character_attribute_table WHERE ".
-			$this->gfObj->string_from_array($dataArr, 'select');
-		
-		try {
-			$result = $this->dbObj->run_query($sql, 'character_attribute_id');
+		$cacheKey = $this->get_attribute_key($dataArr);
+		if(isset($this->dataCache[$cacheKey])) {
+			$dataArr = array(
+				'attribute_value'	=> $value
+			);
+			$result = $this->dataCache[$cacheKey]['id'];
 		}
-		catch(exception $e) {
-			throw new exception(__METHOD__ .": failed to retrieve attribute::: ". $e->getMessage());
+		else {
+			$this->gfObj->debug_print(__METHOD__ .": no data at location (". $cacheKey ."): ". $this->gfObj->debug_print($this->dataCache[$cacheKey],0),1);
+			$sql = "SELECT * FROM csbt_character_attribute_table WHERE ".
+				$this->gfObj->string_from_array($dataArr, 'select');
+			
+			try {
+				$result = $this->dbObj->run_query($sql, 'character_attribute_id');
+			}
+			catch(exception $e) {
+				throw new exception(__METHOD__ .": failed to retrieve attribute::: ". $e->getMessage());
+			}
 		}
 		
 		return($result);
@@ -184,10 +233,69 @@ class characterSheet {
 	
 	//-------------------------------------------------------------------------
 	private function get_attribute_key(array $data) {
-		$key = $data['attribute_type'] .'-'. $data['attribute_subtype'] 
-				.'-'. $data['attribute_name'];
+		$key = $data['attribute_type'] .'-'. $data['attribute_subtype'];
+		if(strlen($data['attribute_name'])) {
+			$key .= '-'. $data['attribute_name'];
+		}
 		return($key);
 	}//end get_attribute_key()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function update_attrib($id, array $updates) {
+		if(is_array($updates) && count($updates) && is_numeric($id) && is_numeric($this->characterId)) {
+			$this->gfObj->switch_force_sql_quotes(true);
+			$sql = "UPDATE csbt_character_attribute_table SET " .
+					$this->gfObj->string_from_array($updates, 'update', null, 'sql', true) .
+					" WHERE character_id=". $this->characterId ." AND " .
+					"character_attribute_id=". $id;
+			$this->gfObj->switch_force_sql_quotes(false);
+			$this->dbObj->run_update($sql);
+		}
+		else {
+			throw new exception(__METHOD__ .": no updates");
+		}
+	}//end update_attrib()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_main_character_data() {
+		if(is_numeric($this->characterId)) {
+			$data = $this->dbObj->run_query("SELECT * FROM csbt_character_table " .
+					"WHERE character_id=". $this->characterId);
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid characterId");
+		}
+		return($data);
+	}//end get_main_character_data()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function update_main_character_data(array $data) {
+		if(is_numeric($this->characterId)) {
+			if(is_array($data) && count($data)) {
+				$sql = "UPDATE csbt_character_table SET " .
+						$this->gfObj->string_from_array($data, 'update', null, 'sql') .
+						" WHERE character_id=". $this->characterId;
+				$updateRes = $this->dbObj->run_update($sql);
+			}
+			else {
+				throw new exception(__METHOD__ .": invalid data");
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid characterId");
+		}
+		
+		return($updateRes);
+	}//end update_main_character_data()
 	//-------------------------------------------------------------------------
 	
 }

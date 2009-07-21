@@ -26,28 +26,28 @@ body {
 
           <table id="info" cellspacing="0">
             <tbody><tr>
-              <td colspan="2"><input name="main[name]" title="Your character's name" value="{main-name-NULL}" type="text"><br>Character Name</td>
-              <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" value="{generated-player-NULL}"><br>Player</td>
+              <td colspan="2"><input name="main[character_name]" title="Your character's name" value="{main_character_name}" type="text"><br>Character Name</td>
+              <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" value="{generated-player}"><br>Player</td>
               <td><input name="generic[alignment]" title="Alignment" value="{generic-alignment}" type="text"><br>Alignment</td>
-              <td><input name="xp[current]" title="Current XP" value="{xp-current-NULL}" type="text"><br>Current XP</td>
-              <td><input name="xp[next]" title="XP to next level" value="{xp-next-NULL}" type="text"><br>Next Level XP</td>
-              <td><input name="xp[change]" title="Add this XP..." value="{xp-change-NULL}" type="text"><br>XP Change</td>
+              <td><input name="xp[current]" title="Current XP" value="{xp-current}" type="text"><br>Current XP</td>
+              <td><input name="xp[next]" title="XP to next level" value="{xp-next}" type="text"><br>Next Level XP</td>
+              <td><input name="xp[change]" title="Add this XP..." value="{xp-change}" type="text"><br>XP Change</td>
             </tr>
             <tr>
-              <td colspan="2"><input name="generic[class]" title="CURRENT class" value="{generic-class-NULL}" type="text"><br>Class</td>
-              <td colspan="2"><input name="generic[race]" title="Race" value="{generic-race-NULL}" type="text"><br>Race</td>
-              <td colspan="2"><input name="generic[campaign]" title="Campaign" value="{generic-campaign-NULL}" type="text"><br>Campaign</td>
-              <td colspan="2"><input name="generic[deity]" title="Deity" value="{generic-deity-NULL}" type="text"><br>Deity</td>
+              <td colspan="2"><input name="generic[class]" title="CURRENT class" value="{generic-class}" type="text"><br>Class</td>
+              <td colspan="2"><input name="generic[race]" title="Race" value="{generic-race}" type="text"><br>Race</td>
+              <td colspan="2"><input name="generic[campaign]" title="Campaign" value="{generic-campaign}" type="text"><br>Campaign</td>
+              <td colspan="2"><input name="generic[deity]" title="Deity" value="{generic-deity}" type="text"><br>Deity</td>
             </tr>
             <tr>
-              <td class="unit"><input name="class_total[level]" title="Level" value="{class_total-level-NULL}" type="text"><br>Level</td>
-              <td class="unit"><input name="generic[size]" title="Size" value="{generic-size-NULL}" type="text"><br>Size</td>
-              <td class="unit"><input name="generic[age]" title="Age" value="{generic-age-NULL}" type="text"><br>Age</td>
-              <td class="unit"><input name="generic[gender]" title="Gender" value="{generic-gender-NULL}" type="text"><br>Gender</td>
-              <td class="unit"><input name="generic[height]" title="Height" value="{generic-height-NULL}" type="text"><br>Height</td>
-              <td class="unit"><input name="generic[weight]" title="Weight" value="{generic-weight-NULL}" type="text"><br>Weight</td>
-              <td class="unit"><input name="generic[eyes]" title="Eye color" value="{generic-eyecolor-NULL}" type="text"><br>Eyes</td>
-              <td class="unit"><input name="generic[hair]" title="Hair color" value="{generic-haircolor-NULL}" type="text"><br>Hair</td>
+              <td class="unit"><input name="class_total[level]" title="Level" value="{class_total-level}" type="text"><br>Level</td>
+              <td class="unit"><input name="generic[size]" title="Size" value="{generic-size}" type="text"><br>Size</td>
+              <td class="unit"><input name="generic[age]" title="Age" value="{generic-age}" type="text"><br>Age</td>
+              <td class="unit"><input name="generic[gender]" title="Gender" value="{generic-gender}" type="text"><br>Gender</td>
+              <td class="unit"><input name="generic[height]" title="Height" value="{generic-height}" type="text"><br>Height</td>
+              <td class="unit"><input name="generic[weight]" title="Weight" value="{generic-weight}" type="text"><br>Weight</td>
+              <td class="unit"><input name="generic[eyes]" title="Eye color" value="{generic-eyecolor}" type="text"><br>Eyes</td>
+              <td class="unit"><input name="generic[hair]" title="Hair color" value="{generic-haircolor}" type="text"><br>Hair</td>
             </tr>
           </tbody></table>
 
@@ -110,7 +110,7 @@ body {
                 <table id="init"> <!-- This is Action Points -->
                 	<tbody><tr>
                     	<td class="tag">Action Points</td>
-                        <td class="unit"><input name="generic[action_points]" title="Action points" value="{generic-action_points-NULL}" type="text"></td>
+                        <td class="unit"><input name="generic[action_points]" title="Action points" value="{generic-action_points}" type="text"></td>
                     </tr>
                 </tbody></table>
                 
@@ -132,15 +132,15 @@ body {
                   </tr>
                   <tr>
                     <td class="tag"><span title="Hit Points" class="help">HP</span></td>
-                    <td><input name="generic[hp]" title="Hit points" value="{generic-hp-NULL}" type="text"></td>
+                    <td><input name="generic[hp]" title="Hit points" value="{generic-hp}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="status[current_hp]" title="Current hit points" value="{status-current_hp-NULL}" type="text"></td>
+                    </td><td colspan="3"><input name="status[current_hp]" title="Current hit points" value="{status-current_hp}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="status[nonlethal_damage]" title="Nonlethal damage" value="{status-nonlethal_damage-NULL}" type="text"></td>
+                    </td><td colspan="3"><input name="status[nonlethal_damage]" title="Nonlethal damage" value="{status-nonlethal_damage}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="current_class[hit_dice]" title="Hit dice for your CURRENT class" value="{current_class-hit_dice-NULL}" type="text"></td>
+                    </td><td colspan="3"><input name="current_class[hit_dice]" title="Hit dice for your CURRENT class" value="{current_class-hit_dice}" type="text"></td>
                     <td>
-                    </td><td colspan="3"><input name="special[damage_reduction]" title="DamageRed" value="{special-damage_reduction-NULL}" type="text"></td>
+                    </td><td colspan="3"><input name="special[damage_reduction]" title="DamageRed" value="{special-damage_reduction}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Armor Class" class="help">AC</span></td>
