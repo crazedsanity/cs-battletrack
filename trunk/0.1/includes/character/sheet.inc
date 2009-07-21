@@ -4,15 +4,6 @@
  */
 
 
-require_once(constant('LIBDIR') .'/cs-battletrack/characterSheet.class.php');
-
-$charId = null;
-if(isset($_SESSION['dnd']['characterId']) && is_numeric($_SESSION['dnd']['characterId'])) {
-	$charId = $_SESSION['dnd']['characterId'];
-}
-$char = new characterSheet($charId);
-
-$page->gfObj->debugPrintOpt=1;
 if($_POST) {
 	
 	if(!is_numeric($charId)) {
