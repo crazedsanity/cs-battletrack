@@ -17,6 +17,7 @@ class characterSheet {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
+			$this->gfObj->debugPrintOpt=1;
 		}
 		else {
 			throw new exception(__METHOD__ .": missing required class 'cs_globalFunctions'");
@@ -105,6 +106,7 @@ class characterSheet {
 	
 	//-------------------------------------------------------------------------
 	public function update_character_data(array $attribs) {
+		$this->get_character_data();
 		$totalCount = count($attribs);
 		$finalCount = 0;
 		$this->dbObj->beginTrans();
@@ -113,41 +115,13 @@ class characterSheet {
 				foreach($subData as $subtype=>$finalBit) {
 					if(is_array($finalBit)) {
 						foreach($finalBit as $name=>$value) {
-							$updateAttrib = $this->get_attrib($type, $subtype, $name, $value);
-							if(is_numeric($updateAttrib)) {
-								$this->update_attrib(
-									$updateAttrib, 
-									array(
-										'attribute_type'	=> $type,
-										'attribute_subtype'	=> $subtype,
-										'attribute_name'	=> $name,
-										'attribute_value'	=> $value
-									)
-								);
-							}
-							else {
-								$this->insert_attrib($type, $subtype, $name, $value);
-							}
+							$this->handle_attrib($type, $subtype, $name, $value);
 							$finalCount++;
 						}
 					}
 					else {
 						$name = null;
-						$updateAttrib = $this->get_attrib($type, $subtype, $name, $finalBit);
-						if(is_numeric($updateAttrib)) {
-							$this->update_attrib(
-								$updateAttrib, 
-								array(
-									'attribute_type'	=> $type,
-									'attribute_subtype'	=> $subtype,
-									'attribute_name'	=> $name,
-									'attribute_value'	=> $finalBit
-								)
-							);
-						}
-						else {
-							$this->insert_attrib($type, $subtype, $name, $finalBit);
-						}
+						$this->handle_attrib($type, $subtype, $name, $finalBit);
 						$finalCount++;
 					}
 				}
@@ -206,19 +180,25 @@ class characterSheet {
 			'attribute_name'	=> $name
 		);
 		$cacheKey = $this->get_attribute_key($dataArr);
+		$result = null;
 		if(isset($this->dataCache[$cacheKey])) {
 			$dataArr = array(
 				'attribute_value'	=> $value
 			);
-			$result = $this->dataCache[$cacheKey]['id'];
+			$result = $this->dataCache[$cacheKey];
 		}
 		else {
-			$this->gfObj->debug_print(__METHOD__ .": no data at location (". $cacheKey ."): ". $this->gfObj->debug_print($this->dataCache[$cacheKey],0),1);
+			unset($dataArr['attribute_value']);
 			$sql = "SELECT * FROM csbt_character_attribute_table WHERE ".
 				$this->gfObj->string_from_array($dataArr, 'select');
 			
 			try {
 				$result = $this->dbObj->run_query($sql, 'character_attribute_id');
+				$numrows = $this->dbObj->numRows();
+				if($numrows > 1) {
+					throw new exception(__METHOD__ .": multiple rows (". $numrows .") detected::: " .
+							$this->gfObj->debug_print(func_get_args(),0) ."<br>SQL::: ". $sql);
+				}
 			}
 			catch(exception $e) {
 				throw new exception(__METHOD__ .": failed to retrieve attribute::: ". $e->getMessage());
@@ -296,6 +276,57 @@ class characterSheet {
 		
 		return($updateRes);
 	}//end update_main_character_data()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function delete_attrib($id) {
+		if(is_numeric($this->characterId)) {
+			if(is_numeric($id) && $id > 0) {
+				$result = $this->dbObj->run_update("DELETE FROM csbt_character_attribute_table WHERE " .
+						"character_id=". $this->characterId ." AND character_attribute_id=". $id);
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": characterId not set");
+		}
+		
+		return($result);
+	}//end delete_attrib();
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function handle_attrib($type, $subtype, $name, $value) {
+		$attribData = $this->get_attrib($type, $subtype, $name, $value);
+		$result = false;
+		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
+			if(is_null($value) || !strlen($value)) {
+				$this->gfObj->debug_print(__METHOD__ .": deleting value (". $attribData['id'] .")". $this->gfObj->debug_print($attribData,0));
+				$this->delete_attrib($attribData['id']);
+			}
+			else {
+				$this->gfObj->debug_print(__METHOD__ .": updating...". $this->gfObj->debug_print($attribData,0));
+				$this->update_attrib(
+					$attribData['id'], 
+					array(
+						'attribute_type'	=> $type,
+						'attribute_subtype'	=> $subtype,
+						'attribute_name'	=> $name,
+						'attribute_value'	=> $value
+					)
+				);
+			}
+		}
+		elseif(!is_null($value) && strlen($value) && !is_array($attribData)) {
+				$this->gfObj->debug_print(__METHOD__ .": inserting... ". $this->gfObj->debug_print($attribData,0));
+			$this->insert_attrib($type, $subtype, $name, $value);
+		}
+		
+		return($result);
+	}//end handle_attrib()
 	//-------------------------------------------------------------------------
 	
 }
