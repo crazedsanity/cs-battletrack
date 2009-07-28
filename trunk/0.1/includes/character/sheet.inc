@@ -5,7 +5,7 @@
 
 if($_GET['id']) {
 	$_SESSION['dnd']['characterId'] = $_GET['id'];
-	$page->gfObj->conditional_header($_SERVER['PHP_SELF']);
+	$charId = $_GET['id'];
 }
 if($_POST) {
 	

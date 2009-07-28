@@ -4,13 +4,21 @@
  *
  */
 
-class characterSheet {
+//TODO: consider optionally adding the logging system.
+require_once(constant('LIBDIR') .'/cs-versionparse/cs_version.abstract.class.php');
+require_once(constant('LIBDIR') .'/cs-webdblogger/cs_webdblogger.class.php');
+
+class characterSheet extends cs_versionAbstract {
 	
 	private $characterId;
 	
 	private $dbObj;
 	
 	private $dataCache=array();
+	
+	private $id2key=array();
+	
+	private $logger;
 	
 	//-------------------------------------------------------------------------
 	public function __construct($characterId=null) {
@@ -22,6 +30,8 @@ class characterSheet {
 		else {
 			throw new exception(__METHOD__ .": missing required class 'cs_globalFunctions'");
 		}
+		
+		$this->set_version_file_location(dirname(__FILE__) .'/VERSION');
 		
 		$dbParams = array(
 			'host'			=> constant('DB_PG_HOST'),
@@ -35,6 +45,8 @@ class characterSheet {
 		
 		$this->characterId = $characterId;
 		
+		$this->logger = new cs_webdblogger($this->dbObj, $this->get_project() .'::'. __CLASS__);
+		
 		if(is_numeric($this->characterId)) {
 			$this->get_character_data();
 		}
@@ -47,6 +59,9 @@ class characterSheet {
 	//-------------------------------------------------------------------------
 	public function set_character_id($id) {
 		if(is_numeric($id)) {
+			if(is_numeric($this->characterId) && $id != $this->characterId) {
+				$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
+			}
 			$this->characterId = $id;
 			$this->get_character_data();
 		}
@@ -66,7 +81,10 @@ class characterSheet {
 					'character_name'	=> $characterName,
 					'uid'				=> $uid
 				), 'insert');
-			$this->set_character_id($this->dbObj->run_insert($sql, 'csbt_character_table_character_id_seq'));
+			$newId = $this->dbObj->run_insert($sql, 'csbt_character_table_character_id_seq');
+			
+			$this->logger->log_by_class("New character (id=". $newId ."),: '". $characterName ."'", 'created character');
+			$this->set_character_id($newId);
 		}
 		else {
 			throw new exception(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
@@ -85,14 +103,18 @@ class characterSheet {
 					"WHERE character_id=". $this->characterId, 'character_attribute_id');
 			
 			$this->dataCache = array();
+			$this->id2key = array();
 			if(is_array($data)) {
 				foreach($data as $id=>$attribs) {
-					$this->dataCache[$this->get_attribute_key($attribs)] = array(
+					$key = $this->get_attribute_key($attribs);
+					$this->dataCache[$key] = array(
 						'value'	=> $attribs['attribute_value'],
 						'id'	=> $id
 					);
+					$this->id2key[$id] = $key;
 				}
 			}
+			$this->logger->log_by_class("Retrieved ". count($this->dataCache) ." attributes for id=(". $this->characterId .")", 'debug');
 		}
 		else {
 			throw new exception(__METHOD__ .": invalid internal characterId");
@@ -109,19 +131,20 @@ class characterSheet {
 		$this->get_character_data();
 		$totalCount = count($attribs);
 		$finalCount = 0;
+		$changeList = array();
 		$this->dbObj->beginTrans();
 		foreach($attribs as $type=>$subData) {
 			if(is_array($subData)) {
 				foreach($subData as $subtype=>$finalBit) {
 					if(is_array($finalBit)) {
 						foreach($finalBit as $name=>$value) {
-							$this->handle_attrib($type, $subtype, $name, $value);
+							$changeList[$this->handle_attrib($type, $subtype, $name, $value)]++;
 							$finalCount++;
 						}
 					}
 					else {
 						$name = null;
-						$this->handle_attrib($type, $subtype, $name, $finalBit);
+						$changeList[$this->handle_attrib($type, $subtype, $name, $finalBit)]++;
 						$finalCount++;
 					}
 				}
@@ -131,6 +154,11 @@ class characterSheet {
 				throw new exception(__METHOD__ .": invalid data under (". $type ."):: ". $attribs);
 			}
 		}
+		if(isset($changeList[null])) {
+			unset($changeList[null]);
+		}
+		$logThis = $this->gfObj->string_from_array($changeList, 'update');
+		$this->logger->log_by_class("Character update result: ". $logThis, 'update');
 		
 		$this->get_character_data();
 		
@@ -147,16 +175,19 @@ class characterSheet {
 		if(is_null($name) || !strlen($name)) {
 			$name = "";
 		}
-		$sql = "INSERT INTO csbt_character_attribute_table ".
-			$this->gfObj->string_from_array(array(
+		$insertData = array(
 				'character_id'		=> $this->characterId,
 				'attribute_type'	=> $type,
 				'attribute_subtype'	=> $subtype,
 				'attribute_name'	=> $name,
 				'attribute_value'	=> $value
-			), 'insert');
+			);
+		$sql = "INSERT INTO csbt_character_attribute_table ".
+			$this->gfObj->string_from_array($insertData, 'insert');
 		try {
 			$retval = $this->dbObj->run_insert($sql, 'csbt_character_attribute_table_character_attribute_id_seq');
+			$key = $this->get_attribute_key($insertData);
+			$this->logger->log_by_class("Created attribute (". $key .") with value '". $value ."'", 'create attribute');
 			if(!is_numeric($retval) || $retval < 1) {
 				throw new exception(__METHOD__ .": failed to create attribute for data::: ". $this->gfObj->debug_print(func_get_args(),0));
 			}
@@ -233,6 +264,9 @@ class characterSheet {
 					"character_attribute_id=". $id;
 			$this->gfObj->switch_force_sql_quotes(false);
 			$this->dbObj->run_update($sql);
+			
+			$key = $this->get_attribute_key($updates);
+			$this->logger->log_by_class("Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'", 'update attribute');
 		}
 		else {
 			throw new exception(__METHOD__ .": no updates");
@@ -286,6 +320,10 @@ class characterSheet {
 			if(is_numeric($id) && $id > 0) {
 				$result = $this->dbObj->run_update("DELETE FROM csbt_character_attribute_table WHERE " .
 						"character_id=". $this->characterId ." AND character_attribute_id=". $id);
+				
+				$key = $this->id2key[$id];
+				$value = $this->dataCache[$key]['value'];
+				$this->logger->log_by_class("Deleted attribute (". $key ."), old value='". $value ."'", 'delete attribute');
 			}
 		}
 		else {
@@ -301,14 +339,13 @@ class characterSheet {
 	//-------------------------------------------------------------------------
 	private function handle_attrib($type, $subtype, $name, $value) {
 		$attribData = $this->get_attrib($type, $subtype, $name, $value);
-		$result = false;
+		$result = null;
 		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
 			if(is_null($value) || !strlen($value)) {
-				$this->gfObj->debug_print(__METHOD__ .": deleting value (". $attribData['id'] .")". $this->gfObj->debug_print($attribData,0));
 				$this->delete_attrib($attribData['id']);
+				$result = 'delete';
 			}
 			else {
-				$this->gfObj->debug_print(__METHOD__ .": updating...". $this->gfObj->debug_print($attribData,0));
 				$this->update_attrib(
 					$attribData['id'], 
 					array(
@@ -318,11 +355,12 @@ class characterSheet {
 						'attribute_value'	=> $value
 					)
 				);
+				$result = 'update';
 			}
 		}
 		elseif(!is_null($value) && strlen($value) && !is_array($attribData)) {
-				$this->gfObj->debug_print(__METHOD__ .": inserting... ". $this->gfObj->debug_print($attribData,0));
 			$this->insert_attrib($type, $subtype, $name, $value);
+			$result = 'insert';
 		}
 		
 		return($result);
