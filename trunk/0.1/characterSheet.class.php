@@ -10,15 +10,15 @@ require_once(constant('LIBDIR') .'/cs-webdblogger/cs_webdblogger.class.php');
 
 class characterSheet extends cs_versionAbstract {
 	
-	private $characterId;
+	protected $characterId;
 	
-	private $dbObj;
+	protected $dbObj;
 	
-	private $dataCache=array();
+	protected $dataCache=array();
 	
-	private $id2key=array();
+	protected $id2key=array();
 	
-	private $logger;
+	protected $logger;
 	
 	//-------------------------------------------------------------------------
 	public function __construct($characterId=null) {
@@ -43,11 +43,10 @@ class characterSheet extends cs_versionAbstract {
 		$this->dbObj = new cs_phpDB('pgsql');
 		$this->dbObj->connect($dbParams);
 		
-		$this->characterId = $characterId;
-		
 		$this->logger = new cs_webdblogger($this->dbObj, $this->get_project() .'::'. __CLASS__);
 		
-		if(is_numeric($this->characterId)) {
+		if(is_numeric($characterId)) {
+			$this->set_character_id($characterId);
 			$this->get_character_data();
 		}
 		
@@ -66,7 +65,7 @@ class characterSheet extends cs_versionAbstract {
 			$this->get_character_data();
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid characterId (". $id .")");
+			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
 		}
 	}//end set_character_id()
 	//-------------------------------------------------------------------------
@@ -87,7 +86,7 @@ class characterSheet extends cs_versionAbstract {
 			$this->set_character_id($newId);
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
+			$this->exception_handler(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
 		}
 		
 		return($this->characterId);
@@ -117,7 +116,7 @@ class characterSheet extends cs_versionAbstract {
 			$this->logger->log_by_class("Retrieved ". count($this->dataCache) ." attributes for id=(". $this->characterId .")", 'debug');
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid internal characterId");
+			$this->exception_handler(__METHOD__ .": invalid internal characterId (". $this->characterId .")");
 		}
 		
 		return($this->dataCache);
@@ -151,7 +150,7 @@ class characterSheet extends cs_versionAbstract {
 			}
 			else {
 				#$this->gfObj->debug_print(__METHOD__ .": XXXXXXXXXXXtype=(". $type ."), subtype=(". $subData .")",1);
-				throw new exception(__METHOD__ .": invalid data under (". $type ."):: ". $attribs);
+				$this->exception_handler(__METHOD__ .": invalid data under (". $type ."):: ". $attribs);
 			}
 		}
 		if(isset($changeList[null])) {
@@ -171,7 +170,7 @@ class characterSheet extends cs_versionAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function insert_attrib($type, $subtype, $name, $value) {
+	protected function insert_attrib($type, $subtype, $name, $value) {
 		if(is_null($name) || !strlen($name)) {
 			$name = "";
 		}
@@ -189,11 +188,11 @@ class characterSheet extends cs_versionAbstract {
 			$key = $this->get_attribute_key($insertData);
 			$this->logger->log_by_class("Created attribute (". $key .") with value '". $value ."'", 'create attribute');
 			if(!is_numeric($retval) || $retval < 1) {
-				throw new exception(__METHOD__ .": failed to create attribute for data::: ". $this->gfObj->debug_print(func_get_args(),0));
+				$this->exception_handler(__METHOD__ .": failed to create attribute for data::: ". $this->gfObj->debug_print(func_get_args(),0));
 			}
 		}
 		catch(exception $e) {
-			throw new exception(__METHOD__ .": error encountered::: ". $e->getMessage());
+			$this->exception_handler(__METHOD__ .": error encountered::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end insert_attrib()
@@ -202,7 +201,8 @@ class characterSheet extends cs_versionAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function get_attrib($type, $subtype, $name, $value) {
+	protected function get_attrib($type, $subtype, $name, $value) {
+		
 		//check the internal cache before going to the database (saves time)
 		$dataArr = array(
 			'character_id'		=> $this->characterId,
@@ -227,12 +227,12 @@ class characterSheet extends cs_versionAbstract {
 				$result = $this->dbObj->run_query($sql, 'character_attribute_id');
 				$numrows = $this->dbObj->numRows();
 				if($numrows > 1) {
-					throw new exception(__METHOD__ .": multiple rows (". $numrows .") detected::: " .
+					$this->exception_handler(__METHOD__ .": multiple rows (". $numrows .") detected::: " .
 							$this->gfObj->debug_print(func_get_args(),0) ."<br>SQL::: ". $sql);
 				}
 			}
 			catch(exception $e) {
-				throw new exception(__METHOD__ .": failed to retrieve attribute::: ". $e->getMessage());
+				$this->exception_handler(__METHOD__ .": failed to retrieve attribute::: ". $e->getMessage());
 			}
 		}
 		
@@ -243,7 +243,7 @@ class characterSheet extends cs_versionAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function get_attribute_key(array $data) {
+	protected function get_attribute_key(array $data) {
 		$key = $data['attribute_type'] .'-'. $data['attribute_subtype'];
 		if(strlen($data['attribute_name'])) {
 			$key .= '-'. $data['attribute_name'];
@@ -269,7 +269,7 @@ class characterSheet extends cs_versionAbstract {
 			$this->logger->log_by_class("Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'", 'update attribute');
 		}
 		else {
-			throw new exception(__METHOD__ .": no updates");
+			$this->exception_handler(__METHOD__ .": no updates");
 		}
 	}//end update_attrib()
 	//-------------------------------------------------------------------------
@@ -283,7 +283,7 @@ class characterSheet extends cs_versionAbstract {
 					"WHERE character_id=". $this->characterId);
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid characterId");
+			$this->exception_handler(__METHOD__ .": invalid characterId");
 		}
 		return($data);
 	}//end get_main_character_data()
@@ -301,11 +301,11 @@ class characterSheet extends cs_versionAbstract {
 				$updateRes = $this->dbObj->run_update($sql);
 			}
 			else {
-				throw new exception(__METHOD__ .": invalid data");
+				$this->exception_handler(__METHOD__ .": invalid data");
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid characterId");
+			$this->exception_handler(__METHOD__ .": invalid characterId");
 		}
 		
 		return($updateRes);
@@ -327,7 +327,7 @@ class characterSheet extends cs_versionAbstract {
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .": characterId not set");
+			$this->exception_handler(__METHOD__ .": characterId not set");
 		}
 		
 		return($result);
@@ -337,7 +337,7 @@ class characterSheet extends cs_versionAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function handle_attrib($type, $subtype, $name, $value) {
+	protected function handle_attrib($type, $subtype, $name, $value) {
 		$attribData = $this->get_attrib($type, $subtype, $name, $value);
 		$result = null;
 		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
@@ -365,6 +365,15 @@ class characterSheet extends cs_versionAbstract {
 		
 		return($result);
 	}//end handle_attrib()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	protected function exception_handler($message) {
+		$logId = $this->logger->log_by_class($message, 'exception in code');
+		throw new exception($message ." -- Logged (id #". $logId .")");
+	}//end exception_handler()
 	//-------------------------------------------------------------------------
 	
 }
