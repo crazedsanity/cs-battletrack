@@ -381,7 +381,7 @@ class characterSheet extends cs_versionAbstract {
 	//-------------------------------------------------------------------------
 	public function handle_attrib_by_key($key, $val) {
 		$bits = explode('-', $key);
-		if(count($bits) == 3) {
+		if(count($bits) >= 2) {
 			return($this->handle_attrib($bits[0], $bits[1], $bits[2], $val));
 		}
 		else {
