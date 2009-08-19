@@ -88,6 +88,7 @@ class characterSheet extends cs_versionAbstract {
 		else {
 			$this->exception_handler(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
 		}
+		$this->load_character_defaults();
 		
 		return($this->characterId);
 	}//end create_character()
@@ -388,6 +389,66 @@ class characterSheet extends cs_versionAbstract {
 			throw new exception(__METHOD__ .": invalid number of bits (". count($bits) .") in key (". $key .")");
 		}
 	}//end handle_attrib_by_key()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function load_character_defaults() {
+		
+		$autoSkills = Array
+		(
+		    "Appraise"				=> "int",
+		    "Balance"				=> "dex",
+		    "Bluff"					=> "cha",
+		    "Climb"					=> "str",
+		    "Concentration"			=> "con",
+		    "Craft ()"				=> "int",
+		    "Craft ()"				=> "int",
+		    "Craft ()"				=> "int",
+		    "Decipher Script"		=> "int",
+		    "Diplomacy"				=> "cha",
+		    "Disable Device"		=> "int",
+		    "Disguise"				=> "cha",
+		    "Escape Artist"			=> "dex",
+		    "Forgery"				=> "int",
+		    "Gather Information"	=> "cha",
+		    "Handle Animal"			=> "cha",
+		    "Heal"					=> "wis",
+		    "Hide"					=> "dex",
+		    "intimidate"			=> "cha",
+		    "Jump"					=> "str",
+		    "Knowledge ()"			=> "int",
+		    "Knowledge ()"			=> "int",
+		    "Knowledge ()"			=> "int",
+		    "Knowledge ()"			=> "int",
+		    "Listen"				=> "wis",
+		    "Move Silently"			=> "dex",
+		    "Open Lock"				=> "dex",
+		    "Perform ()"			=> "cha",
+		    "Perform ()"			=> "cha",
+		    "Perform ()"			=> "cha",
+		    "Profession ()"			=> "wis",
+		    "Profession ()"			=> "wis",
+		    "Ride"					=> "dex",
+		    "Search"				=> "int",
+		    "Sense Motive"			=> "wis",
+		    "Sleight of Hand"		=> "dex",
+		    "Spellcraft"			=> "int",
+		    "Spot"					=> "wis",
+		    "Survival"				=> "wis",
+		    "Swim"					=> "str",
+		    "Tumble"				=> "dex",
+		    "Use Magic Device"		=> "cha",
+		    "Use Rope"				=> "dex"
+		);
+		$i=0;
+		foreach($autoSkills as $n=>$v) {
+			$this->handle_attrib('skills', $i, 'name', $n);
+			$this->handle_attrib('skills', $i, 'ability', $v);
+			$i++;
+		}
+	}//end load_character_defaults()
 	//-------------------------------------------------------------------------
 	
 }
