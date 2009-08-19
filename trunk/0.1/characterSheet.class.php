@@ -337,7 +337,7 @@ class characterSheet extends cs_versionAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	protected function handle_attrib($type, $subtype, $name, $value) {
+	public function handle_attrib($type, $subtype, $name, $value) {
 		$attribData = $this->get_attrib($type, $subtype, $name, $value);
 		$result = null;
 		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
@@ -374,6 +374,20 @@ class characterSheet extends cs_versionAbstract {
 		$logId = $this->logger->log_by_class($message, 'exception in code');
 		throw new exception($message ." -- Logged (id #". $logId .")");
 	}//end exception_handler()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function handle_attrib_by_key($key, $val) {
+		$bits = explode('-', $key);
+		if(count($bits) == 3) {
+			return($this->handle_attrib($bits[0], $bits[1], $bits[2], $val));
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid number of bits (". count($bits) .") in key (". $key .")");
+		}
+	}//end handle_attrib_by_key()
 	//-------------------------------------------------------------------------
 	
 }
