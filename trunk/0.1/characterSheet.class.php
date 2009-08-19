@@ -89,7 +89,6 @@ class characterSheet extends cs_versionAbstract {
 			$this->exception_handler(__METHOD__ .": invalid name (". $characterName .") or uid (". $uid .")");
 		}
 		$this->load_character_defaults();
-		
 		return($this->characterId);
 	}//end create_character()
 	//-------------------------------------------------------------------------
@@ -396,57 +395,63 @@ class characterSheet extends cs_versionAbstract {
 	//-------------------------------------------------------------------------
 	private function load_character_defaults() {
 		
-		$autoSkills = Array
-		(
-		    "Appraise"				=> "int",
-		    "Balance"				=> "dex",
-		    "Bluff"					=> "cha",
-		    "Climb"					=> "str",
-		    "Concentration"			=> "con",
-		    "Craft ()"				=> "int",
-		    "Craft ()"				=> "int",
-		    "Craft ()"				=> "int",
-		    "Decipher Script"		=> "int",
-		    "Diplomacy"				=> "cha",
-		    "Disable Device"		=> "int",
-		    "Disguise"				=> "cha",
-		    "Escape Artist"			=> "dex",
-		    "Forgery"				=> "int",
-		    "Gather Information"	=> "cha",
-		    "Handle Animal"			=> "cha",
-		    "Heal"					=> "wis",
-		    "Hide"					=> "dex",
-		    "intimidate"			=> "cha",
-		    "Jump"					=> "str",
-		    "Knowledge ()"			=> "int",
-		    "Knowledge ()"			=> "int",
-		    "Knowledge ()"			=> "int",
-		    "Knowledge ()"			=> "int",
-		    "Listen"				=> "wis",
-		    "Move Silently"			=> "dex",
-		    "Open Lock"				=> "dex",
-		    "Perform ()"			=> "cha",
-		    "Perform ()"			=> "cha",
-		    "Perform ()"			=> "cha",
-		    "Profession ()"			=> "wis",
-		    "Profession ()"			=> "wis",
-		    "Ride"					=> "dex",
-		    "Search"				=> "int",
-		    "Sense Motive"			=> "wis",
-		    "Sleight of Hand"		=> "dex",
-		    "Spellcraft"			=> "int",
-		    "Spot"					=> "wis",
-		    "Survival"				=> "wis",
-		    "Swim"					=> "str",
-		    "Tumble"				=> "dex",
-		    "Use Magic Device"		=> "cha",
-		    "Use Rope"				=> "dex"
-		);
-		$i=0;
-		foreach($autoSkills as $n=>$v) {
-			$this->handle_attrib('skills', $i, 'name', $n);
-			$this->handle_attrib('skills', $i, 'ability', $v);
-			$i++;
+		$autoSkills = array();
+		
+		//Skills added as a numbered array so I don't have to manually renumber if an item is added or removed.
+		{
+		    $autoSkills[] = array("Appraise",			"int");
+		    $autoSkills[] = array("Balance",			"dex");
+		    $autoSkills[] = array("Bluff",				"cha");
+		    $autoSkills[] = array("Climb",				"str");
+		    $autoSkills[] = array("Concentration",		"con");
+		    $autoSkills[] = array("Craft ()",			"int");
+		    $autoSkills[] = array("Craft ()",			"int");
+		    $autoSkills[] = array("Craft ()",			"int");
+		    $autoSkills[] = array("Decipher Script",	"int");
+		    $autoSkills[] = array("Diplomacy",			"cha");
+		    $autoSkills[] = array("Disable Device",		"int");
+		    $autoSkills[] = array("Disguise",			"cha");
+		    $autoSkills[] = array("Escape Artist",		"dex");
+		    $autoSkills[] = array("Forgery",			"int");
+		    $autoSkills[] = array("Gather Information",	"cha");
+		    $autoSkills[] = array("Handle Animal",		"cha");
+		    $autoSkills[] = array("Heal",				"wis");
+		    $autoSkills[] = array("Hide",				"dex");
+		    $autoSkills[] = array("intimidate",			"cha");
+		    $autoSkills[] = array("Jump",				"str");
+		    $autoSkills[] = array("Knowledge ()",		"int");
+		    $autoSkills[] = array("Knowledge ()",		"int");
+		    $autoSkills[] = array("Knowledge ()",		"int");
+		    $autoSkills[] = array("Knowledge ()",		"int");
+		    $autoSkills[] = array("Listen",				"wis");
+		    $autoSkills[] = array("Move Silently",		"dex");
+		    $autoSkills[] = array("Open Lock",			"dex");
+		    $autoSkills[] = array("Perform ()",			"cha");
+		    $autoSkills[] = array("Perform ()",			"cha");
+		    $autoSkills[] = array("Perform ()",			"cha");
+		    $autoSkills[] = array("Profession ()",		"wis");
+		    $autoSkills[] = array("Profession ()",		"wis");
+		    $autoSkills[] = array("Ride",				"dex");
+		    $autoSkills[] = array("Search",				"int");
+		    $autoSkills[] = array("Sense Motive",		"wis");
+		    $autoSkills[] = array("Sleight of Hand",	"dex");
+		    $autoSkills[] = array("Spellcraft",			"int");
+		    $autoSkills[] = array("Spot",				"wis");
+		    $autoSkills[] = array("Survival",			"wis");
+		    $autoSkills[] = array("Swim",				"str");
+		    $autoSkills[] = array("Tumble",				"dex");
+		    $autoSkills[] = array("Use Magic Device",	"cha");
+		    $autoSkills[] = array("Use Rope",			"dex");
+		}
+		
+		foreach($autoSkills as $i=>$data) {
+			$n = $data[0];
+			$v = $data[1];
+			$namId = $this->handle_attrib('skills', $i, 'name', $n);
+			$abilId = $this->handle_attrib('skills', $i, 'ability', $v);
+			$namKey = 'skills-'. $i .'-name';
+			$abilKey = 'skills-'. $i .'-ability';
+			#$this->gfObj->debug_print(__METHOD__ .": #". $i ." <b>". $namKey ."</b>=(". $n .")[". $namId ."], <b>". $abilKey ."</b>=(". $v .")[". $abilId ."]",1);
 		}
 	}//end load_character_defaults()
 	//-------------------------------------------------------------------------
