@@ -5,8 +5,8 @@
  */
 
 //TODO: consider optionally adding the logging system.
-require_once(constant('LIBDIR') .'/cs-versionparse/cs_version.abstract.class.php');
-require_once(constant('LIBDIR') .'/cs-webdblogger/cs_webdblogger.class.php');
+require_once(constant('LIBDIR') .'/cs-webapplibs/cs_version.abstract.class.php');
+require_once(constant('LIBDIR') .'/cs-webapplibs/cs_webdblogger.class.php');
 
 class characterSheet extends cs_versionAbstract {
 	
