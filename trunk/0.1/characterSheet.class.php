@@ -5,7 +5,7 @@
  */
 
 //TODO: consider optionally adding the logging system.
-require_once(constant('LIBDIR') .'/cs-content/cs_version.abstract.class.php');
+require_once(constant('LIBDIR') .'/cs-content/abstract/cs_version.abstract.class.php');
 require_once(constant('LIBDIR') .'/cs-webapplibs/cs_webdblogger.class.php');
 
 class characterSheet extends cs_versionAbstract {
