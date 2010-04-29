@@ -1,14 +1,19 @@
 <?php
 /*
  * Created on Jul 13, 2009
- *
+ * 
+ * SVN INFORMATION::::
+ * --------------------------
+ * $HeadURL$
+ * $Id$
+ * $LastChangedDate$
+ * $LastChangedRevision$
+ * $LastChangedBy$
  */
 
 //TODO: consider optionally adding the logging system.
-require_once(constant('LIBDIR') .'/cs-content/abstract/cs_version.abstract.class.php');
-require_once(constant('LIBDIR') .'/cs-webapplibs/cs_webdblogger.class.php');
 
-class characterSheet extends cs_versionAbstract {
+class characterSheet extends battleTrackAbstract {
 	
 	protected $characterId;
 	
@@ -22,28 +27,7 @@ class characterSheet extends cs_versionAbstract {
 	
 	//-------------------------------------------------------------------------
 	public function __construct($characterId=null) {
-		
-		if(class_exists('cs_globalFunctions')) {
-			$this->gfObj = new cs_globalFunctions;
-			$this->gfObj->debugPrintOpt=1;
-		}
-		else {
-			throw new exception(__METHOD__ .": missing required class 'cs_globalFunctions'");
-		}
-		
-		$this->set_version_file_location(dirname(__FILE__) .'/VERSION');
-		
-		$dbParams = array(
-			'host'			=> constant('DB_PG_HOST'),
-			'dbname'		=> constant('DB_PG_DBNAME'),
-			'port'			=> constant('DB_PG_PORT'),
-			'user'			=> constant('DB_PG_DBUSER'),
-			'password'		=> constant('DB_PG_DBPASS')
-		);
-		$this->dbObj = new cs_phpDB('pgsql');
-		$this->dbObj->connect($dbParams);
-		
-		$this->logger = new cs_webdblogger($this->dbObj, $this->get_project() .'::'. __CLASS__);
+		parent::__construct();
 		
 		if(is_numeric($characterId)) {
 			$this->set_character_id($characterId);

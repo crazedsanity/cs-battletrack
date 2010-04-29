@@ -1,7 +1,14 @@
 <?php
 /*
  * Created on Jul 30, 2009
- *
+ * 
+ * SVN INFORMATION::::
+ * --------------------------
+ * $HeadURL$
+ * $Id$
+ * $LastChangedDate$
+ * $LastChangedRevision$
+ * $LastChangedBy$
  */
 
 require_once(dirname(__FILE__) .'/characterSheet.class.php');
