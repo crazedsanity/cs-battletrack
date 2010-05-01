@@ -30,6 +30,7 @@ class characterSheet extends battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function __construct($characterId=null) {
 		parent::__construct();
+		$this->logger->logCategory = "Character Sheet";
 		
 		if(is_numeric($characterId) && $characterId >= 0) {
 			$this->set_character_id($characterId);
@@ -267,7 +268,7 @@ class characterSheet extends battleTrackAbstract {
 					$this->_handle_auto_updates($key, $this->dataCache[$key]['value'], $updates['attribute_value']);
 				}
 				catch(Exception $ex) {
-					$this->logger->log_by_class($ex->getMessage, 'DEBUG');
+					$this->logger->log_by_class($ex->getMessage());
 				}
 				$this->dataCache[$key] = $updates['attribute_value'];
 			}
@@ -489,8 +490,6 @@ class characterSheet extends battleTrackAbstract {
 			$name = $bits[2];
 			
 			
-			$this->logger->log_by_class('Handling AUTO updates for key=('. $key .')...  type=('. $type .'), subType=('. $subType .'), name=('. $name .')');
-			
 			//for the key 'skills-0-ranks', $type='skills', $subType=0, $name='ranks'
 			$logThis = NULL;//only logs if this is NOT null.
 			switch(strtolower($type)) {
@@ -505,23 +504,37 @@ class characterSheet extends battleTrackAbstract {
 							//so if $type='abilities' and $name='dex', this will update 'abilities-dex-mod' appropriately.
 							$modKeyName = $type .'-'. $subType .'-mod';
 							try{
-							$newAbilityModifier = $this->_get_ability_mod($subType, $newVal);
-							$this->handle_attrib_by_key($modKeyName, $newAbilityModifier);
-							$logThis = "auto-updated key (". $modKeyName ."), oldVal=(". $oldVal ."), newVal=(". $newVal ."), calculated value was (". $newAbilityModifier .")";
-							
+								$newAbilityModifier = $this->_get_ability_mod($subType, $newVal);
+								$this->handle_attrib_by_key($modKeyName, $newAbilityModifier);
+								$logThis = "auto-updated key (". $modKeyName ."), oldVal=(". $oldVal ."), newVal=(". $newVal ."), calculated value was (". $newAbilityModifier .")";
+								
+								//TODO: update associated skills... find 'skills-($x)-ability' where value == $subType... update 'skills-($x)-abilitymod' (will cause the whole thing to get re-calculated)
+								
+								$numUpdated = 0;
+								foreach($this->dataCache as $i=>$subData) {
+									if(preg_match('/skills-/', $i) && preg_match('/-ability$/', $i)) {
+										if(strtolower($subData['value']) == $subType) {
+											//(if it's dex) found 'skills-($i)-ability' with value of 'dex', update 'skills-($i)-abilitymod'
+											$keyBits = $this->get_bits_from_key($i);
+											$updateKeyName = 'skills-'. $keyBits['subtype'] .'-abilitymod';
+											$this->logger->log_by_class('Updating based on key ('. $i .'), using key=('. $updateKeyName .')...', 'DEBUG');
+											$this->handle_attrib_by_key($updateKeyName, $newAbilityModifier);
+											$numUpdated++;
+											
+										}
+									}
+								}
 							}
 							catch(Exception $ex) {
 								
 $this->logger->log_by_class('**** EXCEPTION!!!! *** '. $ex->getMessage());
 							}
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 							break;
 						//.........................................................
 						
 							
 						//.........................................................
 						case 'mod':
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 							//TODO: change template to NOT allow changes to modifiers.
 							//TODO: don't make changes if they have something in 'abilities-$subType-temp'
 							#throw new exception(__METHOD__ .": cannot change ability modifier manually, set base value instead");
@@ -531,22 +544,21 @@ $this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__)
 							
 						//.........................................................
 						default:
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 							
 						//.........................................................
 					}//end switch($name)
 					break;
 				
 				case 'skills':
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 					$prefix = 'skills-'. $subType .'-';
 					//TODO: handle the "max dex bonus" thing from armor (account for all armor, disregard stuff not worn)
 					switch(strtolower($name)) {
 						//.........................................................
 						case 'miscmod':
 						case 'ranks':
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+						case 'abilitymod':
 							$newTotal = $this->get_skill_modifier($subType, $name, $newVal);
+							$this->logger->log_by_class('Automatically updating ('. $prefix .'total), newVal=('. $newVal .')', 'auto update...');
 							$this->handle_attrib_by_key($prefix .'total', $newTotal);
 							
 							//TODO: for 'ranks', total-up all the ranks & update the (not implemented) total skills value...
@@ -557,33 +569,25 @@ $this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__)
 						
 						//.........................................................
 						default:
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 							
 						//.........................................................
 					}//end switch('skills')
 					break;
 				
 				default:
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 			}//end switch($type)
 			
 		}
 		else {
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 			throw new exception(__METHOD__ .": too many bits in key (". $key ."), key is malformed");
 		}
 		
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
-		//TODO: log it!
-		if(is_null($logThis)) {
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
-			$logThis = 'nothing updated...';
-		}
 		if(!is_null($logThis)) {
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
 			$this->logger->log_by_class($logThis, 'DEBUG');
 		}
-$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+		else {
+			$this->logger->log_by_class("Skipped '". $key ."'", 'DEBUG');
+		}
 	}//_handle_auto_updates()
 	//-------------------------------------------------------------------------
 	
@@ -592,12 +596,13 @@ $this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__)
 	//-------------------------------------------------------------------------
 	private function get_skill_modifier($skillNum, $changedItem=null, $newVal=null) {
 		$tempNum = 0;
+		$algo = '';
 		try {
-			if($changedItem == 'ability') {
+			if($changedItem == 'abilitymod') {
 				$tempNum += $newVal;
 			}
 			else {
-				$tempNum += $this->_clean_value_as_numeric('skills-'. $skillNum .'-ability');
+				$tempNum += $this->_clean_value_as_numeric('skills-'. $skillNum .'-abilitymod');
 			}
 			if($changedItem == 'ranks') {
 				$tempNum += $newVal;
@@ -615,7 +620,7 @@ $this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__)
 		catch(Exception $ex) {
 			throw new exception(__METHOD__ .": failed to calculate value for skill #". $skillNum .", details::: ". $ex->getMessage());
 		}
-		
+		$this->logger->log_by_class('updating, ', '**** CHECK ME OUT **** ');
 		return($tempNum);
 	}//end get_skill_modifier()
 	//-------------------------------------------------------------------------
@@ -655,6 +660,23 @@ $this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__)
 		}
 		return($modifier);
 	}//end _get_ability_mod()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_bits_from_key($key) {
+		$bits = explode('-', $key);
+		if(count($bits) < 2 || count($bits) > 3) {
+			throw new exception(__METHOD__ .": invalid key bits, malformed key (". $key .")");
+		}
+		$retval = array(
+			'type'		=> $bits[0],
+			'subtype'	=> $bits[1],
+			'name'		=> $bits[2]
+		);
+		return($retval);
+	}//end get_bits_from_key()
 	//-------------------------------------------------------------------------
 	
 }
