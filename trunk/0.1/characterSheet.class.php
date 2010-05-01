@@ -25,13 +25,18 @@ class characterSheet extends battleTrackAbstract {
 	
 	protected $logger;
 	
+	protected $changesByKey=array();
+	
 	//-------------------------------------------------------------------------
 	public function __construct($characterId=null) {
 		parent::__construct();
 		
-		if(is_numeric($characterId)) {
+		if(is_numeric($characterId) && $characterId >= 0) {
 			$this->set_character_id($characterId);
 			$this->get_character_data();
+		}
+		else {
+			throw new exception(__METHOD__ .": characterId is required");
 		}
 		
 	}//end __construct()
@@ -239,7 +244,7 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function update_attrib($id, array $updates) {
+	private function update_attrib($id, array $updates) {
 		if(is_array($updates) && count($updates) && is_numeric($id) && is_numeric($this->characterId)) {
 			$this->gfObj->switch_force_sql_quotes(true);
 			$sql = "UPDATE csbt_character_attribute_table SET " .
@@ -251,6 +256,21 @@ class characterSheet extends battleTrackAbstract {
 			
 			$key = $this->get_attribute_key($updates);
 			$this->logger->log_by_class("Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'", 'update attribute');
+			
+			//keep track of changes, so other code (i.e. AJAX calls) know what has changed.
+			$this->changesByKey[$key] += 1;
+			
+			//update internal data cache.
+			if(isset($updates['attribute_value'])) {
+				//handle automatic updates BEFORE touching internal cache.
+				try {
+					$this->_handle_auto_updates($key, $this->dataCache[$key]['value'], $updates['attribute_value']);
+				}
+				catch(Exception $ex) {
+					$this->logger->log_by_class($ex->getMessage, 'DEBUG');
+				}
+				$this->dataCache[$key] = $updates['attribute_value'];
+			}
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": no updates");
@@ -438,6 +458,203 @@ class characterSheet extends battleTrackAbstract {
 			#$this->gfObj->debug_print(__METHOD__ .": #". $i ." <b>". $namKey ."</b>=(". $n .")[". $namId ."], <b>". $abilKey ."</b>=(". $v .")[". $abilId ."]",1);
 		}
 	}//end load_character_defaults()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function __get($var) {
+		if(isset($this->$var)) {
+			$returnThis = $this->$var;
+		}
+		else {
+			throw new exception(__METHOD__ .": unknown var (". $var .")");
+		}
+		return($returnThis);
+	}//end __get()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function _handle_auto_updates($key, $oldVal=NULL, $newVal=NULL) {
+		
+		$bits = explode('-', $key);
+		if((!is_null($oldVal) && !is_numeric($oldVal)) || (!is_null($newVal) && !is_numeric($newVal))) {
+			throw new exception(__METHOD__ .": FAIL, oldVal=(". $oldVal ."), newVal=(". $newVal .")");
+		}
+		elseif(count($bits) >= 2 && count($bits) < 4) {
+			$type = $bits[0];
+			$subType = $bits[1];
+			$name = $bits[2];
+			
+			
+			$this->logger->log_by_class('Handling AUTO updates for key=('. $key .')...  type=('. $type .'), subType=('. $subType .'), name=('. $name .')');
+			
+			//for the key 'skills-0-ranks', $type='skills', $subType=0, $name='ranks'
+			$logThis = NULL;//only logs if this is NOT null.
+			switch(strtolower($type)) {
+				case 'abilities':
+					switch(strtolower($name)) {
+						//.........................................................
+						case 'base':
+							//TODO: if this is strength, update all the 'weight-*' values...
+							//TODO: for strength or dex, tell 'em to check their attack/damage stuff
+							//TODO: for dex, update init.
+							
+							//so if $type='abilities' and $name='dex', this will update 'abilities-dex-mod' appropriately.
+							$modKeyName = $type .'-'. $subType .'-mod';
+							try{
+							$newAbilityModifier = $this->_get_ability_mod($subType, $newVal);
+							$this->handle_attrib_by_key($modKeyName, $newAbilityModifier);
+							$logThis = "auto-updated key (". $modKeyName ."), oldVal=(". $oldVal ."), newVal=(". $newVal ."), calculated value was (". $newAbilityModifier .")";
+							
+							}
+							catch(Exception $ex) {
+								
+$this->logger->log_by_class('**** EXCEPTION!!!! *** '. $ex->getMessage());
+							}
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+							break;
+						//.........................................................
+						
+							
+						//.........................................................
+						case 'mod':
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+							//TODO: change template to NOT allow changes to modifiers.
+							//TODO: don't make changes if they have something in 'abilities-$subType-temp'
+							#throw new exception(__METHOD__ .": cannot change ability modifier manually, set base value instead");
+							break;
+						//.........................................................
+						
+							
+						//.........................................................
+						default:
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+							
+						//.........................................................
+					}//end switch($name)
+					break;
+				
+				case 'skills':
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+					$prefix = 'skills-'. $subType .'-';
+					//TODO: handle the "max dex bonus" thing from armor (account for all armor, disregard stuff not worn)
+					switch(strtolower($name)) {
+						//.........................................................
+						case 'miscmod':
+						case 'ranks':
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+							$newTotal = $this->get_skill_modifier($subType, $name, $newVal);
+							$this->handle_attrib_by_key($prefix .'total', $newTotal);
+							
+							//TODO: for 'ranks', total-up all the ranks & update the (not implemented) total skills value...
+							$logThis = 'updated '. $name .', newTotal=('. $newTotal .')';
+							break;
+						//.........................................................
+						
+						
+						//.........................................................
+						default:
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+							
+						//.........................................................
+					}//end switch('skills')
+					break;
+				
+				default:
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+			}//end switch($type)
+			
+		}
+		else {
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+			throw new exception(__METHOD__ .": too many bits in key (". $key ."), key is malformed");
+		}
+		
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+		//TODO: log it!
+		if(is_null($logThis)) {
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+			$logThis = 'nothing updated...';
+		}
+		if(!is_null($logThis)) {
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+			$this->logger->log_by_class($logThis, 'DEBUG');
+		}
+$this->logger->log_by_class('... testing... '. __METHOD__ .': line #'. __LINE__);
+	}//_handle_auto_updates()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function get_skill_modifier($skillNum, $changedItem=null, $newVal=null) {
+		$tempNum = 0;
+		try {
+			if($changedItem == 'ability') {
+				$tempNum += $newVal;
+			}
+			else {
+				$tempNum += $this->_clean_value_as_numeric('skills-'. $skillNum .'-ability');
+			}
+			if($changedItem == 'ranks') {
+				$tempNum += $newVal;
+			}
+			else {
+				$tempNum += $this->_clean_value_as_numeric('skills-'. $skillNum .'-ranks');
+			}
+			if($changedItem == 'miscmod') {
+				$tempNum += $newVal;
+			}
+			else {
+				$tempNum += $this->_clean_value_as_numeric('skills-'. $skillNum .'-miscmod');
+			}
+		}
+		catch(Exception $ex) {
+			throw new exception(__METHOD__ .": failed to calculate value for skill #". $skillNum .", details::: ". $ex->getMessage());
+		}
+		
+		return($tempNum);
+	}//end get_skill_modifier()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function _clean_value_as_numeric($key) {
+		
+		if(is_numeric(preg_replace('/[^0-9]/', '', $this->dataCache[$key]['value']))) {
+			$retval = preg_replace('/[^0-9]/', '', $this->dataCache[$key]['value']);
+			settype($retval, 'int');
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid data for '". $key ."' (". $this->dataCache['$key'] .")". cs_debug_backtrace(0) ."\n". $this->gfObj->debug_print($this->dataCache,0));
+		}
+		return($retval);
+	}//end _clean_value_as_numeric()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function _get_ability_mod($abilityName, $useThisNum=null) {
+		try {
+			//for 'str', it would be passing 'abilities-str'...
+			if(!is_null($useThisNum)) {
+				$baseVal = $useThisNum;
+			} 
+			else {
+				$baseVal = $this->_clean_value_as_numeric('abilities-'. $abilityName .'-base');
+			}
+			$modifier = floor((($baseVal - 10)/2));
+		}
+		catch(Exception $ex) {
+			throw new exception(__METHOD__ .": invalid base value for '". $abilityName ."', details::: ". $ex->getMessage());
+		}
+		return($modifier);
+	}//end _get_ability_mod()
 	//-------------------------------------------------------------------------
 	
 }
