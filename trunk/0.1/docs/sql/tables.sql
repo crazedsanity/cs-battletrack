@@ -5,6 +5,17 @@
 -- Last Committed Path::: $HeadURL:https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/docs/sql/tables.sql $
 --  
 
+--
+-- Contains a list of campaigns.
+--
+CREATE TABLE csbt_campaign_table (
+	campaign_id serial NOT NULL PRIMARY KEY,
+	campaign_name varchar(128) NOT NULL UNIQUE,	
+	owner_uid integer NOT NULL REFERENCES cs_authentication_table(uid),
+	create_date timestamp NOT NULL DEFAULT NOW(),
+	is_active bool NOT NULL DEFAULT true
+);
+
 
 -- 
 -- Contains the main character information.
@@ -13,7 +24,8 @@
 CREATE TABLE csbt_character_table (
 	character_id serial NOT NULL PRIMARY KEY,
 	uid integer NOT NULL REFERENCES cs_authentication_table(uid),
-	character_name text
+	character_name text,
+	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id)
 );
 
 
