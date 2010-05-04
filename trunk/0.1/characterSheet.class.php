@@ -37,7 +37,7 @@ class characterSheet extends battleTrackAbstract {
 			$this->get_character_data();
 		}
 		else {
-			throw new exception(__METHOD__ .": characterId is required");
+			#throw new exception(__METHOD__ .": characterId is required");
 		}
 		
 	}//end __construct()
@@ -245,7 +245,7 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function update_attrib($id, array $updates) {
+	private function update_attrib($id, array $updates, $logPrefix=NULL, $logClass=NULL) {
 		if(is_array($updates) && count($updates) && is_numeric($id) && is_numeric($this->characterId)) {
 			$this->gfObj->switch_force_sql_quotes(true);
 			$sql = "UPDATE csbt_character_attribute_table SET " .
@@ -256,7 +256,14 @@ class characterSheet extends battleTrackAbstract {
 			$this->dbObj->run_update($sql);
 			
 			$key = $this->get_attribute_key($updates);
-			$this->logger->log_by_class("Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'", 'update attribute');
+			$logThis = "Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'";
+			if(!is_null($logPrefix) && strlen($logPrefix)) {
+				$logThis = $logPrefix .' - '. $logThis;
+			}
+			if(is_null($logClass) || !strlen($logClass)) {
+				$logClass = 'update attribute';
+			}
+			$this->logger->log_by_class($logThis, $logClass);
 			
 			//keep track of changes, so other code (i.e. AJAX calls) know what has changed.
 			$this->changesByKey[$key] += 1;
@@ -270,7 +277,7 @@ class characterSheet extends battleTrackAbstract {
 				catch(Exception $ex) {
 					$this->logger->log_by_class($ex->getMessage());
 				}
-				$this->dataCache[$key] = $updates['attribute_value'];
+				$this->dataCache[$key] = $this->dataCache[$key];
 			}
 		}
 		else {
@@ -342,7 +349,7 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function handle_attrib($type, $subtype, $name, $value) {
+	public function handle_attrib($type, $subtype, $name, $value, $logPrefix, $logClass) {
 		$attribData = $this->get_attrib($type, $subtype, $name, $value);
 		$result = null;
 		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
@@ -358,7 +365,9 @@ class characterSheet extends battleTrackAbstract {
 						'attribute_subtype'	=> $subtype,
 						'attribute_name'	=> $name,
 						'attribute_value'	=> $value
-					)
+					), 
+					$logPrefix, 
+					$logClass
 				);
 				$result = 'update';
 			}
@@ -384,10 +393,10 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function handle_attrib_by_key($key, $val) {
+	public function handle_attrib_by_key($key, $val, $logPrefix=NULL, $logClass=NULL) {
 		$bits = explode('-', $key);
 		if(count($bits) >= 2) {
-			return($this->handle_attrib($bits[0], $bits[1], $bits[2], $val));
+			return($this->handle_attrib($bits[0], $bits[1], $bits[2], $val, $logPrefix, $logClass));
 		}
 		else {
 			throw new exception(__METHOD__ .": invalid number of bits (". count($bits) .") in key (". $key .")");
@@ -505,8 +514,8 @@ class characterSheet extends battleTrackAbstract {
 							$modKeyName = $type .'-'. $subType .'-mod';
 							try{
 								$newAbilityModifier = $this->_get_ability_mod($subType, $newVal);
-								$this->handle_attrib_by_key($modKeyName, $newAbilityModifier);
-								$logThis = "auto-updated key (". $modKeyName ."), oldVal=(". $oldVal ."), newVal=(". $newVal ."), calculated value was (". $newAbilityModifier .")";
+								$this->handle_attrib_by_key($modKeyName, $newAbilityModifier, 'Auto-update from key ('. $key .')', 'auto-update');
+								#$logThis = "auto-updated key (". $modKeyName ."), oldVal=(". $oldVal ."), newVal=(". $newVal ."), calculated value was (". $newAbilityModifier .")";
 								
 								//TODO: update associated skills... find 'skills-($x)-ability' where value == $subType... update 'skills-($x)-abilitymod' (will cause the whole thing to get re-calculated)
 								
@@ -517,8 +526,8 @@ class characterSheet extends battleTrackAbstract {
 											//(if it's dex) found 'skills-($i)-ability' with value of 'dex', update 'skills-($i)-abilitymod'
 											$keyBits = $this->get_bits_from_key($i);
 											$updateKeyName = 'skills-'. $keyBits['subtype'] .'-abilitymod';
-											$this->logger->log_by_class('Updating based on key ('. $i .'), using key=('. $updateKeyName .')...', 'DEBUG');
-											$this->handle_attrib_by_key($updateKeyName, $newAbilityModifier);
+											#$this->logger->log_by_class('Auto-updating based on key ('. $i .')';
+											$this->handle_attrib_by_key($updateKeyName, $newAbilityModifier, 'Auto-update from key ('. $i .')', 'auto-update');
 											$numUpdated++;
 											
 										}
@@ -558,11 +567,11 @@ $this->logger->log_by_class('**** EXCEPTION!!!! *** '. $ex->getMessage());
 						case 'ranks':
 						case 'abilitymod':
 							$newTotal = $this->get_skill_modifier($subType, $name, $newVal);
-							$this->logger->log_by_class('Automatically updating ('. $prefix .'total), newVal=('. $newVal .')', 'auto update...');
-							$this->handle_attrib_by_key($prefix .'total', $newTotal);
+							#$this->logger->log_by_class('Automatically updating ('. $prefix .'total), newVal=('. $newVal .')', 'auto update...');
+							$this->handle_attrib_by_key($prefix .'total', $newTotal, 'Auto-update from key ('. $key .')', 'auto-update');
 							
 							//TODO: for 'ranks', total-up all the ranks & update the (not implemented) total skills value...
-							$logThis = 'updated '. $name .', newTotal=('. $newTotal .')';
+							#$logThis = 'updated '. $name .', newTotal=('. $newTotal .')';
 							break;
 						//.........................................................
 						
@@ -584,9 +593,6 @@ $this->logger->log_by_class('**** EXCEPTION!!!! *** '. $ex->getMessage());
 		
 		if(!is_null($logThis)) {
 			$this->logger->log_by_class($logThis, 'DEBUG');
-		}
-		else {
-			$this->logger->log_by_class("Skipped '". $key ."'", 'DEBUG');
 		}
 	}//_handle_auto_updates()
 	//-------------------------------------------------------------------------
@@ -620,7 +626,6 @@ $this->logger->log_by_class('**** EXCEPTION!!!! *** '. $ex->getMessage());
 		catch(Exception $ex) {
 			throw new exception(__METHOD__ .": failed to calculate value for skill #". $skillNum .", details::: ". $ex->getMessage());
 		}
-		$this->logger->log_by_class('updating, ', '**** CHECK ME OUT **** ');
 		return($tempNum);
 	}//end get_skill_modifier()
 	//-------------------------------------------------------------------------
