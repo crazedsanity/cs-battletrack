@@ -14,7 +14,9 @@
 
 abstract class battleTrackAbstract extends cs_versionAbstract {
 	
-	public function __construct() {
+	protected $characterId;
+	
+	public function __construct($characterId=NULL) {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
@@ -37,6 +39,9 @@ abstract class battleTrackAbstract extends cs_versionAbstract {
 		$this->dbObj->connect($dbParams);
 		
 		$this->logger = new cs_webdblogger($this->dbObj, $this->get_project() .'::'. __CLASS__);
+		if(is_numeric($this->characterId)) {
+			$this->characterId = $characterId;
+		}
 		
 	}//end __construct()
 }

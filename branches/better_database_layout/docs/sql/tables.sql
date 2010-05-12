@@ -25,9 +25,52 @@ CREATE TABLE csbt_character_table (
 	character_id serial NOT NULL PRIMARY KEY,
 	uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	character_name text,
-	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id)
+	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id),
+	name text DEFAULT 'set character name...',
+	eye_color varchar(20),
+	height varchar(10),
+	hair_color text,
+	weight integer,
+	age integer,
+	sex varchar(3),
+	race text,
+	picture text --NOTE::: this could be either a URL or the encoded contents of the image...
 );
 
+CREATE TABLE csbt_character_attribute_table (
+	character_ability_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	str integer NOT NULL DEFAULT 10,
+	con integer NOT NULL DEFAULT 10,
+	dex integer NOT NULL DEFAULT 10,
+	'int' integer NOT NULL DEFAULT 10,
+	wis integer NOT NULL DEFAULT 10,
+	cha integer NOT NULL DEFAULT 10
+);
+
+CREATE TABLE csbt_skill_table (
+	skill_id serial NOT NULL PRIMARY KEY,
+	name text NOT NULL,
+	ability varchar(3) NOT NULL,
+	is_default bool NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE csbt_character_skill_table (
+	character_skill_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	skill_id integer NOT NULL REFERENCES csbt_skill_table(skill_id),
+	ranks integer NOT NULL DEFAULT 0
+);
+
+CREATE TABLE csbt_class_table (
+	class_id serial NOT NULL PRIMARY KEY,
+	name text NOT NULL,
+	description text NOT NULL,
+	level_adjustment integer NOT NULL DEFAULT 0,
+	hit_dice varchar(20) NOT NULL,
+	skill_points_per_level integer NOT NULL,
+	alignment text,
+);
 
 
 CREATE TABLE csbt_character_attribute_table (
