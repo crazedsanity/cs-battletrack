@@ -394,10 +394,7 @@ class characterSheet extends battleTrackAbstract {
 	
 	//-------------------------------------------------------------------------
 	public function handle_attrib_by_key($key, $val, $logPrefix=NULL, $logClass=NULL) {
-		$separator = "_";
-		if(preg_match('/-/', $key) && !preg_match('/_/', $key)) {
-			$separator = "-";
-		}
+		$separator = "-";
 		$bits = explode($separator, $key);
 		if(count($bits) >= 2) {
 			return($this->handle_attrib($bits[0], $bits[1], $bits[2], $val, $logPrefix, $logClass));
