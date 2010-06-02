@@ -38,6 +38,9 @@ abstract class battleTrackAbstract extends cs_versionAbstract {
 		
 		$this->logger = new cs_webdblogger($this->dbObj, $this->get_project() .'::'. __CLASS__);
 		
+		$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbParams, __CLASS__ .'.lock');
+		$upgradeObj->check_versions(true);
+		
 	}//end __construct()
 }
 

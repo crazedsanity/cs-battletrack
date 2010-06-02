@@ -16,6 +16,7 @@ CREATE TABLE csbt_campaign_table (
 	is_active bool NOT NULL DEFAULT true
 );
 
+ALTER TABLE csbt_character_attribute_table RENAME TO _backup_csbt_ca;
 
 -- 
 -- Contains the main character information.
@@ -108,4 +109,37 @@ CREATE TABLE csbt_character_gear_table (
 	location text
 );
 
+-- Create a unique set of attributes.
+INSERT INTO csbt_attribute_table (attribute) 
+	SELECT 
+		DISTINCT ON (
+			attribute_type,
+			attribute_subtype,
+			attribute_name
+		)
+		(attribute_type || '-' || attribute_subtype || '-' || attribute_name) AS attribute
+	FROM
+		_backup_csbt_ca
+	ORDER BY
+		attribute_type,
+		attribute_subtype,
+		attribute_name;
 
+
+-- Populate the new character attribute table with previous values.
+INSERT INTO csbt_character_attribute_table (character_id, attribute_id, attribute_value)
+	SELECT 
+		bak.character_id,
+		(
+			SELECT 
+				attribute_id 
+			FROM 
+				csbt_attribute_table 
+			WHERE 
+				attribute = (attribute_type || '-' || attribute_subtype || '-' || attribute_name)
+		),
+		bak.attribute_value
+	FROM
+		_backup_csbt_ca AS bak;
+
+DROP TABLE _backup_csbt_ca;
