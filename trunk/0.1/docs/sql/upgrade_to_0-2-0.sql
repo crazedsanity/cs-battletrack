@@ -112,18 +112,10 @@ CREATE TABLE csbt_character_gear_table (
 -- Create a unique set of attributes.
 INSERT INTO csbt_attribute_table (attribute) 
 	SELECT 
-		DISTINCT ON (
-			attribute_type,
-			attribute_subtype,
-			attribute_name
-		)
-		(attribute_type || '-' || attribute_subtype || '-' || attribute_name) AS attribute
+		DISTINCT
+			trim(trailing '-' FROM (attribute_type || '-' || attribute_subtype || '-' || attribute_name)) AS attribute
 	FROM
-		_backup_csbt_ca
-	ORDER BY
-		attribute_type,
-		attribute_subtype,
-		attribute_name;
+		_backup_csbt_ca;
 
 
 -- Populate the new character attribute table with previous values.
@@ -136,7 +128,7 @@ INSERT INTO csbt_character_attribute_table (character_id, attribute_id, attribut
 			FROM 
 				csbt_attribute_table 
 			WHERE 
-				attribute = (attribute_type || '-' || attribute_subtype || '-' || attribute_name)
+				attribute = trim(trailing '-' FROM (attribute_type || '-' || attribute_subtype || '-' || attribute_name))
 		),
 		bak.attribute_value
 	FROM

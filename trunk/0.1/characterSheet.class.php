@@ -88,14 +88,15 @@ class characterSheet extends battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function get_character_data() {
 		if(is_numeric($this->characterId)) {
-			$data = $this->dbObj->run_query("SELECT * FROM csbt_character_attribute_table ".
-					"WHERE character_id=". $this->characterId, 'character_attribute_id');
+			$data = $this->dbObj->run_query("SELECT ca.*, a.attribute FROM csbt_character_attribute_table "
+					."AS ca INNER JOIN csbt_attribute_table AS a USING (attribute_id) "
+					."WHERE ca.character_id=". $this->characterId, 'character_attribute_id');
 			
 			$this->dataCache = array();
 			$this->id2key = array();
 			if(is_array($data)) {
 				foreach($data as $id=>$attribs) {
-					$key = $this->get_attribute_key($attribs);
+					$key = $attribs['attribute'];
 					$this->dataCache[$key] = array(
 						'value'	=> $attribs['attribute_value'],
 						'id'	=> $id
@@ -122,26 +123,8 @@ class characterSheet extends battleTrackAbstract {
 		$finalCount = 0;
 		$changeList = array();
 		$this->dbObj->beginTrans();
-		foreach($attribs as $type=>$subData) {
-			if(is_array($subData)) {
-				foreach($subData as $subtype=>$finalBit) {
-					if(is_array($finalBit)) {
-						foreach($finalBit as $name=>$value) {
-							$changeList[$this->handle_attrib($type, $subtype, $name, $value)]++;
-							$finalCount++;
-						}
-					}
-					else {
-						$name = null;
-						$changeList[$this->handle_attrib($type, $subtype, $name, $finalBit)]++;
-						$finalCount++;
-					}
-				}
-			}
-			else {
-				#$this->gfObj->debug_print(__METHOD__ .": XXXXXXXXXXXtype=(". $type ."), subtype=(". $subData .")",1);
-				$this->exception_handler(__METHOD__ .": invalid data under (". $type ."):: ". $attribs);
-			}
+		foreach($attribs as $key=>$newValue) {
+			$changeList[$this->handle_attrib($key, $newValue)]++;
 		}
 		if(isset($changeList[null])) {
 			unset($changeList[null]);
@@ -160,15 +143,13 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	protected function insert_attrib($type, $subtype, $name, $value) {
+	protected function insert_attrib($attributeId, $value) {
 		if(is_null($name) || !strlen($name)) {
 			$name = "";
 		}
 		$insertData = array(
 				'character_id'		=> $this->characterId,
-				'attribute_type'	=> $type,
-				'attribute_subtype'	=> $subtype,
-				'attribute_name'	=> $name,
+				'attribute_id'		=> $attributeId,
 				'attribute_value'	=> $value
 			);
 		$sql = "INSERT INTO csbt_character_attribute_table ".
@@ -191,14 +172,12 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	protected function get_attrib($type, $subtype, $name, $value) {
+	protected function get_attrib($key, $value) {
 		
 		//check the internal cache before going to the database (saves time)
 		$dataArr = array(
 			'character_id'		=> $this->characterId,
-			'attribute_type'	=> $type,
-			'attribute_subtype'	=> $subtype,
-			'attribute_name'	=> $name
+			'attribute'			=> $key
 		);
 		$cacheKey = $this->get_attribute_key($dataArr);
 		$result = null;
@@ -245,8 +224,8 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function update_attrib($id, array $updates, $logPrefix=NULL, $logClass=NULL) {
-		if(is_array($updates) && count($updates) && is_numeric($id) && is_numeric($this->characterId)) {
+	private function update_attrib($id, $key, $logPrefix=NULL, $logClass=NULL) {
+		if(strlen($key) && is_string($key) && is_numeric($id) && is_numeric($this->characterId)) {
 			$this->gfObj->switch_force_sql_quotes(true);
 			$sql = "UPDATE csbt_character_attribute_table SET " .
 					$this->gfObj->string_from_array($updates, 'update', null, 'sql', true) .
@@ -255,7 +234,6 @@ class characterSheet extends battleTrackAbstract {
 			$this->gfObj->switch_force_sql_quotes(false);
 			$this->dbObj->run_update($sql);
 			
-			$key = $this->get_attribute_key($updates);
 			$logThis = "Updated attribute (". $key .") with value '". $updates['attribute_value'] ."'";
 			if(!is_null($logPrefix) && strlen($logPrefix)) {
 				$logThis = $logPrefix .' - '. $logThis;
@@ -349,8 +327,8 @@ class characterSheet extends battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function handle_attrib($type, $subtype, $name, $value, $logPrefix, $logClass) {
-		$attribData = $this->get_attrib($type, $subtype, $name, $value);
+	public function handle_attrib($key, $value, $logPrefix, $logClass) {
+		$attribData = $this->get_attrib($key, $value);
 		$result = null;
 		if(is_numeric($attribData['id']) && $value !== $attribData['value']) {
 			if(is_null($value) || !strlen($value)) {
