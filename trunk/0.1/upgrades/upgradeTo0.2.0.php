@@ -141,27 +141,104 @@ class upgradeTo_0_2_0 extends cs_webdblogger {
 	//=========================================================================
 	private function do_key_changes() {
 		$oldToNew = array(
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
-			""			=> "",
+			"ac-size_modifier"				=> "ac-mod-size",
+			"current_class-hit_dice"		=> "class-hit_dice",
+			"current-class-hit-dice"		=> "class-hit_dice",
+			"class_total-level"				=> "class-total-level	",
+			"featsAbilities"				=> "featsAbilities-name",
+			"generic-class"					=> "class-name",
+			"generic-action_points"			=> "mainCharacter-actionPoints",
+			"generic-age"					=> "mainCharacter-age",
+			"generic-alignment"				=> "mainCharacter-alignment",
+			"generic-bab"					=> "mainCharacter-bab",
+			"generic-base_attack_bonus"		=> "mainCharacter-bab",
+			"generic-base-attack-bonus"		=> "mainCharacter-bab",
+			"generic-campaign"				=> "generated-campaign",
+			"generic-deity"					=> "mainCharacter-deity",
+			"generic-eyes"					=> "mainCharacter-eyes",
+			"generic-gender"				=> "mainCharacter-gender",
+			"generic-hair"					=> "mainCharacter-hair",
+			"generic-height"				=> "mainCharacter-height",
+			"generic-hp"					=> "hp-total",
+			"status-current_hp"				=> "hp-current",
+			"status-current-hp"				=> "hp-current",
+			"generic-race"					=> "mainCharacter-race",
+			"generic-size"					=> "mainCharacter-size",
+			"generic-skills-maxcc"			=> "skills-max-cc",
+			"generic-skills-maxrank"		=> "skills-max-rank",
+			"generic-weight"				=> "mainCharacter-weight",
+			"init-misc"						=> "initiative-misc",
+			"init-total"					=> "initiative-total",
+			"melee-miscmod"					=> "melee-mods-misc",
+			"MELEE--abilities-str-mod"		=> "melee-mods-str",
+			"melee-size_mod"				=> "melee-mods-size",
+			"melee-temp_mod"				=> "melee-mods-temp",
+			"melee-temp-mod"				=> "melee-mods-temp",
+			"ranged-misc_mod"				=> "ranged-mods-misc",
+			"ranged-size_mod"				=> "ranged-mods-size",
+			"ranged-temp_mod"				=> "ranged-mods-temp",
+			"special-damage_reduction"		=> "hp-damage-reduction",
+			"status-current_hp"				=> "hp-current",
+			"status-current-hp"				=> "hp-current",
+			"status-nonlethal_damage"		=> "hp-damage-nonlethal",
+			"weaponSlot-critical_range"		=> "weaponSlot-critical",
+			"weaponSlot-critical-range"		=> "weaponSlot-critical",
+			"weight-lift_off_ground"		=> "weight-lift-off_ground",
+			"weight-lift_over_head"			=> "weight-lift-over_head",
+			"weight-lift_push_drag"			=> "weight-lift-push_drag",
+			"weight-light_load"				=> "weight-load-light",
+			"weight-medium_load"			=> "weight-load-medium",
+			"weight-heavy_load"				=> "weight-load-heavy",
+			"xp-current"					=> "xp-total"
 		);
+		
+		//list of name => id, for those new attributes that had many old names (i.e. "generic-bab/generic-base_attack_bonus/generic-base-attack-bonus") 
+		$newKeyList = array();
+		
+		foreach($oldToNew as $old => $new) {
+			$sql = "SELECT * FROM csbt_attribute_table WHERE attribute='". $old ."'";
+			$data = $this->db->run_query($sql);
+			
+			if(is_array($data) && isset($data['attribute_id']) && is_numeric($data['attribute_id'])) {
+				$currentId = $data['attribute_id'];
+			}
+			else {
+				$this->logObj->log_by_class(__METHOD__ .":: failed to retrieve data for (". $old ."), DETAILS:::: ". $e->getMessage(), 'Exception in code');
+			}
+			
+			
+			if(isset($newKeyList[$new])) {
+				//The current key is a duplicate of an existing (already re-named) one: update existing character attributes & destroy it.
+				$updateId = $newKeyList[$new];
+				$sql = "UPDATE csbt_character_attribute_table SET attribute_id=". $updateId ." WHERE attribute_id=". $currentId;
+				$numUpdates = $this->db->run_update($sql, true);
+				
+				$this->logsObj->log_by_class(__METHOD__ .":: updated (". $numUpdates .") references from '". $old ."' (id=". $currentId .") to '". $new ."'(id=". $updateId .")", 'Update');
+				
+				
+				$numRemaining = $this->db->run_query("select * FROM csbt_character_attribute_table WHERE attribute_id=". $currentId);
+				
+				if($numRemaining == 0) {
+					//now delete the old unused key.
+					$sql = "DELETE FROM csbt_attribute_table WHERE attribute_id=". $currentId;
+					$numUpdates = $this->db->run_update($sql);
+					$this->logsObj->log_by_class(__METHOD__ .":: deleted (". $numUpdates .") to '". $old ."'", 'Delete');
+				}
+				else {
+					$details = __METHOD__ .":: FATAL: ". count($numRemaining) ." records remain for (". $old .")";
+					$this->logsObj->log_by_class($details, "Error");
+					throw new exception($details);
+				}
+			}
+			else {
+				//update from old name to new name.
+				$sql = "UPDATE csbt_attribute_table SET attribute='". $new ."' WHERE attribute_id=". $currentId;
+				$numUpdates = $this->db->run_update($sql, true);
+				$newKeyList[$new] = $currentId;
+				
+				$this->logsObj->log_by_class(__METHOD__ .":: renamed '". $old ."' to '". $new ."', attribute_id=(". $currentId .")", 'Update');
+			}
+		}
 	}//end do_key_changes()
 	//=========================================================================
 }
