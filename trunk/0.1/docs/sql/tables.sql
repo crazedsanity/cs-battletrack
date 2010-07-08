@@ -35,6 +35,10 @@ CREATE TABLE csbt_attribute_table (
 
 
 
+--
+-- NOTE::: this table (and 'csbt_attribute_table') is a remnant of the old, one-table system; it should eventually 
+--    be completely superceded by specific tables.
+-- 
 CREATE TABLE csbt_character_attribute_table (
 	character_attribute_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
@@ -42,21 +46,31 @@ CREATE TABLE csbt_character_attribute_table (
 	attribute_value text NOT NULL
 );
 
-CREATE TABLE csbt_skill_ability_table (
-	skill_ability_id serial NOT NULL PRIMARY KEY,
+CREATE TABLE csbt_ability_table (
+	ability_id serial NOT NULL PRIMARY KEY,
 	ability_name varchar(3) NOT NULL UNIQUE
 );
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('str');
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('con');
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('dex');
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('int');
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('wis');
-INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('cha');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('str');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('con');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('dex');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('int');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('wis');
+INSERT INTO csbt_ability_table (ability_name) VALUES ('cha');
+
+-- 
+-- Each character should have 6 records (str, con, dex, int, wis, cha), and should be UNIQUE.
+-- 
+CREATE TABLE csbt_character_ability_table (
+	character_ability_id serial NOT NULL PRIMARY KEY,
+	ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id),
+	ability_score integer NOT NULL DEFAULT 10,
+	temporary_score integer DEFAULT NULL
+);
 
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
-	skill_ability_id integer NOT NULL REFERENCES csbt_skill_ability_table (skill_ability_id),
+	ability_id integer NOT NULL REFERENCES csbt_ability_table (ability_id),
 	skill_name text NOT NULL,
 	is_class_skill bool NOT NULL DEFAULT false,
 	skill_mod integer NOT NULL default 0,
