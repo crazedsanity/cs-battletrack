@@ -145,13 +145,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 class csbt_tester extends csbt_battleTrackAbstract {
 	//(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr)
 	public function __construct($dbObj) {
-		try {
-			parent::__construct($dbObj, __METHOD__, __METHOD__, __METHOD__, array(__METHOD__ => __METHOD__));
-		}
-		catch(Exception $e) {
-			$gf = new cs_globalFunctions();
-			$gf->debug_print($dbObj,1);
-		}
+		$this->dbObj = $dbObj;
 	}
 	public function get_sheet_data() {
 		return(parent::get_sheet_data());

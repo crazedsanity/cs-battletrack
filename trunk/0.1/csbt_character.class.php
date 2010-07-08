@@ -78,6 +78,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$this->characterId = $id;
 			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
 			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
+			$this->abilityObj = new csbt_ability($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");

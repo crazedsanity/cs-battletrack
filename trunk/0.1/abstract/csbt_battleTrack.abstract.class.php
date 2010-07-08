@@ -12,7 +12,11 @@
  */
 
 
-abstract class csbt_battleTrackAbstract extends cs_singleTableHandlerAbstract {
+abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
+	
+	protected $tableHandlerObj=null;
+	protected $abilityObj = null;
+	protected $charAbilityObj = null;
 	
 	abstract public function get_sheet_data();
 	abstract public function get_character_defaults();
@@ -37,12 +41,15 @@ abstract class csbt_battleTrackAbstract extends cs_singleTableHandlerAbstract {
 		
 		$this->set_version_file_location(dirname(__FILE__) .'/../VERSION');
 		
+		parent::__construct(true);
+		
 		$this->logger = new cs_webdblogger($dbObj, $this->get_project() .'::'. __CLASS__);
 		
 		$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
 		$upgradeObj->check_versions(true);
 		
-		parent::__construct($this->dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr);
+		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr);
+		$this->abilityObj = new csbt_ability($this->dbObj);
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	

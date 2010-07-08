@@ -50,9 +50,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function get_ability_id($abilityName) {
 		try {
-			$sql = "SELECT * FROM csbt_ability_table WHERE ability_name='". strtolower($abilityName) ."'";
-			$data = $this->dbObj->run_query($sql);
-			$retval = $data['ability_id'];
+			$retval = $this->abilityObj->get_ability_id($abilityName);
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve abilityName (". $abilityName ."), DETAILS::: ". $e->getMessage());
@@ -68,9 +66,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	public function get_ability_name($abilityId) {
 		if(is_numeric($abilityId) && $abilityId > 0) {
 			try {
-				$sql = "SELECT * FROM csbt_ability_table WHERE ability_id='". $abilityId ."'";
-				$data = $this->dbObj->run_query($sql);
-				$retval = $data['ability_name'];
+				$retval = $this->abilityObj->get_ability_name($abilityId);
 			}
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to retrieve abilityName (". $abilityId ."), DETAILS::: ". $e->getMessage());
@@ -96,11 +92,11 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			else {
 				$insertArr = array('skill_name'=>$name);
 			}
-			$insertArr['ability_id'] = $this->get_ability_id($ability);
+			$insertArr['ability_id'] = $this->abilityObj->get_ability_id($ability);
 			$insertArr['character_id'] = $this->characterId;
 			
 			try {
-				$newId = $this->create_record($insertArr);
+				$newId = $this->tableHandlerObj->create_record($insertArr);
 			}
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage());
@@ -151,9 +147,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_skill_by_name($name) {
-		$data = $this->get_records(array('skill_name'=>$name), 'skill_name', 1);
-		$keys = array_keys($data);
-		$data = $data[$keys[0]];
+		$data = $this->tableHandlerObj->get_single_record('skill_name', $name);
 		$data['ability_name'] = $this->get_ability_name($data['ability_id']);
 		
 		return($data);
