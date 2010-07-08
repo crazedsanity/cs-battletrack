@@ -57,6 +57,7 @@ INSERT INTO csbt_skill_ability_table (ability_name) VALUES ('cha');
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	skill_name text NOT NULL,
 	skill_ability_id integer NOT NULL REFERENCES csbt_skill_ability_table (skill_ability_id),
 	is_class_skill bool NOT NULL DEFAULT false,
 	skill_mod integer NOT NULL default 0,
@@ -68,7 +69,7 @@ CREATE TABLE csbt_character_skill_table (
 CREATE TABLE csbt_character_weapon_table (
 	character_weapon_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
-	name text NOT NULL,
+	weapon_name text NOT NULL,
 	total_attack_bonus integer NOT NULL,
 	damage text NOT NULL,
 	critical text NOT NULL,
@@ -84,7 +85,7 @@ CREATE TABLE csbt_character_weapon_table (
 CREATE TABLE csbt_character_armor_table (
 	character_armor_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
-	name text NOT NULL,
+	armor_name text NOT NULL,
 	armor_type text NOT NULL,
 	ac_bonus integer NOT NULL,
 	check_penalty integer NOT NULL DEFAULT 0,
@@ -98,13 +99,13 @@ CREATE TABLE csbt_character_armor_table (
 
 CREATE TABLE csbt_character_feat_ability_table (
 	character_feat_ability_id serial NOT NULL PRIMARY KEY,
-	name text NOT NULL,
+	feat_name text NOT NULL,
 	description text
 );
 
 CREATE TABLE csbt_character_gear_table (
 	character_gear_id serial NOT NULL PRIMARY KEY,
-	name text NOT NULL,
+	gear_name text NOT NULL,
 	weight integer NOT NULL DEFAULT 1,
 	location text
 );

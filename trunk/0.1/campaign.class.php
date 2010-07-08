@@ -47,23 +47,26 @@ class campaign extends battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_campaign($campaignId) {
-		$this->_sanity();
 		$sql = "SELECT * FROM csbt_campaign_table WHERE campaign_id=". $campaignId;
-		$data = $this->dbObj->run_query($sql);
-		$numRows = $this->dbObj->numRows();
-		$dbError = $this->dbObj->errorMsg();
-			
+		try {
+			$data = $this->dbObj->run_query($sql);
+			$numRows = $this->dbObj->numRows();
+			$dbError = $this->dbObj->errorMsg();
+				
 			if($numRows != 1 || strlen($dbError) !== 0) {
 				//now set some internal items.
-			$this->campaignId = $data['campaign_id'];
-			
+				$this->campaignId = $data['campaign_id'];
+				$this->_sanity();
+			}
+			else {
+				throw new exception(__METHOD__ .": invalid number of records (". $numRows() .") or" 
+						." database error (". $dbError .")");
+			}
 		}
-		else {
-			throw new exception(__METHOD__ .": invalid number of records (". $numRows() .") or" 
-					." database error (". $dbError .")");
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve campaign (". $campaignId ."), DETAILS::: ". $e->getMessage());
 		}
-		
-		
+		return($data);
 	}//end get_campaign()
 	//-------------------------------------------------------------------------
 	
@@ -92,11 +95,32 @@ class campaign extends battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function update_campaign($campaignName) {
+	public function update_campaign($campaignName, $ownerUid=null, $isActive=null) {
 		$this->_sanity();
 		
-		$sql = "UPDATE csbt_campaign_table SET campaign_name='". $this->gfObj->cleanString($campaignName, 'sql')
+		$cleanString = array(
+			'campaign_name'		=> 'sql',
+			'owner_uid'			=> 'int',
+			'is_active'			=> 'bool'
+		);
+		$sqlArr = array(
+			'campaign_name'		=> $campaignName
+		);
+		if(!is_null($ownerUid) && is_numeric($ownerUid) && $ownerUid > 0) {
+			$sqlArr['owner_uid'] = $ownerUid;
+		}
+		if(!is_null($isActive) && is_bool($isActive)) {
+			$sqlArr['is_active'] = $isActive;
+		}
+		$sql = "UPDATE csbt_campaign_table SET ". $this->gfObj->string_from_array($sqlArr, 'update', null, $cleanString, true)
 			."' WHERE campaign_id=". $this->campaignId;
+		try {
+			$retval = $this->dbObj->run_update($sql,true);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to update campaign record, DETAILS::: ". $e->getMessage());
+		}
+		return($retval);
 	}//end update_campaign()
 	//-------------------------------------------------------------------------
 	
