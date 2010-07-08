@@ -60,7 +60,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			'csbt_attribute_table', 'csbt_campaign_table', 'csbt_character_armor_table',
 			'csbt_character_attribute_table', 'csbt_character_feat_ability_table', 
 			'csbt_character_gear_table', 'csbt_character_skill_table', 'csbt_character_table',
-			'csbt_character_weapon_table', 'csbt_skill_ability_table'
+			'csbt_character_weapon_table', 'csbt_ability_table'
 		);
 		
 		$db = $this->create_dbconn();
@@ -86,9 +86,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		$x = new csbt_tester($dbObj);
 		$x->load_schema();
-		$char = new character($dbObj, $playerName, true, $playerUid);
+		$char = new csbt_character($dbObj, $playerName, true, $playerUid);
 		
 		$this->assertTrue(is_numeric($char->characterId));
+		
+		//give the character some stats.
 		
 		$defaults = $char->get_character_defaults();
 		$this->assertTrue(is_array($defaults));
@@ -121,11 +123,16 @@ class testOfCSBattleTrack extends UnitTestCase {
 				$this->assertTrue(isset($testData['ability_mod']));
 				
 				
-				$findKey = $char->create_sheet_id(skill::sheetIdPrefix, $skillName, $testData['skill_ability_id']);
+				$findKey = $char->create_sheet_id(csbt_skill::sheetIdPrefix, $skillName, $testData['ability_id']);
 				
 				#$this->gfObj->debug_print($testData);
 				#exit;
 			}
+		}
+		
+		//test creation/updating of armor.
+		{
+			
 		}
 		
 		$this->assertTrue(is_array($sheetData));
@@ -135,7 +142,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 	
 }
 
-class csbt_tester extends battleTrackAbstract {
+class csbt_tester extends csbt_battleTrackAbstract {
 	//(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr)
 	public function __construct($dbObj) {
 		try {

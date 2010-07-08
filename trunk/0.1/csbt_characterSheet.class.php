@@ -13,7 +13,7 @@
 
 //TODO: consider optionally adding the logging system.
 
-class characterSheet extends battleTrackAbstract {
+class csbt_characterSheet extends csbt_battleTrackAbstract {
 	
 	protected $characterId;
 	
@@ -50,7 +50,7 @@ class characterSheet extends battleTrackAbstract {
 			#$this->get_character_data();
 		}
 		elseif(is_string($characterIdOrName) && strlen($characterIdOrName) >= 2) {
-			$this->characterObj = new character($dbObj, $characterIdOrName, true, $playerUid);
+			$this->characterObj = new csbt_character($dbObj, $characterIdOrName, true, $playerUid);
 			$this->set_character_id($this->characterObj->characterId);
 		}
 		else {
@@ -69,8 +69,8 @@ class characterSheet extends battleTrackAbstract {
 				$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
 			}
 			$this->characterId = $id;
-			$this->skillObj = new skill($this->dbObj,$this->characterId);
-			$this->characterObj = new character($this->dbObj, $this->characterId);
+			$this->skillObj = new csbt_skill($this->dbObj,$this->characterId);
+			$this->characterObj = new csbt_character($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");

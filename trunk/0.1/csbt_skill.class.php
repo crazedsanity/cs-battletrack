@@ -10,7 +10,7 @@
  * $LastChangedBy$
  */
 
-class skill extends battleTrackAbstract	 {
+class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
@@ -18,8 +18,8 @@ class skill extends battleTrackAbstract	 {
 	const tableName = 'csbt_character_skill_table';
 	const tableSeq  = 'csbt_character_skill_table_character_skill_id_seq';
 	const pkeyField = 'character_skill_id';
-	const joinTable = 'csbt_skill_ability_table';
-	const joinTableField = 'skill_ability_id';
+	const joinTable = 'csbt_ability_table';
+	const joinTableField = 'ability_id';
 	const sheetIdPrefix = 'skills__';
 	
 	
@@ -34,7 +34,7 @@ class skill extends battleTrackAbstract	 {
 		$this->fields = array(
 			'character_id'		=> 'int',
 			'skill_name'		=> 'sql',
-			'skill_ability_id'	=> 'int',
+			'ability_id'		=> 'int',
 			'is_class_skill'	=> 'bool',
 			'skill_mod'			=> 'int',
 			'ability_mod'		=> 'int',
@@ -50,9 +50,9 @@ class skill extends battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function get_ability_id($abilityName) {
 		try {
-			$sql = "SELECT * FROM csbt_skill_ability_table WHERE ability_name='". strtolower($abilityName) ."'";
+			$sql = "SELECT * FROM csbt_ability_table WHERE ability_name='". strtolower($abilityName) ."'";
 			$data = $this->dbObj->run_query($sql);
-			$retval = $data['skill_ability_id'];
+			$retval = $data['ability_id'];
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve abilityName (". $abilityName ."), DETAILS::: ". $e->getMessage());
@@ -68,7 +68,7 @@ class skill extends battleTrackAbstract	 {
 	public function get_ability_name($abilityId) {
 		if(is_numeric($abilityId) && $abilityId > 0) {
 			try {
-				$sql = "SELECT * FROM csbt_skill_ability_table WHERE skill_ability_id='". $abilityId ."'";
+				$sql = "SELECT * FROM csbt_ability_table WHERE ability_id='". $abilityId ."'";
 				$data = $this->dbObj->run_query($sql);
 				$retval = $data['ability_name'];
 			}
@@ -96,7 +96,7 @@ class skill extends battleTrackAbstract	 {
 			else {
 				$insertArr = array('skill_name'=>$name);
 			}
-			$insertArr['skill_ability_id'] = $this->get_ability_id($ability);
+			$insertArr['ability_id'] = $this->get_ability_id($ability);
 			$insertArr['character_id'] = $this->characterId;
 			
 			try {
@@ -154,7 +154,7 @@ class skill extends battleTrackAbstract	 {
 		$data = $this->get_records(array('skill_name'=>$name), 'skill_name', 1);
 		$keys = array_keys($data);
 		$data = $data[$keys[0]];
-		$data['ability_name'] = $this->get_ability_name($data['skill_ability_id']);
+		$data['ability_name'] = $this->get_ability_name($data['ability_id']);
 		
 		return($data);
 	}//end get_skill_by_name()

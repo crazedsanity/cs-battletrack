@@ -12,7 +12,7 @@
  */
 
 
-abstract class battleTrackAbstract extends cs_singleTableHandlerAbstract {
+abstract class csbt_battleTrackAbstract extends cs_singleTableHandlerAbstract {
 	
 	abstract public function get_sheet_data();
 	abstract public function get_character_defaults();

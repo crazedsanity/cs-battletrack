@@ -13,7 +13,7 @@
 
 require_once(dirname(__FILE__) .'/characterSheet.class.php');
 
-class userCharacterList extends characterSheet {
+class csbt_userCharacterList extends csbt_characterSheet {
 	
 	private $uid;
 	

@@ -10,7 +10,7 @@
  * $LastChangedBy$
  */
 
-class campaign extends battleTrackAbstract	 {
+class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	protected $campaignId;
 	

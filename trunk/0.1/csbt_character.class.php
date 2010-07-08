@@ -17,7 +17,7 @@
  * 	classes when the need arises.
  */
 
-class character extends battleTrackAbstract {
+class csbt_character extends csbt_battleTrackAbstract {
 	
 	protected $characterId;
 	
@@ -76,8 +76,8 @@ class character extends battleTrackAbstract {
 				$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
 			}
 			$this->characterId = $id;
-			$this->skillsObj = new skill($this->dbObj,$this->characterId);
-			$this->armorObj = new characterArmor($this->dbObj, $this->characterId);
+			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
+			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");

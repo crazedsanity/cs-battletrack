@@ -10,7 +10,7 @@
  * $LastChangedBy$
  */
 
-class characterArmor extends battleTrackAbstract	 {
+class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
