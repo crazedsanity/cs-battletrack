@@ -39,22 +39,6 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_sheet_data() {
-		throw new exception(__METHOD__ .":: invalid call, no sheet data available");
-	}//end get_sheet_data()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function get_character_defaults() {
-		throw new exception(__METHOD);
-	}//end get_character_defaults()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
 	protected function get_ability_list() {
 		try {
 			$data = $this->get_records();
@@ -107,6 +91,21 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 		
 		return($retval);
 	}//end get_ability_id()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_ability_modifier($abilityName, $isTemp=false) {
+		//TODO: handle temporary modifiers ($isTemp)
+		if(isset($this->dataCache['byName'][$abilityName])) {
+			$score = $this->dataCache['byName'][$abilityName];
+			$modifier = floor(($score -10)/2);
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid ability (". $abilityName .")");
+		}
+	}//get_ability_modifier()
 	//-------------------------------------------------------------------------
 }
 
