@@ -30,7 +30,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			'ability_id'		=> 'int',
 			'ability_name'		=> 'sql'
 		);
-		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
+		
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
 		$this->get_ability_list();
 	}//end __construct()
@@ -39,7 +39,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	protected function get_ability_list() {
+	public function get_ability_list() {
 		try {
 			$data = $this->get_records();
 			
@@ -96,15 +96,18 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_ability_modifier($abilityName, $isTemp=false) {
+	public function get_ability_modifier($score) {
 		//TODO: handle temporary modifiers ($isTemp)
-		if(isset($this->dataCache['byName'][$abilityName])) {
-			$score = $this->dataCache['byName'][$abilityName];
+		if(is_numeric($score) && $score > 0) {
 			$modifier = floor(($score -10)/2);
 		}
-		else {
-			throw new exception(__METHOD__ .":: invalid ability (". $abilityName .")");
+		elseif(is_null($score)) {
+			$modifier = null;
 		}
+		else {
+			throw new exception(__METHOD__ .":: invalid score (". $score .")");
+		}
+		return($modifier);
 	}//get_ability_modifier()
 	//-------------------------------------------------------------------------
 }

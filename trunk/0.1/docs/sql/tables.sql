@@ -62,6 +62,7 @@ INSERT INTO csbt_ability_table (ability_name) VALUES ('cha');
 -- 
 CREATE TABLE csbt_character_ability_table (
 	character_ability_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id),
 	ability_score integer NOT NULL DEFAULT 10,
 	temporary_score integer DEFAULT NULL
@@ -70,8 +71,8 @@ CREATE TABLE csbt_character_ability_table (
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
-	ability_id integer NOT NULL REFERENCES csbt_ability_table (ability_id),
 	skill_name text NOT NULL,
+	ability_id integer NOT NULL REFERENCES csbt_ability_table (ability_id),
 	is_class_skill bool NOT NULL DEFAULT false,
 	skill_mod integer NOT NULL default 0,
 	ability_mod integer NOT NULL default 0,

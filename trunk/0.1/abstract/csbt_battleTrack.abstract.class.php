@@ -41,12 +41,12 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		
 		$this->set_version_file_location(dirname(__FILE__) .'/../VERSION');
 		
-		parent::__construct(true);
+		#parent::__construct(true);
 		
-		$this->logger = new cs_webdblogger($dbObj, $this->get_project() .'::'. __CLASS__);
+		#$this->logger = new cs_webdblogger($dbObj, $this->get_project() .'::'. __CLASS__);
 		
-		$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
-		$upgradeObj->check_versions(true);
+		#$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
+		#$upgradeObj->check_versions(true);
 		
 		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr);
 		$this->abilityObj = new csbt_ability($this->dbObj);
@@ -60,7 +60,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		if(is_string($name) && strlen($name) >= 1 && is_numeric($id) && $id > 0) {
 			$sheetId = preg_replace('/[^a-z0-9]/', '_', strtolower($name));
 			$sheetId = preg_replace('/_{2,}/', '_', $sheetId);
-			$sheetId = $prefix . $sheetId . '_'. $id;
+			$sheetId = $prefix . '__' . $sheetId . '__'. $id;
 		}
 		else {
 			throw new exception(__METHOD__ .":: invalid name (". $name .") or id (". $id .")");

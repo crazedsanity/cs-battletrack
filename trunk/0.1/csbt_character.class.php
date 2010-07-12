@@ -78,7 +78,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$this->characterId = $id;
 			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
 			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
-			$this->abilityObj = new csbt_ability($this->dbObj, $this->characterId);
+			$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
@@ -224,25 +224,13 @@ cs_debug_backtrace(1);
 	
 	//-------------------------------------------------------------------------
 	private function load_character_defaults() {
-		$autoSkills = $this->skillsObj->get_character_defaults();
-		foreach($autoSkills as $i=>$data) {
-			$res = $this->skillsObj->create_skill($data[0], $data[1]);
-		}
+		//load abilities.
+		$this->abilityObj->load_character_defaults();
+		
+		//now load skills.
+		$this->skillsObj->load_character_defaults();
+		
 	}//end load_character_defaults()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function __get($var) {
-		if(isset($this->$var)) {
-			$returnThis = $this->$var;
-		}
-		else {
-			throw new exception(__METHOD__ .": unknown var (". $var .")");
-		}
-		return($returnThis);
-	}//end __get()
 	//-------------------------------------------------------------------------
 	
 	
@@ -265,6 +253,10 @@ cs_debug_backtrace(1);
 				$retval = array_merge($retval, $armorData);
 			}
 			
+			$charAbilities = $this->abilityObj->get_sheet_data();
+			if(is_array($charAbilities)) {
+				$retval = array_merge($retval, $charAbilities);
+			}
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve sheet data, DETAILS::: ". $e->getMessage());

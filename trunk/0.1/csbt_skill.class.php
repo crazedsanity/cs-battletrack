@@ -20,7 +20,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	const pkeyField = 'character_skill_id';
 	const joinTable = 'csbt_ability_table';
 	const joinTableField = 'ability_id';
-	const sheetIdPrefix = 'skills__';
+	const sheetIdPrefix = 'skills';
 	
 	
 	//-------------------------------------------------------------------------
@@ -259,6 +259,18 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 		}
 		return($autoSkills);
 	}//end get_character_defaults()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function load_character_defaults() {
+	
+		$autoSkills = $this->get_character_defaults();
+		foreach($autoSkills as $i=>$data) {
+			$res = $this->create_skill($data[0], $data[1]);
+		}
+	}//end load_character_defaults()
 	//-------------------------------------------------------------------------
 }
 

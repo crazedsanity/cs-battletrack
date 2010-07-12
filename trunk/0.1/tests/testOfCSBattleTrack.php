@@ -88,9 +88,60 @@ class testOfCSBattleTrack extends UnitTestCase {
 		$x->load_schema();
 		$char = new csbt_character($dbObj, $playerName, true, $playerUid);
 		
-		$this->assertTrue(is_numeric($char->characterId));
+		$this->assertTrue(is_numeric($char->characterId));		
 		
-		//give the character some stats.
+		//sanity testing for max load for given strength values.
+		{
+			//These are directly out of PHB3.5
+			$scoreToMaxLoad = array(
+				1	=> 10,
+				2	=> 20,
+				3	=> 30,
+				4	=> 40,
+				5	=> 50,
+				6	=> 60,
+				7	=> 70,
+				8	=> 80,
+				10	=> 100,
+				11	=> 115,
+				12	=> 130,
+				13	=> 150,
+				14	=> 175,
+				15	=> 200,
+				16	=> 230,
+				17	=> 260,
+				18	=> 300,
+				19	=> 350,
+				20	=> 400,
+				21	=> 460,
+				22	=> 520,
+				23	=> 600,
+				24	=> 700,
+				25	=> 800,
+				26	=> 920,
+				27	=> 1040,
+				28	=> 1200,
+				29	=> 1400,
+				
+				//anything above 29 isn't in the handbook... to simplify things, it does NOT go by the strange explanation in the book, so 
+				//	these strength values will actually be significantly higher than what they would be in the book:
+				//	Strength	| BOOK			| BattleTracker	| DIFFERENCE
+				// -------------+---------------
+				//	  40		|      6,000	|      6,400	|     400
+				//	 100		| 25,600,000	| 26,217,800	| 617,800
+				//
+				//  It is a significant difference, once values get that high, there's a bit more leniency on how much things weigh (either they can lift the house or not).
+				//
+				30	=> 1600,
+				40	=> 6400,		//by the book, this should be 6,000
+				100	=> 26217800		//by the book, this should be 25,600,000
+			);
+			
+			foreach($scoreToMaxLoad as $score => $maxLoad) {
+				$derivedMaxLoad = $char->abilityObj->get_max_load($score);
+				$this->assertEqual($derivedMaxLoad, $maxLoad, "Wrong max load for strength of (". $score ."), got (". $derivedMaxLoad .") instead of (". $maxLoad .")");
+			}
+		}
 		
 		$defaults = $char->get_character_defaults();
 		$this->assertTrue(is_array($defaults));
