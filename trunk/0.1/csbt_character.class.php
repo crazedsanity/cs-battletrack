@@ -271,6 +271,48 @@ cs_debug_backtrace(1);
 	}//end get_sheet_data()
 	//-------------------------------------------------------------------------
 	
+	
+	
+	//-------------------------------------------------------------------------
+	public function handle_update($sheetId, $recordId=null, $newValue) {
+		$bits = $this->parse_sheet_id($sheetId);
+		$updateType = array_shift($bits);
+		
+		$sheetIdBit = $bits[0];
+		
+		//Record ID (usually only supplied for lists of things like skills, skipped for unique items like abilities).
+		$recordId = null;
+		if(isset($bits[1])) {
+			$recordId = $bits[1];
+		}
+		
+		switch($updateType) {
+			case 'characterAbility':
+			case 'characterAbilities':
+				//TODO: this call should return the affected ability so automatic updates work; for temporary, don't return anything.
+				$retval = $this->abilityObj->handle_update($sheetIdBit, $recordId, $newValue);
+				
+				//TODO: handle automatic updates for skills.
+				$abilityName = substr($sheetIdBit, 0, 3);
+				$affectedSkills = $this->skillsObj->get_character_skills($abilityName);
+				
+				//update internal ability cache.
+				$this->abilityObj->get_character_abilities();
+				
+				if(is_array($affectedSkills) && count($affectedSkills) > 0) {
+					foreach($affectedSkills as $id=>$skillInfo) {
+						$this->skillsObj->handle_update('ability_mod', $id, $this->abilityObj->get_ability_modifier($abilityName));
+					}
+				}
+				break;
+			
+			default:
+				throw new exception(__METHOD__ .":: invalid update type (". $updateType .") for sheetId (". $sheetId ."), no class to handle it");
+		}
+		
+		return($retval);
+	}//end handle_update()
+	//-------------------------------------------------------------------------
 }
 
 ?>

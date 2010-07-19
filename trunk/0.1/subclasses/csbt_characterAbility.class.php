@@ -21,7 +21,11 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	const pkeyField = 'character_ability_id';
 	const sheetIdPrefix = 'characterAbility';
 	
+	private $lastCall=null;
+	
 	protected $dataCache=array();
+	
+	protected $updatesByKey = array();
 	
 	//-------------------------------------------------------------------------
 	/**
@@ -101,6 +105,8 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			}
 			try {
 				$recId = $this->tableHandlerObj->create_record($insertArr);
+				
+				//TODO: should this store an entry into $this->updatesByKey?
 			}
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to create record::: ". $e->getMessage());
@@ -124,31 +130,14 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			$retval = array();
 			foreach($this->dataCache['abilities'] as $abilityName=>$arr) {
 				foreach($arr as $scoreIndex => $scoreValue) {
-					$key = $this->create_sheet_id(self::sheetIdPrefix, $abilityName .'_'. $scoreIndex, $this->dataCache['idLinker'][$abilityName]);
+					$key = $this->create_sheet_id(self::sheetIdPrefix, $abilityName .'_'. $scoreIndex);
 					$retval[$key] = $scoreValue;
 				}
 			}
 			
-			//now get additional indexes for push/pull/drag/etc (base on strength)
-			$strengthScore = $this->dataCache['abilities']['str']['score'];
+			$extraStats = $this->get_strength_stats($this->dataCache['abilities']['str']['score']);
+			$retval = array_merge($extraStats, $retval);
 			
-			if($strengthScore <= 10) {
-				$maxLoad = $strengthScore * 10;
-			}
-			else {
-				//So a score of 17 would be::: 1.1487^(17-10)*100
-				//	1.1487^7*100
-				//	2.63904227623 * 100
-				//	263.904227623  (or ~264) --> 265
-				//
-				//	19 would be::: 1.1487^(19-10)*100
-				//	1.1487^9*100
-				//	3.48224713389*100
-				//	348.224713389  (or ~348) --> 350
-				//	
-				$maxLoad = (1.1487^($strengthScore - 10)) * 100;
-			}
-			$retval['TESTTHIS'] = $maxLoad;
 		}
 		else {
 			throw new exception(__METHOD__ .":: missing internal data cache");
@@ -168,32 +157,48 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		//	from http://www.superdan.net/download/superabilities.rtf
 		
 		if(is_numeric($strScore) && $strScore > 0) {
+			
+			//round UP to the nearest 5, 10, 20, or 40 (in steps of 5 strength)
+			$roundingSteps = array(
+				1	=> 5,
+				2	=> 10,
+				3	=> 20,
+				4	=> 40
+			);
+			
+			$useRoundingStep = ceil(($strScore -10)/5);
+				
+			if(isset($roundingSteps[$useRoundingStep])) {
+				$roundingTo = $roundingSteps[$useRoundingStep];
+			}
+			else {
+				//is this right?  Didn't find anything...
+				$roundingTo = 100;
+			}
+			$firstNum = $strScore -10;
+			$secondNum = pow(1.1487, $firstNum);
+			$almostDone = (int)($secondNum * 100);
+			$retval = round($almostDone/$roundingTo)*$roundingTo;
+			
 			if($strScore <= 10) {
 				$retval = $strScore * 10;
 			}
-			else {
-				$firstNum = $strScore -10;
-				$secondNum = pow(1.1487, $firstNum);
-				$almostDone = (int)($secondNum * 100);
-				
-				
-				//round UP to the nearest 5, 10, 20, or 40 (in steps of 5 strength)
-				$roundingSteps = array(
-					1	=> 5,
-					2	=> 10,
-					3	=> 20,
-					4	=> 40
-				);
-				
-				$useRoundingStep = ceil(($strScore -10)/5);
-				if(isset($roundingSteps[$useRoundingStep])) {
-					$roundingTo = $roundingSteps[$useRoundingStep];
+			elseif($strScore > 29) {
+				$exp = ($strScore/10)-2;
+				if($exp < 1) {
+					$exp = 1;
 				}
-				else {
-					//is this right?  Didn't find anything
-					$roundingTo = 100;
-				}
-				$retval = round($almostDone/$roundingTo)*$roundingTo;
+				$exp = floor($exp);
+				
+				$lastNum = substr($strScore, -1);
+				$useScore = 20 + $lastNum;
+				
+				$this->lastCall = __METHOD__;
+				$multiplyThis = $this->get_max_load($useScore);
+				$this->lastCall = null;
+				
+				$multiplyBy = pow(4, $exp);
+				$retval = ($multiplyThis * pow(4, $exp));
 				
 			}
 		}
@@ -220,7 +225,16 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		$defaults = $this->get_character_defaults();
 		
 		foreach($defaults as $id=>$name) {
-			$this->create_ability($id, rand(6,20));
+			if($this->abilityObj->get_ability_name($id) == 'str') {
+				$abilityScore = 16;
+			}
+			elseif($this->abilityObj->get_ability_name($id) == 'int') {
+				$abilityScore = 6;
+			}
+			else {
+				$abilityScore = rand(6,20);
+			}
+			$this->create_ability($id, $abilityScore);
 		}
 		
 		return($this->get_character_abilities());
@@ -230,9 +244,186 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_ability_modifier($mod) {
-		return($this->abilityObj->get_ability_modifier($mod));
+	public function get_ability_modifier($abilityName) {
+		if(is_numeric($abilityName)) {
+			//trying to get it based on a number...
+			$retval = $this->abilityObj->get_ability_modifier($abilityName);
+		}
+		else {
+			if(!is_array($this->dataCache) || !count($this->dataCache)) {
+				if($this->lastCall == __METHOD__) {
+					throw new exception(__METHOD__ .":: failed to create cache, stopping to avoid recursion");
+				}
+				else {
+					$this->lastCall = __METHOD__;
+					$this->get_character_abilities();
+					$this->lastCall = null;
+					$retval = $this->get_ability_modifier($abilityName);
+				}
+			}
+			else {
+				if(strlen($abilityName) >= 3 && is_array($this->dataCache) && isset($this->dataCache['abilities'][$abilityName]['score'])) {
+					$retval = $this->abilityObj->get_ability_modifier($this->dataCache['abilities'][$abilityName]['score']);
+				}
+				else {
+					throw new exception(__METHOD__ .":: cannot find cached value for (". $abilityName .")");
+				}
+			}
+		}
+		return($retval);
 	}//end get_ability_modifier()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_strength_stats($strengthScore) {
+		$retval = array();
+		
+		//now get additional indexes for push/pull/drag/etc (base on strength)
+		if(is_numeric($strengthScore) && $strengthScore > 0) {
+			
+			$maxLoad = $this->get_max_load($strengthScore);
+			$minLoad = (int)floor($maxLoad /3);		// one third (1/3) heavy load
+			$medLoad = (int)floor($minLoad * 2);		// two thirds (2/3) heavy load
+			
+			
+			
+			$retval[$this->create_sheet_id('generated', 'load_light')] = $minLoad;
+			$retval[$this->create_sheet_id('generated', 'load_medium')] = $medLoad;
+			$retval[$this->create_sheet_id('generated', 'load_heavy')] = $maxLoad;
+			
+			//other things...
+			$retval[$this->create_sheet_id('generated', 'lift_over_head')] = $maxLoad;
+			$retval[$this->create_sheet_id('generated', 'lift_off_ground')] = (int)floor($maxLoad *2);
+			$retval[$this->create_sheet_id('generated', 'push_pull_drag')] = (int)floor($maxLoad *5);
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid strength score (". $strengthScore .")");
+		}
+		return($retval);
+	}//end get_strength_stats()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_ability_score($abilityName, $isTemp=false) {
+		if(is_array($this->dataCache['abilities']) && isset($this->dataCache['abilities'][$abilityName])) {
+			
+			$retval = $this->dataCache['abilities'][$abilityName]['score'];
+			if($isTemp === true) {
+				$retval = $this->dataCache['abilities'][$abilityName]['temp'];
+			}
+		}
+		else {
+			if($this->lastCall == __METHOD__) {
+				throw new exception(__METHOD__ .":: failed to retrieve cached score");
+			}
+			else {
+				$this->get_character_abilities();
+				$this->lastCall = __METHOD__;
+				$retval = $this->get_ability_score();
+				$this->lastCall = null;
+			}
+		}
+		
+		return($retval);
+	}//end get_ability_score()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	/**
+	 * Handles ability updates.
+	 * 
+	 * @see abstract/csbt_battleTrackAbstract#handle_update($sheetBitName, $recId, $newValue)
+	 */
+	public function handle_update($updateBitName, $id=null, $newValue) {
+		if(func_num_args() == 3) {
+			$retval = false;
+			
+			$updateBits = explode('_', $updateBitName);
+			if(count($updateBits) == 2) {
+				try {
+					$abilityId = $this->abilityObj->get_ability_id($updateBits[0]);
+					$abilityName = $this->abilityObj->get_ability_name($abilityId);
+				}
+				catch(Exception $e) {
+					throw new exception(__METHOD__ .":: unable to locate ability_id for (". $updateBits[0] ."), DETAILS::: ". $e->getMessage());
+				}
+				
+				//got the ID, keep going.
+				if(!preg_match('/mod/', $updateBits[1])) {
+					try {
+						if(preg_match('/^temp/', $updateBits[1])) {
+							$fieldToUpdate = 'temporary_score';
+						}
+						elseif(preg_match('/^ability/', $updateBits[1]) || preg_match('/^score$/', $updateBits[1])) {
+							if(!is_null($newValue) && is_numeric($newValue)) {
+							$fieldToUpdate = 'ability_score';
+							}
+							else {
+								cs_debug_backtrace(1);
+								throw new exception("invalid new value (". $newValue .")");
+							}
+						}
+						else {
+							//don't add method name, as it will get caught inside this method anyway.
+							throw new exception("unknown field (". $updateBits[1] .")");
+						}
+						
+						//attempt the update.
+						$recordId = $this->dataCache['idLinker'][$updateBits[0]];
+						$retval = $this->tableHandlerObj->update_record($recordId, array($fieldToUpdate=>$newValue), false);
+						
+						//TODO: add entr(ies) to $this->updateByKeys[{sheetIdKey}]
+					}
+					catch(Exception $e) {
+						throw new exception(__METHOD__ .":: error while attempting update, DETAILS::: ". $e->getMessage());
+					}
+				}
+				else {
+					throw new exception(__METHOD__ .":: FATAL: cannot update modifiers (". $updateBits[1] .") directly");
+				}
+			}
+			else {
+				throw new exception(__METHOD__ .":: wrong number of bits in (". $updateBits[0] ."), expecting 2 but found (". count($updateBits) .")");
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .":: not enough arguments to continue::: ". $this->gfObj->debug_var_dump(func_get_args(),0));
+		}
+		
+		return($retval);
+	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	/**
+	 * Wrapper for csbt_ability::get_ability_id().
+	 * @see csbt_ability::get_ability_id()
+	 */
+	public function get_ability_id($name) {
+		return($this->abilityObj->get_ability_id($name));
+	}//end get_ability_id()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	/**
+	 * Wrapper for csbt_ability::get_ability_name().
+	 * 
+	 * @param $id	ability_id
+	 * @see csbt_ability::get_ability_id()
+	 */
+	public function get_ability_name($id) {
+		return($this->abilityObj->get_ability_name($id));
+	}
 	//-------------------------------------------------------------------------
 }
 

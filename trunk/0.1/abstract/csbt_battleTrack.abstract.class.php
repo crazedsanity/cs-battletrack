@@ -20,6 +20,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	
 	abstract public function get_sheet_data();
 	abstract public function get_character_defaults();
+	abstract public function handle_update($sheetBitName, $recId=null, $newValue);
 	
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr) {
@@ -56,11 +57,17 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function create_sheet_id($prefix, $name, $id) {
-		if(is_string($name) && strlen($name) >= 1 && is_numeric($id) && $id > 0) {
+	public function create_sheet_id($prefix, $name, $id=null) {
+		if(is_string($name) && strlen($name) >= 1) {
+			$prefix = preg_replace('/_/', '', $prefix);
+			
 			$sheetId = preg_replace('/[^a-z0-9]/', '_', strtolower($name));
 			$sheetId = preg_replace('/_{2,}/', '_', $sheetId);
-			$sheetId = $prefix . '__' . $sheetId . '__'. $id;
+			$sheetId = $prefix . '__' . $sheetId;
+			
+			if(!is_null($id) && is_numeric($id) && $id > 0) {
+				$sheetId .=  '__'. $id;
+			}
 		}
 		else {
 			throw new exception(__METHOD__ .":: invalid name (". $name .") or id (". $id .")");
@@ -80,6 +87,23 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 			throw new exception(__METHOD__ .":: failed to load schema, ERROR::: ". $this->dbObj->errorMsg());
 		}
 	}//end load_schema()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function parse_sheet_id($sheetId) {
+		if(strlen($sheetId) && preg_match('/__/', $sheetId)) {
+			$bits = explode('__', $sheetId);
+			if(count($bits) > 3 || count($bits) < 2) {
+				throw new exception(__METHOD__ .":: invalid number of bits (". count($bits) .") [expecting 2-3] in sheetId (". $sheetId .")");
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid sheetId (". $sheetId .")");
+		}
+		return($bits);
+	}//end parse_sheet_id()
 	//-------------------------------------------------------------------------
 }
 

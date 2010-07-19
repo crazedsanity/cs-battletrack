@@ -48,41 +48,6 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_ability_id($abilityName) {
-		try {
-			$retval = $this->abilityObj->get_ability_id($abilityName);
-		}
-		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve abilityName (". $abilityName ."), DETAILS::: ". $e->getMessage());
-		}
-		
-		return($retval);
-	}//end get_ability_id()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function get_ability_name($abilityId) {
-		if(is_numeric($abilityId) && $abilityId > 0) {
-			try {
-				$retval = $this->abilityObj->get_ability_name($abilityId);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to retrieve abilityName (". $abilityId ."), DETAILS::: ". $e->getMessage());
-			}
-		}
-		else {
-			throw new exception(__METHOD__ .":: invalid abilityId (". $abilityId .")");
-		}
-		
-		return($retval);
-	}//end get_ability_name()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
 	public function create_skill($name, $ability, array $fields=null) {
 		if(is_string($name) && strlen($name)) {
 			if(is_array($fields) && count($fields) > 0) {
@@ -96,6 +61,18 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			$insertArr['character_id'] = $this->characterId;
 			
 			try {
+				//get their ability modifier.
+				$charAbilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
+				$insertArr['ability_mod'] = $charAbilityObj->get_ability_modifier($ability);
+
+				$insertArr['skill_mod'] = $insertArr['ability_mod'];
+				if(isset($insertArr['ranks'])) {
+					$insertArr['skill_mod'] += $insertArr['ranks'];
+				}
+				if(isset($insertArr['misc_mod'])) {
+					$insertArr['skill_mod'] += $insertArr['misc_mod'];
+				}
+				
 				$newId = $this->tableHandlerObj->create_record($insertArr);
 			}
 			catch(Exception $e) {
@@ -115,25 +92,11 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function update_skill($skillId, array $updates) {
 		if(is_numeric($skillId) && $skillId > 0 && is_array($updates) && count($updates) > 0) {
-			$sqlArr = array();
-			foreach($updates as $key=>$val) {
-				if(isset($this->fields[$key])) {
-					$sqlArr[$key] = $val;
-				}
+			try {
+				$retval = $this->tableHandlerObj->update_record($skillId, $updates, true);
 			}
-			if(count($sqlArr)) {
-				$updateSql = 'UPDATE '. self::tableName .' SET '
-					. $this->gfObj->string_from_array($sqlArr, 'update', null, $this->fields)
-					. ' WHERE skill_id='. $skillId .' AND character_id='. $this->characterId;
-				try {
-					$retval = $this->dbObj->run_update($updateSql);
-				}
-				catch(Exception $e) {
-					throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
-				}
-			}
-			else {
-				throw new exception(__METHOD__ .":: no valid fields to update");
+			catch(Exception $e) {
+				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
 			}
 		}
 		else {
@@ -148,7 +111,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function get_skill_by_name($name) {
 		$data = $this->tableHandlerObj->get_single_record('skill_name', $name);
-		$data['ability_name'] = $this->get_ability_name($data['ability_id']);
+		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
 		
 		return($data);
 	}//end get_skill_by_name()
@@ -157,10 +120,27 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_skills() {
+	public function get_skill_by_id($skillId) {
+		$data = $this->tableHandlerObj->get_single_record(self::pkeyField, $skillId);
+		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
+		
+		return($data);
+	}//end get_skill_by_id()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_character_skills($byAbilityName=null) {
+		
 		$sql = 'SELECT t.*, t2.ability_name FROM '. self::tableName .' AS t INNER JOIN '. self::joinTable .' AS t2 '
-			. ' USING ('. self::joinTableField .') WHERE character_id='. $this->characterId
-			. ' ORDER BY skill_name';
+			. ' USING ('. self::joinTableField .') WHERE character_id='. $this->characterId;
+		
+		if(!is_null($byAbilityName) && !is_numeric($byAbilityName) && strlen($byAbilityName)) {
+			$sql .= " AND t.ability_id=". $this->abilityObj->get_ability_id($byAbilityName);
+		}
+		$sql .= ' ORDER BY skill_name';
+		
 		try {
 			$retval = $this->dbObj->run_query($sql, 'character_skill_id');
 		}
@@ -184,7 +164,6 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				'ability_mod', 'ranks', 'misc_mod'
 			);
 			foreach($data as $id=>$skillData) {
-				#$retval[$id]['sheetId'] = $this->create_sheet_id(self::sheetIdPrefix, $skillData['skill_name'], $id);
 				foreach($makeKeysFrom as $indexName) {
 					if(isset($skillData[$indexName])) {
 						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName, $skillData['character_skill_id']);
@@ -265,12 +244,63 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function load_character_defaults() {
-	
 		$autoSkills = $this->get_character_defaults();
 		foreach($autoSkills as $i=>$data) {
 			$res = $this->create_skill($data[0], $data[1]);
 		}
 	}//end load_character_defaults()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function calculate_skill_mod(array $skillData) {
+		$requiredIndexes = array('ability_mod', 'ranks', 'misc_mod');
+		$skillMod = 0;
+		foreach($requiredIndexes as $indexName) {
+			if(isset($skillData[$indexName])) {
+				$skillMod += $skillData[$indexName];
+			}
+			else {
+				throw new exception(__METHOD__ .":: missing required index (". $indexName .")");
+			}
+		}
+		return($skillMod);
+	}//end calculate_skill_mod()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function handle_update($updateBitName, $recordId=null, $newValue) {
+		
+		try {
+			$oldSkillVals = $this->get_skill_by_id($recordId);
+			switch($updateBitName) {
+				case 'ability_mod':
+				case 'skill_name':
+				case 'ranks':
+				case 'misc_mod':
+				case 'is_class_skill':
+					break;
+				
+				default:
+					throw new exception(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
+			}
+			
+			//now perform the update.
+			$oldSkillVals[$updateBitName] = $newValue;
+			$updatesArr = array(
+				$updateBitName	=> $newValue,
+				'skill_Mod'		=> $this->calculate_skill_mod($oldSkillVals)
+			);
+			$this->update_skill($recordId, $updatesArr);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
+		}
+		
+	}//end handle_update()
 	//-------------------------------------------------------------------------
 }
 

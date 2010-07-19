@@ -81,6 +81,12 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_ability_id($name) {
+		
+		//it is a long string... rip out the first 3 characters.
+		if(strlen($name) > 3) {
+			$name = substr($name,0,3);
+		}
+		
 		if(isset($this->dataCache['byName'][$name])) {
 			$retval = $this->dataCache['byName'][$name];
 		}

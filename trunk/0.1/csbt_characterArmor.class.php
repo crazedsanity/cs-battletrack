@@ -107,6 +107,14 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		return(array());
 	}//end get_character_defaults()
 	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function handle_update($updateBitName, $recordId=null, $newValue) {
+		
+	}//end handle_update()
+	//-------------------------------------------------------------------------
 }
 
 ?>
