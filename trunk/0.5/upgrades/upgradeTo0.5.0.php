@@ -1,6 +1,6 @@
 <?php
 
-class upgradeTo_0_2_0 extends cs_webdblogger {
+class upgradeTo_0_5_0 extends cs_webdblogger {
 	
 	private $logsObj;
 	

@@ -379,60 +379,78 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		//test updates to make sure they work properly.
 		if($this->dependent_test_checker()) {
-			//check to make sure the key for abilities is available.
+			
 			$sheetData = $char->get_sheet_data();
-			if($this->assertTrue(isset($sheetData['characterAbility__str_score'])) && $this->assertTrue(isset($sheetData['characterAbility__str_modifier']))) {
-				$oldValue = $sheetData['characterAbility__str_score'];
-				$oldMod = $sheetData['characterAbility__str_modifier'];
-				$newValue = $oldValue +2;
-				$this->assertTrue(is_numeric($newValue));
-				
-				$updateRes = $char->handle_update('characterAbility__str_score', null, $newValue);
-				$this->assertTrue($updateRes, "Failed to update strength from (". $oldValue .") to (". $newValue ."), update result was (". $updateRes .")");
-				
-				//now make sure the update actually happened.
-				$sheetData = $char->get_sheet_data();
-				
-				$newMod = $sheetData['characterAbility__str_modifier'];
-				
-				$this->assertEqual($sheetData['characterAbility__str_score'], ($oldValue +2));
-				$this->assertEqual($sheetData['characterAbility__str_modifier'], ($oldMod +1));
-			}
-			else {
-				$this->gfObj->debug_print($sheetData);
+			
+			
+			$abilityList = $char->skillsObj->abilityObj->get_ability_list();
+			$abilities = $abilityList['byId'];
+			
+			$this->assertEqual(count($abilities), 6);
+			$this->assertTrue(is_array($abilities));
+			
+			if($this->dependent_test_checker()) {
+				foreach($abilities as $id=>$abilitName) {
+					$sheetIdForScore = 'characterAbility__'. $abilityName .'_score';
+					$sheetIdForModifier = 'characterAbility__'. $abilityName .'_modifier';
+					
+					if($this->assertTrue(isset($sheetIdForScore)) && $this->assertTrue(isset($sheetIdForModifier))) {
+						$oldValue = $sheetData[$sheetIdForScore];
+						$oldMod = $sheetData[$sheetIdForModifier];
+						$newValue = $oldValue +2;
+						$newMod = $oldMod +1;
+						
+						$this->assertTrue(is_numeric($newValue));
+						
+						//perform the update.
+						$updateRes = $char->handle_update($sheetIdForScore, null, $newValue);
+						$this->assertTrue($updateRes, "Failed to update '". $abilityName ."' from (". $oldValue .") to (". $newValue ."), update result was (". $updateRes .")");
+						
+						$sheetData = $char->get_sheet_data();
+						$newMod = $sheetData[$sheetIdForModifier];
+						
+						$this->assertNotEqual($oldValue, $newValue);
+						$this->assertEqual($sheetData[$sheetIdForScore], ($oldValue +2));
+						$this->assertNotEqual($oldMod, $newMod);
+						$this->assertEqual($sheetData[$sheetIdForModifier], ($oldMod +1));
+						
+						//now check to ensure that the ability modifiers for skills have been updated.
+						$skillsByAbility = $char->skillsObj->get_character_skills($abilityName);
+						$this->assertTrue(is_array($skillsByAbility));
+						$this->assertTrue(count($skillsByAbility) > 0);
+						
+						foreach($skillsByAbility as $id=>$skillInfo) {
+							$this->assertEqual($skillInfo['ability_name'], $abilityName);
+							$this->assertEqual($skillInfo['ability_mod'], $newMod);
+						}
+					}
+					else {
+						$this->gfObj->debug_print($sheetData);
+					}
+				}
 			}
 		}
 		
-		//now, the in-depth testing: ability changes must automatically cause affected skills to get updated.
-		if($this->dependent_test_checker()) {
-			$oldSkills = $char->skillsObj->get_character_skills();
-			$this->assertTrue(count($oldSkills) > 0);
+		
+		//test gear.
+		{
 			
-			$oldSkillsByAbility = array();
-			foreach($oldSkills as $i=>$skillInfo) {
-				$oldSkillsByAbility[$skillInfo['ability_name']][] = $skillInfo;
-			}
-			
-			//make sure all the skills are still accounted for, and that the ability modifier is correct.
-			$tCount=0;
-			foreach($oldSkillsByAbility as $abilityName=>$info) {
-				$tCount += count($info);
-				
-				foreach($info as $i=>$a) {
-					$tOldAbilityMod = $a['ability_mod'];
-					$tAbilityMod = $char->abilityObj->get_ability_modifier($abilityName);
-					$this->assertEqual($tOldAbilityMod, $tAbilityMod, "Ability modifier for '". $a['skill_name'] ."' (". $tOldAbilityMod .") does not match true modifier (". $tAbilityMod ."), total score is (". $char->abilityObj->get_ability_score($abilityName) .")");
-				}
-			}
-			$this->assertEqual($tCount, count($oldSkills));
-			
-//			//now do the in-depth checking.
-//			if($this->dependent_test_checker()) {
-//				foreach($char->skillsObj->abilityObj->get_ability_list() as $abilityName=>$id) {
-//					
-//				}
-//			}
 		}
+		
+		
+		
+		//now test handling of armor.
+		{
+			
+		}
+		
+		
+		
+		//test handling of weapons.
+		{
+			
+		}
+		
 	}//end test_basics()
 	//--------------------------------------------------------------------------
 	
