@@ -1,0 +1,586 @@
+ 
+    <link type="text/css" rel="stylesheet" href="/css/dnd.css">
+<script language="javascript" src="/js/dnd.js" type="text/javascript"></script>
+
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+</style>
+
+<br style="clear: both;">
+    <form action="javascript:void()" method="post" id="charactersheet">
+	<input type="hidden" name="character_id" id="form_character_id" value="{main_character_id}" />
+<table id="maintable" border="10">
+      <tbody><tr>
+        <td>
+          <!-- Left buffer cell -->
+        </td>
+        <td id="main">
+
+          <table id="info" cellspacing="0">
+            <tbody><tr>
+              <div id="div_main_character_name"></div><td colspan="2"><input title="Your character's name" id="main-character-name" value="{main-character-name}" type="text"><br>Character Name</td></div>
+              <td colspan="2"><input name="generated[player]" title="Player name [display name for your account]" id="generated-player" value="{generated-player}"><br>Player</td>
+              <td><input title="Alignment" id="main-character-alignment" value="{main-character-alignment}" type="text"><br>Alignment</td>
+              <td><input title="Current XP" id="xp-total" value="{xp-total}" type="text"><br>Current XP</td>
+              <td><input title="XP to next level" id="xp-next" value="{xp-next}" type="text"><br>Next Level XP</td>
+              <td><input title="Add this XP..." id="xp-change" value="{xp-change}" type="text"><br>XP Change</td>
+            </tr>
+            <tr>
+              <td colspan="2"><input title="Class(es)" id="class-0-name" value="{class-0-name}" type="text"><br>Class</td>
+              <td colspan="2"><input title="Race" id="main-character-race" value="{main-character-race}" type="text"><br>Race</td>
+              <td colspan="2"><input title="Campaign" id="generated-campaign" value="{generated-campaign}" type="text"><br>Campaign</td>
+              <td colspan="2"><input title="Deity" id="main-character-deity" value="{main-character-deity}" type="text"><br>Deity</td>
+            </tr>
+            <tr>
+              <td class="unit"><input title="Level" id="class-total" value="{class-total}" type="text"><br>Level</td>
+              <td class="unit"><input title="Size" id="main-character-size" value="{main-character-size}" type="text"><br>Size</td>
+              <td class="unit"><input title="Age" id="main-character-age" value="{main-character-age}" type="text"><br>Age</td>
+              <td class="unit"><input title="Gender" id="main-character-gender" value="{main-character-gender}" type="text"><br>Gender</td>
+              <td class="unit"><input title="Height" id="main-character-height" value="{main-character-height}" type="text"><br>Height</td>
+              <td class="unit"><input title="Weight" id="main-character-weight" value="{main-character-weight}" type="text"><br>Weight</td>
+              <td class="unit"><input title="Eye color" id="main-character-eyes" value="{main-character-eyes}" type="text"><br>Eyes</td>
+              <td class="unit"><input title="Hair color" id="main-character-hair" value="{main-character-hair}" type="text"><br>Hair</td>
+            </tr>
+          </tbody></table>
+
+          <table id="stats" cellspacing="0">
+            <tbody><tr>
+              <td rowspan="2" class="unit top">
+                
+                <table id="statblock">
+                  <tbody><tr>
+                    <td class="header">Ability</td>
+                    <td class="header">Score</td>
+                    <td class="header">Mod</td>
+                    <td class="header">Temp<br>Score</td>
+                    <td class="header">Temp<br>Mod</td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Strength" class="help">STR</span></td>
+                    <td><input title="Strength" id="abilities-str-base" value="{abilities-str-base}" class="mod" type="text"></td>
+                    <td><input title="Strength bonus" id="abilities-str-mod" value="{abilities-str-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY strength (total)" id="abilities-str-temp" value="{abilities-str-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY strength bonus" id="abilities-str-temp_mod" value="{abilities-str-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Dexterity" class="help">DEX</span></td>
+                    <td><input title="Dexterity" id="abilities-dex-base" value="{abilities-dex-base}" class="mod" type="text"></td>
+                    <td><input title="Dexterity bonus" id="abilities-dex-mod" value="{abilities-dex-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY dexterity (total)" id="abilities-dex-temp" value="{abilities-dex-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY dexterity bonus" id="abilities-dex-temp_mod" value="{abilities-dex-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Constitution" class="help">CON</span></td>
+                    <td><input title="Constution" id="abilities-con-base" value="{abilities-con-base}" class="mod" type="text"></td>
+                    <td><input title="Constitution bonus" id="abilities-con-mod" value="{abilities-con-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY constitution (total)" id="abilities-con-temp" value="{abilities-con-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY constitution bonus" id="abilities-con-temp_mod" value="{abilities-con-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Intelligence" class="help">INT</span></td>
+                    <td><input title="Intelligence" id="abilities-int-base" value="{abilities-int-base}" class="mod" type="text"></td>
+                    <td><input title="Intelligence bonus" id="abilities-int-mod" value="{abilities-int-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY intelligence (total)" id="abilities-int-temp" value="{abilities-int-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY intelligence bonus" id="abilities-int-temp_mod" value="{abilities-int-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Wisdom" class="help">WIS</span></td>
+                    <td><input title="Wisdom" id="abilities-wis-base" value="{abilities-wis-base}" class="mod" type="text"></td>
+                    <td><input title="Wisdom bonus" id="abilities-wis-mod" value="{abilities-wis-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY wisdom (total)" id="abilities-wis-temp" value="{abilities-wis-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY wisdom bonus" id="abilities-wis-temp_mod" value="{abilities-wis-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Charisma" class="help">CHA</span></td>
+                    <td><input title="Charisma" id="abilities-cha-base" value="{abilities-cha-base}" class="mod" type="text"></td>
+                    <td><input title="Charisma bonus" id="abilities-cha-mod" value="{abilities-cha-mod}" class="mod" type="text" readonly="readonly"></td>
+                    <td><input title="TEMPORARY charisma (total)" id="abilities-cha-temp" value="{abilities-cha-temp}" class="tempmod" type="text"></td>
+                    <td><input title="TEMPORARY charisma bonus" id="abilities-cha-temp_mod" value="{abilities-cha-temp_mod}" class="tempmod" type="text" readonly="readonly"></td>
+                  </tr>
+                </tbody></table>
+                
+                <table id="init"> <!-- This is Action Points -->
+                	<tbody><tr>
+                    	<td class="tag">Action Points</td>
+                        <td class="unit"><input title="Action points" id="main-character-action_points" value="{main-character-action_points}" type="text"></td>
+                    </tr>
+                </tbody></table>
+                
+              </td>
+              <td colspan="2" class="top">
+                
+                <table id="hp">
+                  <tbody><tr>
+                    <td>
+                    </td><td class="header"><br>TOTAL</td>
+                    <td>
+                    </td><td class="header" colspan="3">Current HP</td>
+                    <td>
+                    </td><td class="header" colspan="3">Nonlethal Damage</td>
+                    <td>
+                    </td><td class="header" colspan="3">Hit Dice</td>
+                    <td>
+                    </td><td class="header" colspan="3"><span title="Damage Reduction" class="help">Damage Reduction</span></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Hit Points" class="help">HP</span></td>
+                    <td><input title="Total Hit Points" id="hp-total" value="{hp-total}" type="text"></td>
+                    <td>
+                    </td><td colspan="3"><input title="Current hit points" id="hp-current" value="{hp-current}" type="text"></td>
+                    <td>
+                    </td><td colspan="3"><input title="Nonlethal damage" id="hp-damage-nonlethal" value="{hp-damage-nonlethal}" type="text"></td>
+                    <td>
+                    </td><td colspan="3"><input title="Hit dice for your CURRENT class" id="class-0-hit_dice" value="{class-0-hit_dice}" type="text"></td>
+                    <td>
+                    </td><td colspan="3"><input title="Damage Reduction" id="hp-damage-reduction" value="{hp-damage-reduction}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span title="Armor Class" class="help">AC</span></td>
+                    <td class="unit"><input title="AC" id="ac-total" value="{ac-total}" type="text"></td>
+                    <td class="char">=</td>
+                    <td class="basenum"><span>10</span></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Armor class (add AC bonus from all worn protective items)" id="ac-armor" value="{ac-armor}" type="text"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="AC bonus from shield" id="ac-shield" value="{ac-shield}" type="text"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Dexterity modifier" id="ac-abilitymod-dex" value="{ac-abilitymod-dex}" type="text" readonly="readonly"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Size modifier for AC" id="ac-mod-size" value="{ac-mod-size}" type="text"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Deflection bonus to AC" id="ac-deflect" value="{ac-deflect}" type="text"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Natural armor bonus" id="ac-natural" value="{ac-natural}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td class="unit"><input title="Misc. modifier to AC" id="ac-shield" value="{ac-misc}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td>
+                    </td><td class="footer">TOTAL</td>
+                    <td>
+                    </td><td>
+                    </td><td>
+                    </td><td class="footer">Armor</td>
+                    <td>
+                    </td><td class="footer">Shield</td>
+                    <td>
+                    </td><td class="footer">Dex</td>
+                    <td>
+                    </td><td class="footer">Size</td>
+                    <td>
+                    </td><td class="footer">Natural</td>
+                    <td>
+                    </td><td class="footer">Deflect</td>
+                    <td>
+                    </td><td class="footer">Misc</td>
+                  </tr>
+                </tbody></table>
+
+              </td>
+            </tr>
+            <tr>
+              <td class="unit top">
+              
+                <table id="init"> <!-- This is Touch and Flat-footed AC -->
+                	<tbody><tr>
+                    	<td class="tag">Touch</td>
+                        <td class="unit"><input title="Touch AC" id="ac-touch" value="{ac-touch}" type="text"></td>
+                        <td>
+                        </td><td class="tag">Flat-footed</td>
+                        <td class="unit"><input title="Flat-footed AC" id="ac-flat_footed" value="{ac-flat_footed}" type="text"></td>
+                    </tr>
+                </tbody></table>
+                
+                <table id="init">
+                  <tbody><tr>
+                    <td>
+                    </td><td class="header">Total</td>
+                    <td>
+                    </td><td class="header">Dex</td>
+                    <td>
+                    </td><td class="header">Misc</td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span class="help" title="Initiative">INIT</span></td>
+                    <td class="unit"><input title="Initiative" id="initiative-total" value="{initiative-total}" type="text"></td>
+                    <td class="char">=</td>
+                    <td class="unit"><input title="Dex modifier" id="initiative-mod-dex" value="{initiative-abilitymod-dex}" type="text" readonly="readonly"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input title="Miscellaneous modifier for initiative" id="initiative-misc" value="{initiative-misc}" type="text"></td>
+                  </tr>
+                </tbody></table>
+
+                <table id="speed">
+                  <tbody><tr>
+                    <td><input title="Speed" id="speed-total" value="{speed-total}" type="text"></td>
+                    <td><input title="Base attack bonus" id="main-character-bab" value="{main-character-bab}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="footer">Speed</td>
+                    <td class="footer">Base Attack Bonus</td>
+                  </tr>
+                </tbody></table>
+
+              </td>
+              <td rowspan="2">
+              
+                <table id="imgload">
+                  <tbody><tr>
+                    <td rowspan="6" class="piccell"><img id="pic" src="/images/clear.gif" alt="Character Portrait" title="Character Portrait"></td>
+                    <td class="loadtext title">Light<br>Load</td>
+                    <td class="loadinputs"><input title="Light load" id="weight-load-light" value="{weight-load-light}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="loadtext title">Med<br>Load</td>
+                    <td><input title="Medium load" id="weight-load-medium" value="{weight-load-medium}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="loadtext title">Max<br>Load</td>
+                    <td><input title="Heavy load" id="weight-load-heavy" value="{weight-heavy_load}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="loadtext title">Over<br>Head</td>
+                    <td><input title="Lift over head" id="weight-lift-over_head" value="{weight-lift_over_head}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="loadtext title">Off<br>Ground</td>
+                    <td><input title="Lift off ground" id="weight-lift-off_ground" value="{weight-lift_off_ground}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="loadtext title">Push/<br>Drag</td>
+                    <td><input title="Lift, push, or drag" id="weight-lift-push_drag" value="{weight-lift-push_drag}" type="text"></td>
+                  </tr>
+                </tbody></table>
+              
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+              
+                <table id="saves">
+                  <tbody><tr>
+                    <td class="header">Saving Throws</td>
+                    <td>
+                    </td><td class="header">Total</td>
+                    <td>
+                    </td><td class="header">Base</td>
+                    <td>
+                    </td><td class="header">Ability<br>Mod</td>
+                    <td>
+                    </td><td class="header">Magic<br>Mod</td>
+                    <td>
+                    </td><td class="header">Misc<br>Mod</td>
+                    <td>
+                    </td><td class="header">Temp<br>Mod</td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span class="help" title="Fortitude: Based on Constitution">FORTITUDE</span></td>
+                    <td>
+                    </td>
+                    <td class="unit"><input title="Total fortitude save" id="fortsave-total" value="{fortsave-total}" type="text"></td>
+                    <td class="char"><span class="dark">=</span></td>
+                    <td class="unit"><input title="Fortitude base save -- USE HIGHEST FROM CHOSEN CLASSES" id="fortsave-base" value="{fortsave-base}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td class="unit"><input id="fortsave-abilitymod" value="{fortsave-abilitymod-con}" type="text" readonly="readonly"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td class="unit"><input title="Magic modifier" id="fortsave-magic" value="{fortsave-magic}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td class="unit"><input title="Misc. modifier" id="fortsave-misc" value="{fortsave-misc}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td class="unit"><input class="temp" title="Temporary modifier" id="fortsave-temp" value="{fortsave-temp}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span class="help" title="Reflex: Based on Dexterity">REFLEX</span></td>
+                    <td>
+                    </td><td><input title="Total reflex save" id="reflexsave-total" value="{reflexsave-total}" type="text"></td>
+                    <td class="char"><span class="dark">=</span></td>
+                    <td><input title="Reflex base save" id="reflexsave-base" value="{reflexsave-base}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Ability modifier (dexterity)" id="reflexsave-abilitymod-dex" value="{reflexsave-abilitymod-dex}" type="text" readonly="readonly"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Magic modifier" id="reflexsave-magic" value="{reflexsave-magic}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Misc. modifier" id="reflexsave-misc" value="{reflexsave-misc}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input class="temp" title="Temporary modifier" id="reflexsave-temp" value="{reflexsave-temp}" type="text"></td>
+                  </tr>
+                  <tr>
+                    <td class="tag"><span class="big help" title="Will: Based on Wisdom">WILL</span></td>
+                    <td>
+                    </td><td><input title="Will save" id="willsave-total" value="{willsave-total}" type="text"></td>
+                    <td class="char"><span class="dark">=</span></td>
+                    <td><input title="Will base save" id="willsave-base" value="{willsave-base}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Will ability modifier" id="willsave-abilitymod-wis" value="{willsave-abilitymod-wis}" type="text" readonly="readonly"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Magic modifier" id="willsave-magic" value="{willsave-magic}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input title="Misc. modifier" id="willsave-misc" value="{willsave-misc}" type="text"></td>
+                    <td class="char"><span class="dark">+</span></td>
+                    <td><input class="temp" title="Temporary modifier" id="willsave-temp" value="{willsave-temp}" type="text"></td>
+                  </tr>
+                </tbody></table>
+
+              </td>
+            </tr>
+          </tbody></table>
+
+          <!--
+            table#attacks contains the base melee and ranged attack bonuses.
+          -->
+
+          <table id="attacks">
+            <tbody><tr>
+              <td>
+              </td><td class="header">Total Attack Bonus</td>
+              <td>
+              </td><td class="header">Base Attack Bonus</td>
+              <td>
+              </td><td class="header">Str Mod</td>
+              <td>
+              </td><td class="header">Size Mod</td>
+              <td>
+              </td><td class="header">Misc Mod</td>
+              <td>
+              </td><td class="header">Temp Mod</td>
+            </tr>
+            <tr>
+              <td class="tag"><span class="help" title="Melee Attack Bonus">MELEE</span></td>
+              <td class="wide"><input title="Melee Attack Bonus" id="melee-total" value="{melee-total}" type="text"></td>
+              <td class="char">=</td>
+              <td class="wide"><input title="Base attack bonus" id="melee-mods-bab" value="{melee-mods-bab}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Strength modifier" id="melee-mods-str" value="{melee-mods-str}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Size modifier" id="melee-mods-size" value="{melee-mods-size}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Miscellaneous modifer" id="melee-mods-misc" value="{melee-mods-misc}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input class="temp" title="Temporary melee attack modifier" id="melee-mods-temp" value="{melee-mods-temp}" type="text"></td>
+            </tr>
+            <tr>
+              <td class="tag"><span class="help" title="Ranged Attack Bonus">RANGED</span></td>
+              <td class="wide"><input title="Total ranged attack bonus" id="ranged-total" value="{ranged-total}" type="text"></td>
+              <td class="char">=</td>
+              <td class="wide"><input title="Base attack bonus" id="ranged-mods-bab" value="{ranged-mods-bab}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Dexterity modifier" id="ranged-mods-bab" value="{ranged-mods-bab}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Size modifier" id="ranged-mods-size" value="{ranged-mods-size}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Miscellaneous modifier" id="ranged-mods-misc" value="{ranged-mods-misc}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input class="temp" title="Temporary ranged attack modifier" id="ranged-mods-temp" value="{ranged-mods-temp}" type="text"></td>
+            </tr>
+            <tr>
+              <td>
+              </td><td class="footer">Total Attack Bonus</td>
+              <td>
+              </td><td class="footer">Base Attack Bonus</td>
+              <td>
+              </td><td class="footer">Dex Mod</td>
+              <td>
+              </td><td class="footer">Size Mod</td>
+              <td>
+              </td><td class="footer">Misc Mod</td>
+              <td>
+              </td><td class="footer">Temp Mod</td>
+            </tr>
+          </tbody></table>
+          
+          <!--
+            table.weapon are weapon slots.
+          -->
+          <!-- BEGIN weaponSlot -->
+          <div style="display:inline" id="weaponSlot_{wsNum}">
+          <table class="weapon" cellspacing="0">
+            <tbody><tr class="header">
+              <td class="type wide">Weapon</td>
+              <td class="wide">Total Attack Bonus</td>
+              <td class="medium">Damage</td>
+              <td class="small">Critical</td>
+              <td class="small">Range</td>
+            </tr>
+            <tr>
+              <td><input class="left" title="Weapon's name" id="weaponSlot-{wsNum}-name" value="{weaponSlot-{wsNum}-name}"></td>
+              <td><input title="Total attack bonus for this weapon" id="weaponSlot-{wsNum}-totalatk" value="{weaponSlot-{wsNum}-totalatk}"></td>
+              <td><input title="Damage" id="weaponSlot-{wsNum}-damage" value="{weaponSlot-{wsNum}-damage}"></td>
+              <td><input title="Critical threat range" id="weaponSlot-{wsNum}-critical_range" value="{weaponSlot-{wsNum}-critical_range}"></td>
+              <td><input title="Range increment (applies only to throwable weapons)" id="weaponSlot-{wsNum}-ranged" value="{weaponSlot-{wsNum}-ranged}"></td>
+            </tr>
+            <tr class="header">
+              <td>Special Properties</td>
+              <td>Ammunition</td>
+              <td>Weight</td>
+              <td>Size</td>
+              <td>Type</td>
+            </tr>
+            <tr>
+              <td><input class="left" title="Special properties" id="weaponSlot-{wsNum}-special" value="{weaponSlot-{wsNum}-special}"></td>
+              <td><input title="Current ammunition (for ranged weapons)" id="weaponSlot-{wsNum}-ammo" value="{weaponSlot-{wsNum}-ammo}"></td>
+              <td><input title="Weight" id="weaponSlot-{wsNum}-weight" value="{weaponSlot-{wsNum}-weight}"></td>
+              <td><input title="Size ([S]mall, [M]edium, [L]arge, [H]oly shit)" id="weaponSlot-{wsNum}-size" value="{weaponSlot-{wsNum}-size}"></td>
+              <td><input title="Damage type (slashing bludgeoning, etc)" id="weaponSlot-{wsNum}-type" value="{weaponSlot-{wsNum}-type}"></td>
+            </tr>
+          </tbody></table></div>
+          <!-- END weaponSlot -->
+          
+          <!--
+            table.armor are armor slots.
+          -->
+          <!-- BEGIN armorSlot -->
+          <table class="armor" cellspacing="0">
+            <tbody><tr class="header">
+              <td class="type wide">Armor/Protective Item</td>
+              <td class="small">Type</td>
+              <td class="small">AC Bonus</td>
+              <td class="small">Check Pen</td>
+              <td class="small">Max Dex</td>
+            </tr>
+            <tr>
+              <td><input class="left" title="Armor (or protective item)'s name" id="armorSlot-{asNum}-name" value="{armorSlot-{asNum}-name}"></td>
+              <td><input title="Type of armor (light, medium, heavy)" id="armorSlot-{asNum}-type" value="{armorSlot-{asNum}-type}"></td>
+              <td><input title="AC Bonus" id="armorSlot-{asNum}-acbonus" value="{armorSlot-{asNum}-acbonus}"></td>
+              <td><input title="Armor check penalty" id="armorSlot-{asNum}-checkpenalty" value="{armorSlot-{asNum}-checkpenalty}"></td>
+              <td><input title="Maximum dexterity bonus" id="armorSlot-{asNum}-dexbonus" value="{armorSlot-{asNum}-dexbonus}"></td>
+            </tr>
+            <tr class="header">
+              <td colspan="2">Special Properties</td>
+              <td>Weight</td>
+              <td>Spell Fail</td>
+              <td>Speed</td>
+            </tr>
+            <tr>
+              <td colspan="2"><input class="left" title="Special properties" id="armorSlot-{asNum}-special" value="{armorSlot-{asNum}-special}"></td>
+              <td><input title="Weight of armor (or item)" id="armorSlot-{asNum}-weight" value="{armorSlot-{asNum}-weight}"></td>
+              <td><input title="Arcane spell failure %" id="armorSlot-{asNum}-spellfail" value="{armorSlot-{asNum}-spellfail}"></td>
+              <td><input title="Maximum speed while wearing this armor" id="armorSlot-{asNum}-speed" value="{armorSlot-{asNum}-speed}"></td>
+            </tr>
+          </tbody></table>
+          <!-- END armorSlot -->
+
+
+          <!--
+            table#skillsandgear holds both the skills and gear tables
+          -->
+
+          <table id="skillsandgear">
+            <tbody><tr>
+              <td id="skillcontainer">
+
+                <table id="skills" cellpadding="0" cellspacing="0">
+                  <tbody><tr class="title">
+                    <td colspan="10">
+                      <div id="skillranks">
+                        <div>
+                          <input title="Maximum ranks for class skills" id="skills-max-rank" value="{skills-max-rank}" type="text">/
+                          <input title="Maximum ranks for cross-class (CC) skills" id="skills-max-cc" value="{skills-max-cc}" type="text">
+                        </div>
+                        Max Rank
+                      </div>
+                      Skills
+                    </td>
+                  </tr>
+                  <tr class="header">
+                    <td class="name"><div title="Sort by Skill Name">Skill Name</div></td>
+                    <td><div title="Sort by Key Ability">Key<br>Ab</div></td>
+                    <td><div title="Sort by Cross Class">CC</div></td>
+                    <td><div title="Sort by Skill Modifier">Skill<br>Mod</div></td>
+                    <td>
+                    </td><td><div id="skillSort_abmodifier" title="Ability Modifier">Ab<br>Mod</div></td>
+                    <td>
+                    </td><td><div id="skillSort_rank" title="Rank">Rank</div></td>
+                    <td>
+                    </td><td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
+                  </tr>
+                  <!-- BEGIN skillRow -->
+		          <tr class="skillslot">
+                    <td class="name"><input class="text" title="Name of skill" id="skills-{skillNum}-name" value="{skills-{skillNum}-name}" type="text"></td>
+                    <td class="unit"><!-- USE A DROP-DOWN FOR THIS... --><input class="text" title="Ability" id="skills-{skillNum}-ability" value="{skills-{skillNum}-ability}" type="text"><!-- USE A DROP-DOWN FOR THIS... --></td>
+                    <td class="char"><input class="chk" {skills-{skillNum}-is_class} id="skills-{skillNum}-is_class" type="checkbox"></td>
+                    <td class="unit"><input class="text" title="Total skill modifier" id="skills-{skillNum}-total" value="{skills-{skillNum}-total}" type="text"></td>
+                    <td class="char">=</td>
+                    <td class="unit"><input class="text" title="Ability Modifier" id="skills-{skillNum}-abilitymod" value="{skills-{skillNum}-abilitymod}" type="text" readonly="readonly"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input class="text" title="Ranks" id="skills-{skillNum}-ranks" value="{skills-{skillNum}-ranks}" type="text"></td>
+                    <td class="char">+</td>
+                    <td class="unit"><input class="text" title="Miscellaneous Modifier" id="skills-{skillNum}-miscmod" value="{skills-{skillNum}-miscmod}" type="text"></td>
+                  </tr>
+                  <!-- END skillRow -->
+                  
+                </tbody></table>
+
+              </td>
+              <td class="spacer"></td>
+
+              <td id="featsandgearcontainer">
+
+                <!--
+                  table#feats is the feats table.
+                -->
+                <table id="feats" border="5">
+                  <tbody><tr class="title">
+                    <td colspan="4">Feats &amp; Special Abilities</td>
+                  </tr>
+                  <!-- BEGIN featsAbilitiesRow -->
+                  <tr>
+                    <td>
+                      <input title="This is a feat (or a special ability)" id="featsAbilities-{featAbNum}-name" value="{featsAbilities-{featAbNum}-name}" type="text">
+                    </td>
+
+                  </tr>
+                  <!-- END featsAbilitiesRow -->
+                </tbody></table>
+
+                <table id="gear" cellspacing="0">
+                  <tbody><tr class="title">
+                    <td colspan="3">Other Possessions</td>
+                  </tr>
+                  <tr class="header">
+                    <td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
+                    <td class="unit"><div id="sortGear_ByWeight" title="Weight">Weight<br>(lbs)</div></td>
+                    <td class="unit"><div id="sortGear_ByLoc" title="Location">Loc</div></td>
+                  </tr>
+
+				<!-- BEGIN gearSlot -->
+                  <tr class="slot">
+                    <td><input class="name" title="Item name/description" id="gear-{gsNum}-name" value="{gear-{gsNum}-name}" type="text"></td>
+                    <td><input title="Item weight" id="gear-{gsNum}-weight" value="{gear-{gsNum}-weight}" type="text"></td>
+                    <td><input title="Location of item #{gsNum}" id="gear-{gsNum}-location" value="{gear-{gsNum}-location}" type="text"></td>
+                  </tr>
+				<!-- END gearSlot -->
+		
+                  <tr class="footer">
+                    <td>Total Weight:</td>
+                    <td class="total"><span id="totalweight" title="Includes only items in this list.">{total_weight_carried}</span></td>
+                    <td>
+                  </td></tr>
+                </tbody></table>
+
+              </td>
+            </tr>
+          </tbody></table>
+
+           <table id="notes" style="width: 100%;" width="100%">
+            <tbody><tr class="header">
+              <td>Notes</td>
+            </tr>
+            <tr>
+              <td><textarea title="Notes" id="misc-notes" cols="10" rows="10">{misc-notes}</textarea></td>
+            </tr>
+          </tbody></table>
+   
+          
+
+        </td>
+        
+        <td style="border:solid #000 10px;">
+          <!-- Right buffer cell -->
+        </td>
+      </tr>
+    </tbody></table>
+  </form>
+
