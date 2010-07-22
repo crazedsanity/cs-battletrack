@@ -107,7 +107,7 @@ CREATE TABLE csbt_character_armor_table (
 	max_dex integer NOT NULL,
 	special text,
 	weight text,
-	spell_fail integer NOT NULL DEFAULT 50,
+	spell_fail integer NOT NULL DEFAULT 0,
 	max_speed integer NOT NULL DEFAULT 30,
 	is_worn boolean NOT NULL DEFAULT true
 );

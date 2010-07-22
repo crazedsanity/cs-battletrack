@@ -440,16 +440,185 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		
 		//now test handling of armor.
-		{
+		if($this->dependent_test_checker()) {
 			
+			$listOfArmor = array(
+				"Chainmail" => array(
+					'armor_type'	=> "medium",
+					'ac_bonus'		=> 1,
+					'max_dex'		=> 2,
+					'check_penalty'	=> 2,
+					'weight'		=> 10,
+					'max_speed'		=> 30
+				),
+				"Buckler" => array(
+					'armor_type'	=> "medium",
+					'ac_bonus'		=> 3,
+					'max_dex'		=> 4,
+					'weight'		=> 5,
+					'spell_fail'	=> 10,
+					'max_speed'		=> 40
+				),
+				"Ring of Protection +1"	=> array(
+					'armor_type'	=> "medium",
+					'ac_bonus'		=> 5,
+					'max_dex'		=> 6,
+					'spell_fail'	=> 0,
+					'special'		=> "+1 AC bonus, cursed, flooglesparks"
+				)
+			);
+			
+			$allArmorRecords = $char->armorObj->get_character_armor();
+			$this->assertTrue(count($allArmorRecords) == 0);
+			
+			$piecesCreated = 0;
+			foreach($listOfArmor as $name=>$armorDetails) {
+				$createResult = $char->armorObj->create_armor($name, $armorDetails);
+				$this->assertTrue(is_numeric($createResult));
+				$this->assertTrue($createResult > 0);
+				
+				$piecesCreated++;
+				
+				//make sure the proper number of pieces have been created so far.
+				$allArmorRecords = $char->armorObj->get_character_armor();
+				$this->assertEqual(count($allArmorRecords), $piecesCreated);
+			}
+			
+			$allArmorRecords = $char->armorObj->get_character_armor();
+			$this->assertEqual(count($listOfArmor), $piecesCreated);
+			$this->assertEqual(count($allArmorRecords), count($listOfArmor));
+			
+			//make sure each record has the right details.
+			$nameToKey = array();
+			foreach($allArmorRecords as $i=>$armorDetails) {
+				$this->assertEqual($i, $armorDetails['character_armor_id']);
+				$nameToKey[$armorDetails['armor_name']] = $i;
+			}
+			
+			//make sure the list of names to ID's is sane.
+			$this->assertEqual(count($nameToKey), count($listOfArmor));
+			
+			foreach($nameToKey as $name=>$key) {
+				$this->assertTrue(isset($allArmorRecords[$key]));
+				$this->assertTrue(isset($listOfArmor[$name]));
+				
+				$createSpecs = $listOfArmor[$name];
+				$recordData = $allArmorRecords[$key];
+				
+				//retrieve the individual record for testing!
+				$singleRecordData = $char->armorObj->get_armor_by_id($key);
+				$this->assertTrue(is_array($singleRecordData));
+				$this->assertEqual($singleRecordData['character_armor_id'], $key);
+				
+				foreach($createSpecs as $columnName=>$expectedValue) {
+					$this->assertEqual($recordData[$columnName], $expectedValue);
+					$this->assertEqual($singleRecordData[$columnName], $expectedValue);
+				}
+			}
+			
+			
+			//now, let's update some data & see what happens.
+			foreach($listOfArmor as $name=>$armorDetails) {
+				$armorDetails['ac_bonus']  += 1;
+				$armorDetails['max_dex'] += 1;
+				$updateThisId = $nameToKey[$name];
+				
+				$updateRes = $char->armorObj->update_armor($updateThisId, $armorDetails);
+				
+				//pull the single record & check that it matches.
+				$recordData = $char->armorObj->get_armor_by_id($updateThisId);
+				foreach($armorDetails as $columnName=>$expectedValue) {
+					$this->assertEqual($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
+				}
+				
+				$this->assertNotEqual($armorDetails['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
+				$this->assertNotEqual($recordData['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
+				
+				$this->assertNotEqual($armorDetails['max_dex'], $listOfArmor[$name]['max_dex']);
+				$this->assertNotEqual($recordData['max_dex'], $listOfArmor[$name]['max_dex']);
+				
+				$listOfArmor[$name] = $armorDetails;
+			}
+			
+			//TODO: make a few calls to "handle_update()" to make sure that works too, and that the records appear in the main sheet data.
+			foreach($listOfArmor as $name=>$armorDetails) {
+				$armorDetails['ac_bonus']  += 1;
+				$armorDetails['max_dex'] += 1;
+				$updateThisId = $nameToKey[$name];
+				
+				$this->assertTrue($char->handle_update('characterArmor__ac_bonus__'. $updateThisId, null, $armorDetails['ac_bonus']));
+				$this->assertTrue($char->handle_update('characterArmor__max_dex__'. $updateThisId, null, $armorDetails['max_dex']));
+				
+				//pull the single record & check that it matches.
+				$recordData = $char->armorObj->get_armor_by_id($updateThisId);
+				foreach($armorDetails as $columnName=>$expectedValue) {
+					$this->assertEqual($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
+				}
+				
+				$this->assertNotEqual($armorDetails['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
+				$this->assertNotEqual($recordData['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
+				
+				$this->assertNotEqual($armorDetails['max_dex'], $listOfArmor[$name]['max_dex']);
+				$this->assertNotEqual($recordData['max_dex'], $listOfArmor[$name]['max_dex']);
+				
+				
+				$listOfArmor[$name] = $armorDetails;
+			}
 		}
 		
 		
 		
 		//test handling of weapons.
 		{
+			$listOfWeapons = array(
+				"Dagger" => array(
+					'damage'				=> "1d4 +1",
+					'total_attack_bonus'	=> "+5",
+					'critical'				=> "20x2",
+					'size'					=> "small",
+					'weapon_type'			=> "piercing",
+				),
+				"Sword of Unit Testing +5" => array(
+					'damage'				=> "10d10 + 5",
+					'total_attack_bonus'	=> "+50",
+					'critical'				=> "15-20x5",
+					'size'					=> "38 bytes",
+					'weapon_type'			=> "fictional"
+				)
+			);
 			
+			$useForUpdates = array();
+			foreach($listOfWeapons as $name=>$weaponInfo) {
+				$createRes = $char->weaponObj->create_weapon($name, $weaponInfo);
+				$this->assertTrue(is_numeric($createRes));
+				
+				$useForUpdates[] = array(
+					'recId'	=> $createRes,
+					'name'	=> $name,
+					'info'	=> $weaponInfo
+				);
+				
+				$recordData = $char->weaponObj->get_weapon_by_id($createRes);
+				foreach($weaponInfo as $f=>$v) {
+					$this->assertEqual($recordData[$f], $v);
+				}
+			}
+			
+			$createdWeapons = $char->weaponObj->get_character_weapons();
+			$this->assertEqual(count($listOfWeapons), count($createdWeapons));
+			
+			$sheetData = $char->get_sheet_data();
+			
+			//now do updates in a couple of different ways.
+			$this->assertTrue(isset($sheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']]));
+			$updateRes = $char->handle_update('characterWeapon__damage__'. $useForUpdates[0]['recId'], null, "30d30, SUCK");
+			$this->assertTrue(is_numeric($updateRes));
+			
+			$updatedSheetData = $char->get_sheet_data();
+			$this->assertEqual($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
 		}
+		$sheetData = $char->get_sheet_data();
+$this->gfObj->debug_print($sheetData);
 		
 	}//end test_basics()
 	//--------------------------------------------------------------------------

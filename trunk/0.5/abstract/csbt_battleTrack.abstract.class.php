@@ -17,6 +17,8 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	protected $tableHandlerObj=null;
 	protected $abilityObj = null;
 	protected $charAbilityObj = null;
+	protected $fields;
+	
 	
 	abstract public function get_sheet_data();
 	abstract public function get_character_defaults();
@@ -104,6 +106,25 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		return($bits);
 	}//end parse_sheet_id()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_columns_for_sheet_keys() {
+		//TODO: make all the subclasses & such use this when calling get_sheet_data().
+		if(is_array($this->fields) && count($this->fields)) {
+			$myFields = $this->fields;
+			if(isset($myFields['character_id'])) {
+				unset($myFields['character_id']);
+			}
+			$retval = array_keys($myFields);
+		}
+		else {
+			throw new exception(__METHOD__ .":: failed to create list of columns for sheet keys, no list of fields available");
+		}
+		return($retval);
+	}//end get_columns_for_sheet_keys()
 	//-------------------------------------------------------------------------
 }
 

@@ -10,16 +10,16 @@
  * $LastChangedBy$
  */
 
-class csbt_characterArmor extends csbt_battleTrackAbstract	 {
+class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
-	const tableName = 'csbt_character_armor_table';
-	const tableSeq  = 'csbt_character_armor_table_character_armor_id_seq';
-	const pkeyField = 'character_armor_id';
-	const sheetIdPrefix = 'characterArmor';
+	const tableName = 'csbt_character_weapon_table';
+	const tableSeq  = 'csbt_character_weapon_table_character_weapon_id_seq';
+	const pkeyField = 'character_weapon_id';
+	const sheetIdPrefix = 'characterWeapon';
 	
 	
 	//-------------------------------------------------------------------------
@@ -31,17 +31,18 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
-			'character_id'		=> 'int',
-			'armor_name'		=> 'sql',
-			'armor_type'		=> 'sql',
-			'ac_bonus'			=> 'int',
-			'check_penalty'		=> 'int',
-			'max_dex'			=> 'int',
-			'special'			=> 'sql',
-			'weight'			=> 'sql',
-			'spell_fail'		=> 'int',
-			'max_speed'			=> 'int',
-			'is_worn'			=> 'bool'
+			'character_id'			=> 'int',
+			'weapon_name'			=> 'sql',
+			'total_attack_bonus'	=> 'sql',
+			'damage'				=> 'sql',
+			'critical'				=> 'sql',
+			'range'					=> 'sql',
+			'special'				=> 'sql',
+			'ammunition'			=> 'sql',
+			'weight'				=> 'sql',
+			'size'					=> 'sql',
+			'weapon_type'			=> 'sql',
+			'in_use'				=> 'bool'
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
@@ -51,28 +52,28 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_armor_by_id($armorId) {
+	public function get_weapon_by_id($weaponId) {
 		try {
-			$data = $this->tableHandlerObj->get_record_by_id($armorId);
+			$data = $this->tableHandlerObj->get_record_by_id($weaponId);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve armor with record id (". $armorId ."), DETAILS:::: ". $e->getMessage());
+			throw new exception(__METHOD__ .":: failed to retrieve weapon with record id (". $weaponId ."), DETAILS:::: ". $e->getMessage());
 		}
 		
-		if(isset($data[$armorId])) {
-			$retval = $data[$armorId];
+		if(isset($data[$weaponId])) {
+			$retval = $data[$weaponId];
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $armorId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
+			throw new exception(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $weaponId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
 		}
 		return($retval);
-	}//end get_armor_by_id()
+	}//end get_weapon_by_id()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_armor() {
+	public function get_all_weapons() {
 		try {
 			$data = $this->tableHandlerObj->get_records(array('character_id'=>$this->characterId));
 			if($data == false || !is_array($data)) {
@@ -84,37 +85,55 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		}
 		
 		return($data);
-	}//end get_character_armor()
+	}//end get_all_weapons()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function create_armor($name, array $miscData=null) {
+	public function create_weapon($name, array $miscData=null) {
 		if(is_array($miscData) && count($miscData)) {
 			$sqlArr = $miscData;
-			$sqlArr['armor_name'] = $name;
+			$sqlArr['weapon_name'] = $name;
 			$sqlArr['character_id'] = $this->characterId;
 			try {
 				$newId = $this->tableHandlerObj->create_record($sqlArr);
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: error while creating armor record, DETAILS::: ". $e->getMessage());
+				throw new exception(__METHOD__ .":: error while creating weapon record, DETAILS::: ". $e->getMessage());
 			}
 		}
 		else {
 			throw new exception(__METHOD__ .":: missing data");
 		}
 		return($newId);
-	}//end create_armor()
+	}//end create_weapon()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function update_armor($armorId, array $updates) {
-		return($this->tableHandlerObj->update_record($armorId, $updates));
-	}//end update_armor()
+	public function update_weapon($weaponId, array $updates) {
+		return($this->tableHandlerObj->update_record($weaponId, $updates));
+	}//end update_weapon()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_character_weapons() {
+		try {
+			$retval = $this->tableHandlerObj->get_records(array('character_id'=>$this->characterId));
+		
+			if($retval == false || !is_array($retval)) {
+				$retval = array();
+			}
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve weapons, DETAILS::: ". $e->getMessage());
+		}
+		return($retval);
+	}//end get_character_weapon()
 	//-------------------------------------------------------------------------
 	
 	
@@ -122,26 +141,24 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function get_sheet_data() {
 		try {
-			$records = $this->get_character_armor();
+			$data = $this->get_character_weapons();
 			
 			$retval = array();
-			if(count($records) > 0) {
+			if(is_array($data) && count($data)) {
 				$makeKeysFrom = $this->get_columns_for_sheet_keys();
 				
-				foreach($records as $id=>$armorInfo) {
-					#foreach($armorInfo as $k=>$v) {
-					foreach($makeKeysFrom as $k) {
-						$v = $armorInfo[$k];
-						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $k, $id);
-						$retval[$sheetId] = $v;
+				foreach($data as $id=>$weaponInfo) {
+					foreach($makeKeysFrom as $columnName) {
+						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $columnName, $id);
+						$retval[$sheetId] = $weaponInfo[$columnName];
 					}
 				}
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: fatal error while retrieving armor records, DETAILS::: ". $e->getMessage());
+			throw new exception(__METHOD__ .":: failed to retrieve character weapons, DETAILS::: ". $e->getMessage());
 		}
-		
+
 		return($retval);
 	}//end get_sheet_data()
 	//-------------------------------------------------------------------------
@@ -158,13 +175,13 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function handle_update($updateBitName, $recordId=null, $newValue) {
-		if(in_array($updateBitName, array_keys($this->fields))) {
-			$retval = $this->update_armor($recordId, array($updateBitName => $newValue));
+cs_debug_backtrace(1);
+		try {
+			$retval = $this->update_weapon($recordId, array($updateBitName=>$newValue));
 		}
-		else {
-			throw new exception(__METHOD__ .":: invalid column name (". $updateBitName .")");
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to perform update, DETAILS::: ". $e->getMessage());
 		}
-		
 		return($retval);
 	}//end handle_update()
 	//-------------------------------------------------------------------------

@@ -76,9 +76,10 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
 			}
 			$this->characterId = $id;
+			$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
 			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
 			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
-			$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
+			$this->weaponObj = new csbt_characterWeapon($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
@@ -257,6 +258,11 @@ cs_debug_backtrace(1);
 			if(is_array($charAbilities)) {
 				$retval = array_merge($retval, $charAbilities);
 			}
+			
+			$weaponData = $this->weaponObj->get_sheet_data();
+			if(is_array($weaponData)) {
+				$retval = array_merge($retval, $weaponData);
+			}
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve sheet data, DETAILS::: ". $e->getMessage());
@@ -304,6 +310,16 @@ cs_debug_backtrace(1);
 						$this->skillsObj->handle_update('ability_mod', $id, $this->abilityObj->get_ability_modifier($abilityName));
 					}
 				}
+				break;
+			
+			case 'characterArmor':
+			case 'armor':
+				$retval = $this->armorObj->handle_update($sheetIdBit, $recordId, $newValue);
+				break;
+			
+			case 'characterWeapon':
+			case 'weapon':
+				$retval = $this->weaponObj->handle_update($sheetIdBit, $recordId, $newValue);
 				break;
 			
 			default:
