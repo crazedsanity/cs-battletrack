@@ -175,7 +175,6 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function handle_update($updateBitName, $recordId=null, $newValue) {
-cs_debug_backtrace(1);
 		try {
 			$retval = $this->update_weapon($recordId, array($updateBitName=>$newValue));
 		}

@@ -110,7 +110,11 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_skill_by_name($name) {
-		$data = $this->tableHandlerObj->get_single_record('skill_name', $name);
+		$filterArr = array(
+			'character_id'	=> $this->characterId,
+			'skill_name'	=> $name
+		);
+		$data = $this->tableHandlerObj->get_single_record($filterArr);
 		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
 		
 		return($data);
@@ -121,7 +125,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_skill_by_id($skillId) {
-		$data = $this->tableHandlerObj->get_single_record(self::pkeyField, $skillId);
+		$data = $this->tableHandlerObj->get_single_record(array(self::pkeyField => $skillId));
 		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
 		
 		return($data);

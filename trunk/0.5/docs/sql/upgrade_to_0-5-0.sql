@@ -29,6 +29,82 @@ ALTER TABLE csbt_character_attribute_table RENAME TO _backup_csbt_ca;
 --	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id)
 --);
 
+ALTER TABLE csbt_character_table ADD COLUMN ac_total integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_total SET DEFAULT 10;
+UPDATE csbt_character_table SET ac_total=10;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_total SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ac_misc integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_misc SET DEFAULT 0;
+UPDATE csbt_character_table SET ac_misc=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN action_points integer;
+ALTER TABLE csbt_character_table ALTER COLUMN action_points SET DEFAULT 0;
+UPDATE csbt_character_table SET action_points=0;
+ALTER TABLE csbt_character_table ALTER COLUMN action_points SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN character_age integer;
+ALTER TABLE csbt_character_table ALTER COLUMN character_age SET DEFAULT 18;
+UPDATE csbt_character_table SET character_age=18;
+ALTER TABLE csbt_character_table ALTER COLUMN character_age SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN alignment text;
+ALTER TABLE csbt_character_table ALTER COLUMN alignment SET DEFAULT 'Chaotic Neutral';
+UPDATE csbt_character_table SET alignment='Chaotic Neutral';
+ALTER TABLE csbt_character_table ALTER COLUMN alignment SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN base_attack_bonus integer;
+ALTER TABLE csbt_character_table ALTER COLUMN base_attack_bonus SET DEFAULT 1;
+UPDATE csbt_character_table SET base_attack_bonus=1;
+ALTER TABLE csbt_character_table ALTER COLUMN base_attack_bonus SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN deity text;
+ALTER TABLE csbt_character_table ADD COLUMN eye_color text;
+ALTER TABLE csbt_character_table ADD COLUMN gender text;
+ALTER TABLE csbt_character_table ADD COLUMN hair_color text;
+ALTER TABLE csbt_character_table ADD COLUMN height text;
+
+ALTER TABLE csbt_character_table ADD COLUMN hit_points_max integer;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_points_max SET DEFAULT 1;
+UPDATE csbt_character_table SET hit_points_max=1;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_points_max SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN hit_points_current integer;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_points_current SET DEFAULT 1;
+UPDATE csbt_character_table SET hit_points_current=1;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_points_current SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN race text;
+
+ALTER TABLE csbt_character_table ADD COLUMN size text;
+ALTER TABLE csbt_character_table ALTER COLUMN size SET DEFAULT 'Medium';
+UPDATE csbt_character_table SET size='Medium';
+ALTER TABLE csbt_character_table ALTER COLUMN size SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN weight integer;
+ALTER TABLE csbt_character_table ALTER COLUMN weight SET DEFAULT 180;
+UPDATE csbt_character_table SET weight=180;
+ALTER TABLE csbt_character_table ALTER COLUMN weight SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN initiative_total integer;
+ALTER TABLE csbt_character_table ALTER COLUMN initiative_total SET DEFAULT 1;
+UPDATE csbt_character_table SET initiative_total=1;
+ALTER TABLE csbt_character_table ALTER COLUMN initiative_total SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN initiative_misc integer;
+ALTER TABLE csbt_character_table ALTER COLUMN initiative_misc SET DEFAULT 0;
+UPDATE csbt_character_table SET initiative_misc=0;
+ALTER TABLE csbt_character_table ALTER COLUMN initiative_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN damage_reduction text;
+
+ALTER TABLE csbt_character_table ADD COLUMN speed integer;
+ALTER TABLE csbt_character_table ALTER COLUMN speed SET DEFAULT 0;
+UPDATE csbt_character_table SET speed=0;
+ALTER TABLE csbt_character_table ALTER COLUMN speed SET NOT NULL;
+
+
 CREATE TABLE csbt_attribute_table (
 	attribute_id serial NOT NULL PRIMARY KEY,
 	attribute text NOT NULL UNIQUE
@@ -112,16 +188,20 @@ CREATE TABLE csbt_character_armor_table (
 	is_worn boolean NOT NULL DEFAULT true
 );
 
-CREATE TABLE csbt_character_feat_ability_table (
-	character_feat_ability_id serial NOT NULL PRIMARY KEY,
-	feat_name text NOT NULL,
-	description text
+CREATE TABLE csbt_character_sa_table (
+	character_sa_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	special_ability_name text NOT NULL,
+	description text,
+	book_reference text
 );
 
 CREATE TABLE csbt_character_gear_table (
 	character_gear_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	gear_name text NOT NULL,
-	weight integer NOT NULL DEFAULT 1,
+	weight decimal(10,1) NOT NULL DEFAULT 1,
+	quantity integer NOT NULL DEFAULT 1,
 	location text
 );
 

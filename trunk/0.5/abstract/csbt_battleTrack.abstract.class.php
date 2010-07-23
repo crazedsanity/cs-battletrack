@@ -17,7 +17,8 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	protected $tableHandlerObj=null;
 	protected $abilityObj = null;
 	protected $charAbilityObj = null;
-	protected $fields;
+	protected $fields=null;
+	protected $pkeyField=null;
 	
 	
 	abstract public function get_sheet_data();
@@ -50,8 +51,8 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		
 		#$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
 		#$upgradeObj->check_versions(true);
-		
-		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr);
+		$this->pkeyField = $pkeyField;
+		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr, $this->characterId);
 		$this->abilityObj = new csbt_ability($this->dbObj);
 	}//end __construct()
 	//-------------------------------------------------------------------------
@@ -69,6 +70,9 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 			
 			if(!is_null($id) && is_numeric($id) && $id > 0) {
 				$sheetId .=  '__'. $id;
+			}
+			elseif(!is_numeric($id) && preg_match('/^gen/', strtolower($id))) {
+				$sheetId .= '__generated';
 			}
 		}
 		else {
@@ -117,6 +121,9 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 			$myFields = $this->fields;
 			if(isset($myFields['character_id'])) {
 				unset($myFields['character_id']);
+			}
+			if(isset($myFields[$this->pkeyField])) {
+				unset($myFields[$this->pkeyField]);
 			}
 			$retval = array_keys($myFields);
 		}

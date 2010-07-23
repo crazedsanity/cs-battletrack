@@ -80,6 +80,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
 			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
 			$this->weaponObj = new csbt_characterWeapon($this->dbObj, $this->characterId);
+			$this->gearObj = new csbt_characterGear($this->dbObj, $this->characterId);
+			$this->specialAbilityObj = new csbt_characterSpecialAbility($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
@@ -263,6 +265,16 @@ cs_debug_backtrace(1);
 			if(is_array($weaponData)) {
 				$retval = array_merge($retval, $weaponData);
 			}
+			
+			$gearData = $this->gearObj->get_sheet_data();
+			if(is_array($gearData)) {
+				$retval = array_merge($retval, $gearData);
+			}
+			
+			$specialAbilityData = $this->specialAbilityObj->get_sheet_data();
+			if(is_array($specialAbilityData)) {
+				$retval = array_merge($retval, $specialAbilityData);
+			}
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve sheet data, DETAILS::: ". $e->getMessage());
@@ -320,6 +332,11 @@ cs_debug_backtrace(1);
 			case 'characterWeapon':
 			case 'weapon':
 				$retval = $this->weaponObj->handle_update($sheetIdBit, $recordId, $newValue);
+				break;
+			
+			case 'characterGear':
+			case 'gear':
+				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
 				break;
 			
 			default:

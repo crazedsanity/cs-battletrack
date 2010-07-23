@@ -91,7 +91,8 @@ class testOfCSBattleTrack extends UnitTestCase {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_basics() {
+	public function test_everything() {
+		//TODO: put this into a big loop: create several characters, and add checks to ensure the records are attached to the correct character_id.
 		$playerName = __METHOD__;
 		$playerUid = 101;
 		$dbObj = $this->create_dbconn();
@@ -111,7 +112,6 @@ class testOfCSBattleTrack extends UnitTestCase {
 				$this->assertEqual($modifierFromCall, $calculatedModifier, "Failed to determine modifier for (". $i ."): expected (". $calculatedModifier ."), actual=(". $modifierFromCall .")");
 			}
 		}
-#exit;
 		
 		//sanity testing for character abilities.
 		if($this->dependent_test_checker()){
@@ -434,7 +434,59 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		//test gear.
 		{
+			$listOfGear = array(
+				"Bag of Holding (type III)" => array(
+					'weight'	=> 15,
+					'location'	=> "on back",
+					'quantity'	=> 1
+				),
+				"Torches" => array(
+					'weight'	=> 1,
+					'location'	=> "BoH",
+					'quantity'	=> 3
+				)
+			);
 			
+			$expectedTotalWeight = 0;
+			$idToName = array();
+			foreach($listOfGear as $name=>$gearInfo) {
+				$createRes = $char->gearObj->create_gear($name, $gearInfo);
+				$idToName[$createRes] = $name;
+				$this->assertTrue(is_numeric($createRes));
+				
+				$gearInfo = $char->gearObj->get_gear_by_id($createRes);
+				$this->assertTrue(is_array($gearInfo));
+				$this->assertTrue(count($gearInfo) > 0);
+				
+				//
+				$expectedRecordWeight = round(($gearInfo['quantity'] * $gearInfo['weight']),1);
+				$this->assertEqual($gearInfo['total_weight'], $expectedRecordWeight);
+				
+				$expectedTotalWeight += $expectedRecordWeight;
+			}
+			
+			$sheetData = $char->get_sheet_data();
+			
+			//make sure the total weight carried makes sense.
+			$this->assertTrue(isset($sheetData['gear__total_weight__generated']));
+			$this->assertEqual($sheetData['gear__total_weight__generated'], $expectedTotalWeight);
+			
+			//do a couple of updates to make sure it works.
+			$addWeight = 5;
+			$addQuantity = 3;
+			$updatedExpectedTotalWeight = 0;
+			foreach($idToName as $id=>$name) {
+				$this->assertTrue($char->handle_update('gear__weight__'. $id, null, ($listOfGear[$name]['weight'] + $addWeight)));
+				$this->assertTrue($char->handle_update('gear__quantity__'. $id, null, ($listOfGear[$name]['quantity'] + $addQuantity)));
+				
+				$expectedItemWeight = (($listOfGear[$name]['weight'] + $addWeight) * ($listOfGear[$name]['quantity'] + $addQuantity));
+				$updatedExpectedTotalWeight += $expectedItemWeight;
+				$itemData = $char->gearObj->get_gear_by_id($id);
+				$this->assertEqual($expectedItemWeight, $itemData['total_weight']);
+			}
+			
+			$sheetData = $char->get_sheet_data();
+			$this->assertEqual($updatedExpectedTotalWeight, $sheetData['gear__total_weight__generated']);
 		}
 		
 		
@@ -617,10 +669,33 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$updatedSheetData = $char->get_sheet_data();
 			$this->assertEqual($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
 		}
+		
+		
+		
+		//test special abilities
+		if($this->dependent_test_checker()) {
+			$listOfSpecialAbilities = array(
+				"Blind Fighting" => array(
+					'description'		=> "Yah, sure, you betcha",
+					'book_reference'	=> "PHB145"
+				),
+				"Two-Weapon Fighting" => array(
+					'description'		=> "Fighting with two weapons...",
+					'book_reference'	=> "PHB192"
+				)
+			);
+			
+			foreach($listOfSpecialAbilities as $name=>$specialAbilityInfo) {
+				$createRes = $char->specialAbilityObj->create_special_ability($name, $specialAbilityInfo);
+				$this->assertTrue($createRes);
+			}
+		}
+		
+		
 		$sheetData = $char->get_sheet_data();
 $this->gfObj->debug_print($sheetData);
 		
-	}//end test_basics()
+	}//end test_everything()
 	//--------------------------------------------------------------------------
 	
 }

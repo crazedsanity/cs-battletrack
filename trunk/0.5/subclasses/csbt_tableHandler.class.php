@@ -14,8 +14,10 @@
 
 class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 	
+	protected $characterId = null;
+	
 	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr) {
+	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr, $characterId) {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
@@ -33,16 +35,17 @@ class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
 		}
 		
+		if(is_numeric($characterId)) {
+			$this->characterId = $characterId;
+		}
+		
 		parent::__construct($this->dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr);
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
 	
 	
-	
-	
-	
-	//=========================================================================
+	//-------------------------------------------------------------------------
 	/**
 	 * Magic method to call methods in cs_singleTableHandlerAbstract
 	 */
@@ -56,7 +59,21 @@ class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 		}
 		return($retval);
 	}//end __call()	
-	//=========================================================================
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function __get($name) {
+		if(isset($this->$name)) {
+			$retval = $this->$name;
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid property (". $name .")");
+		}
+		return($retval);
+	}//end __get()
+	//-------------------------------------------------------------------------
 }
 
 ?>

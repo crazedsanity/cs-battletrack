@@ -25,7 +25,27 @@ CREATE TABLE csbt_character_table (
 	character_id serial NOT NULL PRIMARY KEY,
 	uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	character_name text,
-	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id)
+	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id),
+	ac_total integer NOT NULL DEFAULT 10,
+	ac_misc integer NOT NULL DEFAULT 0,
+	action_points integer NOT NULL DEFAULT 0,
+	character_age integer NOT NULL DEFAULT 18,
+	alignment text NOT NULL DEFAULT 'Chaotic Neutral',
+	base_attack_bonus integer NOT NULL DEFAULT 1,
+	deity text,
+	eye_color text,
+	gender text,
+	hair_color text,
+	height text,
+	hit_points_max integer NOT NULL DEFAULT 1,
+	hit_points_current integer NOT NULL DEFAULT 1,
+	race text,
+	size text NOT NULL DEFAULT 'Medium',
+	weight integer NOT NULL DEFAULT 180,
+	initiative_total integer NOT NULL DEFAULT 1,
+	initiative_misc integer NOT NULL DEFAULT 0,
+	damage_reduction text,
+	speed integer NOT NULL DEFAULT 30
 );
 
 CREATE TABLE csbt_attribute_table (
@@ -111,16 +131,20 @@ CREATE TABLE csbt_character_armor_table (
 	is_worn boolean NOT NULL DEFAULT true
 );
 
-CREATE TABLE csbt_character_feat_ability_table (
-	character_feat_ability_id serial NOT NULL PRIMARY KEY,
-	feat_name text NOT NULL,
-	description text
+CREATE TABLE csbt_character_sa_table (
+	character_sa_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	special_ability_name text NOT NULL,
+	description text,
+	book_reference text
 );
 
 CREATE TABLE csbt_character_gear_table (
 	character_gear_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	gear_name text NOT NULL,
-	weight integer NOT NULL DEFAULT 1,
+	weight decimal(10,1) NOT NULL DEFAULT 1,
+	quantity integer NOT NULL DEFAULT 1,
 	location text
 );
 

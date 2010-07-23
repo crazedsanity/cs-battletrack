@@ -1,0 +1,15 @@
+begin;
+truncate table csbt_character_attribute_table ;
+delete from csbt_attribute_table WHERE attribute LIKE 'abilit%';
+delete from csbt_attribute_table WHERE attribute LIKE 'feat%';
+delete from csbt_attribute_table WHERE attribute LIKE 'armor%';
+delete from csbt_attribute_table WHERE attribute LIKE 'gear%';
+delete from csbt_attribute_table WHERE attribute LIKE 'skills%';
+delete from csbt_attribute_table WHERE attribute LIKE 'weapon%';
+delete from csbt_attribute_table WHERE attribute LIKE 'save%';
+delete from csbt_attribute_table WHERE attribute LIKE 'range%';
+delete from csbt_attribute_table WHERE attribute LIKE 'melee%';
+delete from csbt_attribute_table WHERE attribute LIKE 'current%';
+delete from csbt_attribute_table WHERE attribute LIKE 'status%';
+delete from csbt_attribute_table WHERE attribute LIKE 'weight%';
+delete from csbt_attribute_table WHERE attribute LIKE 'xp%';

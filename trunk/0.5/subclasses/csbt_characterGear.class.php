@@ -33,12 +33,10 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 		$this->characterId = $characterId;
 		$this->fields = array(
 			'character_id'		=> 'int',
-			'gear_name'		=> 'sql',
-			'ability_id'		=> 'int',
-			'is_class_gear'	=> 'bool',
-			'gear_mod'			=> 'int',
-			'ability_mod'		=> 'int',
-			'ranks'				=> 'int'
+			'gear_name'			=> 'sql',
+			'weight'			=> 'decimal',
+			'quantity'			=> 'int',
+			'location'			=> 'sql'
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
@@ -48,31 +46,16 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function create_gear($name, $ability, array $fields=null) {
+	public function create_gear($name, array $fields=null) {
 		if(is_string($name) && strlen($name)) {
+			$insertArr = array();
 			if(is_array($fields) && count($fields) > 0) {
 				$insertArr = $fields;
-				$insertArr['gear_name'] = $name;
 			}
-			else {
-				$insertArr = array('gear_name'=>$name);
-			}
-			$insertArr['ability_id'] = $this->abilityObj->get_ability_id($ability);
+			$insertArr['gear_name'] = $name;
 			$insertArr['character_id'] = $this->characterId;
 			
 			try {
-				//get their ability modifier.
-				$charAbilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
-				$insertArr['ability_mod'] = $charAbilityObj->get_ability_modifier($ability);
-
-				$insertArr['gear_mod'] = $insertArr['ability_mod'];
-				if(isset($insertArr['ranks'])) {
-					$insertArr['gear_mod'] += $insertArr['ranks'];
-				}
-				if(isset($insertArr['misc_mod'])) {
-					$insertArr['gear_mod'] += $insertArr['misc_mod'];
-				}
-				
 				$newId = $this->tableHandlerObj->create_record($insertArr);
 			}
 			catch(Exception $e) {
@@ -110,8 +93,17 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_gear_by_name($name) {
-		$data = $this->tableHandlerObj->get_single_record('gear_name', $name);
-		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
+		try {
+			$filterArr = array(
+				'character_id'	=> $this->characterId,
+				'gear_name'		=> $name
+			);
+			$data = $this->tableHandlerObj->get_single_record($filterArr);
+			$data = $this->calculate_gear_weight($data);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
+		}
 		
 		return($data);
 	}//end get_gear_by_name()
@@ -121,8 +113,17 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_gear_by_id($gearId) {
-		$data = $this->tableHandlerObj->get_single_record(self::pkeyField, $gearId);
-		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
+		try {
+			$filterArr = array(
+				'character_id'	=> $this->characterId,
+				self::pkeyField	=> $gearId
+			);
+			$data = $this->tableHandlerObj->get_single_record($filterArr);
+			$data = $this->calculate_gear_weight($data);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
+		}
 		
 		return($data);
 	}//end get_gear_by_id()
@@ -131,18 +132,13 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_gear($byAbilityName=null) {
-		
-		$sql = 'SELECT t.*, t2.ability_name FROM '. self::tableName .' AS t INNER JOIN '. self::joinTable .' AS t2 '
-			. ' USING ('. self::joinTableField .') WHERE character_id='. $this->characterId;
-		
-		if(!is_null($byAbilityName) && !is_numeric($byAbilityName) && strlen($byAbilityName)) {
-			$sql .= " AND t.ability_id=". $this->abilityObj->get_ability_id($byAbilityName);
-		}
-		$sql .= ' ORDER BY gear_name';
+	public function get_character_gear() {
 		
 		try {
-			$retval = $this->dbObj->run_query($sql, 'character_gear_id');
+			$retval = $this->tableHandlerObj->get_records(array('character_id'=>$this->characterId));
+			if(is_array($retval) && count($retval) > 0) {
+				$retval = $this->calculate_gear_weight($retval);
+			}
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve character gear, DETAILS::: ". $e->getMessage());
@@ -157,12 +153,16 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	public function get_sheet_data() {
 		try {
 			$data = $this->get_character_gear();
-			$retval = array();
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+		}
+		
+		$retval = array();
+		if(is_array($data) && count($data) > 0) {
 			
-			$makeKeysFrom = array(
-				'gear_name', 'ability_name', 'is_class_gear', 'gear_mod', 
-				'ability_mod', 'ranks', 'misc_mod'
-			);
+			$makeKeysFrom = $this->get_columns_for_sheet_keys();
+			$makeKeysFrom[] = 'total_weight';
 			foreach($data as $id=>$gearData) {
 				foreach($makeKeysFrom as $indexName) {
 					if(isset($gearData[$indexName])) {
@@ -174,9 +174,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 					}
 				}
 			}
-		}
-		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+			$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_weight', 'generated')] = $this->get_total_weight();
 		}
 		
 		return($retval);
@@ -187,86 +185,8 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_character_defaults() {
-		
-		$autoSkills = array();
-		
-		//Skills added as a numbered array so I don't have to manually renumber if an item is added or removed.
-		{
-		    $autoSkills[] = array("Appraise",			"int");
-		    $autoSkills[] = array("Balance",			"dex");
-		    $autoSkills[] = array("Bluff",				"cha");
-		    $autoSkills[] = array("Climb",				"str");
-		    $autoSkills[] = array("Concentration",		"con");
-		    $autoSkills[] = array("Craft ()",			"int");
-		    $autoSkills[] = array("Craft ()",			"int");
-		    $autoSkills[] = array("Craft ()",			"int");
-		    $autoSkills[] = array("Decipher Script",	"int");
-		    $autoSkills[] = array("Diplomacy",			"cha");
-		    $autoSkills[] = array("Disable Device",		"int");
-		    $autoSkills[] = array("Disguise",			"cha");
-		    $autoSkills[] = array("Escape Artist",		"dex");
-		    $autoSkills[] = array("Forgery",			"int");
-		    $autoSkills[] = array("Gather Information",	"cha");
-		    $autoSkills[] = array("Handle Animal",		"cha");
-		    $autoSkills[] = array("Heal",				"wis");
-		    $autoSkills[] = array("Hide",				"dex");
-		    $autoSkills[] = array("intimidate",			"cha");
-		    $autoSkills[] = array("Jump",				"str");
-		    $autoSkills[] = array("Knowledge ()",		"int");
-		    $autoSkills[] = array("Knowledge ()",		"int");
-		    $autoSkills[] = array("Knowledge ()",		"int");
-		    $autoSkills[] = array("Knowledge ()",		"int");
-		    $autoSkills[] = array("Listen",				"wis");
-		    $autoSkills[] = array("Move Silently",		"dex");
-		    $autoSkills[] = array("Open Lock",			"dex");
-		    $autoSkills[] = array("Perform ()",			"cha");
-		    $autoSkills[] = array("Perform ()",			"cha");
-		    $autoSkills[] = array("Perform ()",			"cha");
-		    $autoSkills[] = array("Profession ()",		"wis");
-		    $autoSkills[] = array("Profession ()",		"wis");
-		    $autoSkills[] = array("Ride",				"dex");
-		    $autoSkills[] = array("Search",				"int");
-		    $autoSkills[] = array("Sense Motive",		"wis");
-		    $autoSkills[] = array("Sleight of Hand",	"dex");
-		    $autoSkills[] = array("Spellcraft",			"int");
-		    $autoSkills[] = array("Spot",				"wis");
-		    $autoSkills[] = array("Survival",			"wis");
-		    $autoSkills[] = array("Swim",				"str");
-		    $autoSkills[] = array("Tumble",				"dex");
-		    $autoSkills[] = array("Use Magic Device",	"cha");
-		    $autoSkills[] = array("Use Rope",			"dex");
-		}
-		return($autoSkills);
+		return(array());
 	}//end get_character_defaults()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function load_character_defaults() {
-		$autoSkills = $this->get_character_defaults();
-		foreach($autoSkills as $i=>$data) {
-			$res = $this->create_gear($data[0], $data[1]);
-		}
-	}//end load_character_defaults()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function calculate_gear_mod(array $gearData) {
-		$requiredIndexes = array('ability_mod', 'ranks', 'misc_mod');
-		$gearMod = 0;
-		foreach($requiredIndexes as $indexName) {
-			if(isset($gearData[$indexName])) {
-				$gearMod += $gearData[$indexName];
-			}
-			else {
-				throw new exception(__METHOD__ .":: missing required index (". $indexName .")");
-			}
-		}
-		return($gearMod);
-	}//end calculate_gear_mod()
 	//-------------------------------------------------------------------------
 	
 	
@@ -275,32 +195,70 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	public function handle_update($updateBitName, $recordId=null, $newValue) {
 		
 		try {
-			$oldSkillVals = $this->get_gear_by_id($recordId);
-			switch($updateBitName) {
-				case 'ability_mod':
-				case 'gear_name':
-				case 'ranks':
-				case 'misc_mod':
-				case 'is_class_gear':
-					break;
-				
-				default:
-					throw new exception(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
-			}
-			
 			//now perform the update.
-			$oldSkillVals[$updateBitName] = $newValue;
-			$updatesArr = array(
-				$updateBitName	=> $newValue,
-				'gear_Mod'		=> $this->calculate_gear_mod($oldSkillVals)
-			);
-			$this->update_gear($recordId, $updatesArr);
+			$retval = $this->update_gear($recordId, array($updateBitName => $newValue));
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
+		return($retval);
 	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_total_weight() {
+		try {
+			$allGear = $this->get_character_gear();
+			$totalWeight = 0;
+			if(is_array($allGear) && count($allGear)) {
+				foreach($allGear as $id=>$gearInfo) {
+					$totalWeight += $gearInfo['total_weight'];
+				}
+			}
+			
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to retrieve all character gear, DETAILS::: ". $e->getMessage());
+		}
+		return($totalWeight);
+	}//end get_total_weight()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function calculate_gear_weight(array $data) {
+		if(is_array($data) && count($data) > 0) {
+			$keyList = array_keys($data);
+			
+			$retval = $data;
+			if(is_numeric($keyList[0])) {
+				foreach($retval as $id=>$gearInfo) {
+					if(isset($gearInfo['quantity']) && is_numeric($gearInfo['quantity']) && isset($gearInfo['weight']) && is_numeric($gearInfo['weight'])) {
+						$retval[$id]['total_weight'] = round(($gearInfo['quantity'] * $gearInfo['weight']),1);
+					}
+					else {
+						throw new exception(__METHOD__ .":: invalid quantity (". $gearInfo['quantity'] .") or weight (". $gearInfo['weight'] .") for item #". $id);
+					}
+				}
+			}
+			elseif(isset($data['quantity']) && is_numeric($data['quantity']) && isset($data['weight']) && is_numeric($data['weight'])) {
+				$retval = $data;
+				$retval['total_weight'] = round(($data['quantity'] * $data['weight']),1);
+			}
+			else {
+				throw new exception(__METHOD__ .":: missing data from array or invalid format, cannot calculate weight");
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid data, cannot calculate weight");
+		}
+		
+		return($retval);
+	}//end calculate_gear_weight()
 	//-------------------------------------------------------------------------
 }
 
