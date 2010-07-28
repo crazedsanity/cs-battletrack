@@ -93,90 +93,97 @@ class testOfCSBattleTrack extends UnitTestCase {
 	//--------------------------------------------------------------------------
 	public function test_everything() {
 		//TODO: put this into a big loop: create several characters, and add checks to ensure the records are attached to the correct character_id.
-		$playerName = __METHOD__;
-		$playerUid = 101;
+		$numCharacters = 0;
+		$maxCharacters = 3;
 		$dbObj = $this->create_dbconn();
 		
 		$x = new csbt_tester($dbObj);
 		$x->load_schema();
-		$char = new csbt_character($dbObj, $playerName, true, $playerUid);
-		
-		$this->assertTrue(is_numeric($char->characterId));
-		
-		//sanity test for calculating modifiers.
-		{
-			for($i=1;$i<=50;$i++) {
-				$calculatedModifier = (int)floor(($i - 10)/2);
-				
-				$modifierFromCall = $char->abilityObj->get_ability_modifier($i);
-				$this->assertEqual($modifierFromCall, $calculatedModifier, "Failed to determine modifier for (". $i ."): expected (". $calculatedModifier ."), actual=(". $modifierFromCall .")");
+		for($x=0; $x< $maxCharacters; $x++) {
+			$characterSuffix = " Test #". $numCharacters;
+			$playerName = __METHOD__;
+			$playerUid = 101;
+			$char = new csbt_character($dbObj, $playerName, true, $playerUid);
+			
+			$this->assertTrue(is_numeric($char->characterId));
+			
+			//sanity test for calculating modifiers.
+			{
+				for($i=1;$i<=50;$i++) {
+					$calculatedModifier = (int)floor(($i - 10)/2);
+					
+					$modifierFromCall = $char->abilityObj->get_ability_modifier($i);
+					$this->assertEqual($modifierFromCall, $calculatedModifier, "Failed to determine modifier for (". $i ."): expected (". $calculatedModifier ."), actual=(". $modifierFromCall .")");
+				}
 			}
-		}
-		
-		if($this->dependent_test_checker()) {
-			$this->_check_ability_scores($char);
-		}
-		
-		//sanity testing for max load for given strength values.
-		if($this->dependent_test_checker()){
-			$this->_check_strength_stats($char);
-		}
-		
-		//pull list of defaults, with minor sanity checking to make sure it seems valid (before going into more in-depth stuff later).
-		if($this->dependent_test_checker()){
-			$defaults = $char->get_character_defaults();
-			$this->assertTrue(is_array($defaults));
-			$this->assertTrue(count($defaults) > 0);
-			$this->assertTrue(isset($defaults['skills']));
-			$this->assertTrue(count($defaults['skills'])>0);
-		}
-		
-		//pull all sheet data, then do some minor sanity checking to ensure it seems valid.
-		if($this->dependent_test_checker()){
-			$this->_check_reassemble_keys($char);
-		}
-		
-		
-		//test updating main character data.
-		if($this->dependent_test_checker()) {
-			$this->_check_main_character_updates($char);
-		}
-		
-		//test initially loaded skills for accuracy, and that they exist in the main sheet data as expected.
-		if($this->dependent_test_checker()){
-			$this->_check_skills($char);
-		}
-		
-		//test updates to make sure they work properly.
-		if($this->dependent_test_checker()) {
-			$this->_check_ability_updates($char);
-		}
-		
-		
-		//test gear.
-		if($this->dependent_test_checker()){
-			$this->_check_gear($char);
-		}
-		
-		
-		
-		//now test handling of armor.
-		if($this->dependent_test_checker()) {
-			$this->_check_armor($char);
-		}
-		
-		
-		
-		//test handling of weapons.
-		{
-			$this->_check_weapons($char);
-		}
-		
-		
-		
-		//test special abilities
-		if($this->dependent_test_checker()) {
-			$this->_check_special_abilities($char);
+			
+			if($this->dependent_test_checker()) {
+				$this->_check_ability_scores($char);
+			}
+			
+			//sanity testing for max load for given strength values.
+			if($this->dependent_test_checker()){
+				$this->_check_strength_stats($char);
+			}
+			
+			//pull list of defaults, with minor sanity checking to make sure it seems valid (before going into more in-depth stuff later).
+			if($this->dependent_test_checker()){
+				$defaults = $char->get_character_defaults();
+				$this->assertTrue(is_array($defaults));
+				$this->assertTrue(count($defaults) > 0);
+				$this->assertTrue(isset($defaults['skills']));
+				$this->assertTrue(count($defaults['skills'])>0);
+			}
+			
+			//pull all sheet data, then do some minor sanity checking to ensure it seems valid.
+			if($this->dependent_test_checker()){
+				$this->_check_reassemble_keys($char);
+			}
+			
+			
+			//test updating main character data.
+			if($this->dependent_test_checker()) {
+				$this->_check_main_character_updates($char);
+			}
+			
+			//test initially loaded skills for accuracy, and that they exist in the main sheet data as expected.
+			if($this->dependent_test_checker()){
+				$this->_check_skills($char);
+			}
+			
+			//test updates to make sure they work properly.
+			if($this->dependent_test_checker()) {
+				$this->_check_ability_updates($char);
+			}
+			
+			
+			//test gear.
+			if($this->dependent_test_checker()){
+				$this->_check_gear($char);
+			}
+			
+			
+			
+			//now test handling of armor.
+			if($this->dependent_test_checker()) {
+				$this->_check_armor($char);
+			}
+			
+			
+			
+			//test handling of weapons.
+			{
+				$this->_check_weapons($char);
+			}
+			
+			
+			
+			//test special abilities
+			if($this->dependent_test_checker()) {
+				$this->_check_special_abilities($char);
+			}
+			
+			$numCharacters++;
 		}
 		
 	}//end test_everything()
@@ -192,6 +199,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			foreach($abilityList as $i=>$arr) {
 				$this->assertEqual($arr['ability_score'], $char->abilityObj->get_ability_score($arr['ability_name']));
+				$this->assertEqual($arr['character_id'], $char->characterId, "Character ID mismatch, expected (". $char->characterId ."), got (". $arr['character_id'] .")");
 			}
 		}
 	}//_check_ability_scores()
@@ -356,6 +364,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 	//--------------------------------------------------------------------------
 	public function _check_main_character_updates($char) {
 		$sheetData = $char->get_sheet_data();
+		$this->assertEqual($char->characterId, $sheetData['main__character_id']);
 		$testSheetData = $sheetData;
 		$listOfChanges = array(
 			'hair_color'			=> "purple",
@@ -411,6 +420,8 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			$this->assertTrue(isset($testData['skill_name']));
 			$this->assertEqual($testData['skill_name'], $skillName);
+			
+			$this->assertEqual($char->characterId, $testData['character_id']);
 			
 			$this->assertTrue(isset($testData['ability_name']));
 			$this->assertEqual($testData['ability_name'], $skillAbility);
@@ -537,6 +548,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 					foreach($skillsByAbility as $id=>$skillInfo) {
 						$this->assertEqual($skillInfo['ability_name'], $abilityName);
 						$this->assertEqual($skillInfo['ability_mod'], $newMod);
+						$this->assertEqual($char->characterId, $skillInfo['character_id']);
 					}
 				}
 				else {
@@ -574,6 +586,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$gearInfo = $char->gearObj->get_gear_by_id($createRes);
 			$this->assertTrue(is_array($gearInfo));
 			$this->assertTrue(count($gearInfo) > 0);
+			$this->assertEqual($char->characterId, $gearInfo['character_id']);
 			
 			//
 			$expectedRecordWeight = round(($gearInfo['quantity'] * $gearInfo['weight']),1);
@@ -651,6 +664,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 			//make sure the proper number of pieces have been created so far.
 			$allArmorRecords = $char->armorObj->get_character_armor();
 			$this->assertEqual(count($allArmorRecords), $piecesCreated);
+			
+			//make sure the character_id is correct.
+			foreach($allArmorRecords as $k=>$v) {
+				$this->assertEqual($char->characterId, $v['character_id']);
+			}
 		}
 		
 		$allArmorRecords = $char->armorObj->get_character_armor();
@@ -739,53 +757,53 @@ class testOfCSBattleTrack extends UnitTestCase {
 	
 	//--------------------------------------------------------------------------
 	protected function _check_weapons($char) {
+		$listOfWeapons = array(
+			"Dagger" => array(
+				'damage'				=> "1d4 +1",
+				'total_attack_bonus'	=> "+5",
+				'critical'				=> "20x2",
+				'size'					=> "small",
+				'weapon_type'			=> "piercing",
+			),
+			"Sword of Unit Testing +5" => array(
+				'damage'				=> "10d10 + 5",
+				'total_attack_bonus'	=> "+50",
+				'critical'				=> "15-20x5",
+				'size'					=> "38 bytes",
+				'weapon_type'			=> "fictional"
+			)
+		);
 		
-			$listOfWeapons = array(
-				"Dagger" => array(
-					'damage'				=> "1d4 +1",
-					'total_attack_bonus'	=> "+5",
-					'critical'				=> "20x2",
-					'size'					=> "small",
-					'weapon_type'			=> "piercing",
-				),
-				"Sword of Unit Testing +5" => array(
-					'damage'				=> "10d10 + 5",
-					'total_attack_bonus'	=> "+50",
-					'critical'				=> "15-20x5",
-					'size'					=> "38 bytes",
-					'weapon_type'			=> "fictional"
-				)
+		$useForUpdates = array();
+		foreach($listOfWeapons as $name=>$weaponInfo) {
+			$createRes = $char->weaponObj->create_weapon($name, $weaponInfo);
+			$this->assertTrue(is_numeric($createRes));
+			
+			$useForUpdates[] = array(
+				'recId'	=> $createRes,
+				'name'	=> $name,
+				'info'	=> $weaponInfo
 			);
 			
-			$useForUpdates = array();
-			foreach($listOfWeapons as $name=>$weaponInfo) {
-				$createRes = $char->weaponObj->create_weapon($name, $weaponInfo);
-				$this->assertTrue(is_numeric($createRes));
-				
-				$useForUpdates[] = array(
-					'recId'	=> $createRes,
-					'name'	=> $name,
-					'info'	=> $weaponInfo
-				);
-				
-				$recordData = $char->weaponObj->get_weapon_by_id($createRes);
-				foreach($weaponInfo as $f=>$v) {
-					$this->assertEqual($recordData[$f], $v);
-				}
+			$recordData = $char->weaponObj->get_weapon_by_id($createRes);
+			foreach($weaponInfo as $f=>$v) {
+				$this->assertEqual($recordData[$f], $v); //? WTF?
 			}
-			
-			$createdWeapons = $char->weaponObj->get_character_weapons();
-			$this->assertEqual(count($listOfWeapons), count($createdWeapons));
-			
-			$sheetData = $char->get_sheet_data();
-			
-			//now do updates in a couple of different ways.
-			$this->assertTrue(isset($sheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']]));
-			$updateRes = $char->handle_update('characterWeapon__damage__'. $useForUpdates[0]['recId'], null, "30d30, SUCK");
-			$this->assertTrue(is_numeric($updateRes));
-			
-			$updatedSheetData = $char->get_sheet_data();
-			$this->assertEqual($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
+			$this->assertEqual($char->characterId, $recordData['character_id'], "Character ID mismatch, expected (". $char->characterId ."), got (". $recordData['character_id'] .")");
+		}
+		
+		$createdWeapons = $char->weaponObj->get_character_weapons();
+		$this->assertEqual(count($listOfWeapons), count($createdWeapons));
+		
+		$sheetData = $char->get_sheet_data();
+		
+		//now do updates in a couple of different ways.
+		$this->assertTrue(isset($sheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']]));
+		$updateRes = $char->handle_update('characterWeapon__damage__'. $useForUpdates[0]['recId'], null, "30d30, SUCK");
+		$this->assertTrue(is_numeric($updateRes));
+		
+		$updatedSheetData = $char->get_sheet_data();
+		$this->assertEqual($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
 	}//end _check_weapons()
 	//--------------------------------------------------------------------------
 	
@@ -807,6 +825,16 @@ class testOfCSBattleTrack extends UnitTestCase {
 		foreach($listOfSpecialAbilities as $name=>$specialAbilityInfo) {
 			$createRes = $char->specialAbilityObj->create_special_ability($name, $specialAbilityInfo);
 			$this->assertTrue($createRes);
+			
+			//retrieve the record.
+			$recordById = $char->specialAbilityObj->get_special_ability_by_id($createRes);
+			$recordByName = $char->specialAbilityObj->get_special_ability_by_name($name);
+			
+			$this->assertTrue(is_array($recordById));
+			$this->assertTrue(is_array($recordByName));
+			
+			$this->assertEqual($char->characterId, $recordById['character_id']);
+			$this->assertEqual($char->characterId, $recordByName['character_id']);
 		}
 	}//end _check_special_abilities()
 	//--------------------------------------------------------------------------

@@ -104,7 +104,6 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 				'special_ability_name'		=> $name
 			);
 			$data = $this->tableHandlerObj->get_single_record($filterArr);
-			$data = $this->calculate_special_ability_weight($data);
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());
@@ -124,7 +123,6 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 				self::pkeyField	=> $special_abilityId
 			);
 			$data = $this->tableHandlerObj->get_single_record($filterArr);
-			$data = $this->calculate_special_ability_weight($data);
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());

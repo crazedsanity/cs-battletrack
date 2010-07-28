@@ -60,7 +60,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function get_character_abilities() {
 		try {
-			$retval = $this->tableHandlerObj->get_records();
+			$retval = $this->tableHandlerObj->get_records(array('character_id' => $this->characterId));
 			
 			foreach($retval as $i=>$arr) {
 				$abilityName = $this->abilityObj->get_ability_name($arr['ability_id']);
