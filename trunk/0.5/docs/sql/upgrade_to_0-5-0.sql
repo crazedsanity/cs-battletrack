@@ -29,15 +29,20 @@ ALTER TABLE csbt_character_attribute_table RENAME TO _backup_csbt_ca;
 --	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id)
 --);
 
-ALTER TABLE csbt_character_table ADD COLUMN ac_total integer;
-ALTER TABLE csbt_character_table ALTER COLUMN ac_total SET DEFAULT 10;
-UPDATE csbt_character_table SET ac_total=10;
-ALTER TABLE csbt_character_table ALTER COLUMN ac_total SET NOT NULL;
-
 ALTER TABLE csbt_character_table ADD COLUMN ac_misc integer;
 ALTER TABLE csbt_character_table ALTER COLUMN ac_misc SET DEFAULT 0;
 UPDATE csbt_character_table SET ac_misc=0;
 ALTER TABLE csbt_character_table ALTER COLUMN ac_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ac_size integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_size SET DEFAULT 0;
+UPDATE csbt_character_table SET ac_size=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_size SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ac_natural integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_natural SET DEFAULT 0;
+UPDATE csbt_character_table SET ac_natural=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ac_natural SET NOT NULL;
 
 ALTER TABLE csbt_character_table ADD COLUMN action_points integer;
 ALTER TABLE csbt_character_table ALTER COLUMN action_points SET DEFAULT 0;
@@ -87,15 +92,20 @@ ALTER TABLE csbt_character_table ALTER COLUMN weight SET DEFAULT 180;
 UPDATE csbt_character_table SET weight=180;
 ALTER TABLE csbt_character_table ALTER COLUMN weight SET NOT NULL;
 
-ALTER TABLE csbt_character_table ADD COLUMN initiative_total integer;
-ALTER TABLE csbt_character_table ALTER COLUMN initiative_total SET DEFAULT 1;
-UPDATE csbt_character_table SET initiative_total=1;
-ALTER TABLE csbt_character_table ALTER COLUMN initiative_total SET NOT NULL;
-
 ALTER TABLE csbt_character_table ADD COLUMN initiative_misc integer;
 ALTER TABLE csbt_character_table ALTER COLUMN initiative_misc SET DEFAULT 0;
 UPDATE csbt_character_table SET initiative_misc=0;
 ALTER TABLE csbt_character_table ALTER COLUMN initiative_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN nonlethal_damage integer;
+ALTER TABLE csbt_character_table ALTER COLUMN nonlethal_damage SET DEFAULT 0;
+UPDATE csbt_character_table SET nonlethal_damage=0;
+ALTER TABLE csbt_character_table ALTER COLUMN nonlethal_damage SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN hit_dice integer;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_dice SET DEFAULT 0;
+UPDATE csbt_character_table SET hit_dice=0;
+ALTER TABLE csbt_character_table ALTER COLUMN hit_dice SET NOT NULL;
 
 ALTER TABLE csbt_character_table ADD COLUMN damage_reduction text;
 

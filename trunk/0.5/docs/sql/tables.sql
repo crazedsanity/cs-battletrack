@@ -26,8 +26,9 @@ CREATE TABLE csbt_character_table (
 	uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	character_name text,
 	campaign_id integer DEFAULT NULL REFERENCES csbt_campaign_table(campaign_id),
-	ac_total integer NOT NULL DEFAULT 10,
 	ac_misc integer NOT NULL DEFAULT 0,
+	ac_size integer NOT NULL DEFAULT 0,
+	ac_natural integer NOT NULL DEFAULT 0,
 	action_points integer NOT NULL DEFAULT 0,
 	character_age integer NOT NULL DEFAULT 18,
 	alignment text NOT NULL DEFAULT 'Chaotic Neutral',
@@ -42,8 +43,9 @@ CREATE TABLE csbt_character_table (
 	race text,
 	size text NOT NULL DEFAULT 'Medium',
 	weight integer NOT NULL DEFAULT 180,
-	initiative_total integer NOT NULL DEFAULT 1,
 	initiative_misc integer NOT NULL DEFAULT 0,
+	nonlethal_damage integer NOT NULL DEFAULT 0,
+	hit_dice text NOT NULL DEFAULT 'd6',
 	damage_reduction text,
 	speed integer NOT NULL DEFAULT 30
 );

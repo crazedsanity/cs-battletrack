@@ -72,9 +72,15 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_armor() {
+	public function get_character_armor($onlyWorn=false) {
 		try {
-			$data = $this->tableHandlerObj->get_records(array('character_id'=>$this->characterId));
+			$filterArr = array(
+				'character_id'	=> $this->characterId
+			);
+			if($onlyWorn === true) {
+				$filterArr['is_worn'] = true;
+			}
+			$data = $this->tableHandlerObj->get_records($filterArr);
 			if($data == false || !is_array($data)) {
 				$data = array();
 			}
@@ -167,6 +173,27 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		
 		return($retval);
 	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_ac_bonus() {
+		try {
+			$allArmor = $this->get_character_armor(true);
+			$totalBonus = 0;
+			if(is_array($allArmor) && count($allArmor) > 0) {
+				foreach($allArmor as $id=>$recordInfo) {
+					$totalBonus += $recordInfo['ac_bonus'];
+				}
+			}
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .": error while retrieving armor, DETAILS::: .". $e->getMessage());
+		}
+		
+		return($totalBonus);
+	}//end get_ac_bonus()
 	//-------------------------------------------------------------------------
 }
 

@@ -281,6 +281,47 @@ class testOfCSBattleTrack extends UnitTestCase {
 		}
 		
 		
+		//test updating main character data.
+		$sheetData = $char->get_sheet_data();
+		if($this->dependent_test_checker()) {
+			$testSheetData = $sheetData;
+			$listOfChanges = array(
+				'hair_color'			=> "purple",
+				'ac_misc'				=> 88,
+				'hit_points_max'		=> 222,
+				'race'					=> "E.V.I.L.",
+				'ac_size'				=> 1,
+				'ac_natural'			=> 2,
+				'action_points'			=> 33,
+				'character_age'			=> 666,
+				'alignment'				=> "Chaotic Nick",
+				'base_attack_bonus'		=> 15,
+				'deity'					=> "yermom",
+				'eye_color'				=> "purple",
+				'gender'				=> "Shemale",
+				'height'				=> "6'6\"",
+				'hit_points_current'	=> 111,
+				'size'					=> "Colossal",
+				'weight'				=> 256,
+				'initiative_misc'		=> 17,
+				'nonlethal_damage'		=> 12,
+				'hit_dice'				=> "d100",
+				'damage_reduction'		=> "+5/yermom",
+				'speed'					=> 400
+			);
+			#$updateRes = $char->handle_update('main__hair_color', null, 'purple');
+			#$this->assertTrue($updateRes);
+			foreach($listOfChanges as $column=>$newValue) {
+				$this->assertNotEqual($newValue, $sheetData['main__'. $column], "Values for (main__". $column .") unexpectedly equal (". $newValue .")");
+				if($this->dependent_test_checker()) {
+					$updateRes = $char->handle_update('main__'. $column, null, $newValue);
+					$this->assertTrue($updateRes);
+					$sheetData = $char->get_sheet_data();
+					$this->assertEqual($newValue, $sheetData['main__'. $column]);
+				}
+			}
+		}
+		
 		//test initially loaded skills for accuracy, and that they exist in the main sheet data as expected.
 		if($this->dependent_test_checker()){
 			$findThese = array();
@@ -693,8 +734,9 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		
 		$sheetData = $char->get_sheet_data();
-$this->gfObj->debug_print($sheetData);
-		
+//$this->gfObj->debug_print($sheetData);
+//$this->gfObj->debug_print(count($sheetData));
+//		
 	}//end test_everything()
 	//--------------------------------------------------------------------------
 	

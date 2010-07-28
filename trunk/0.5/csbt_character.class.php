@@ -32,23 +32,47 @@ class csbt_character extends csbt_battleTrackAbstract {
 	protected $changesByKey=array();
 	
 	protected $cleanStringArr = array(
-			'character_id'		=> 'int',
-			'attribute_id'		=> 'int'
+			'uid'					=> 'int',
+			'character_name'		=> 'sql',
+			'campaign_id'			=> 'int',
+			'ac_misc'				=> 'int',
+			'ac_size'				=> 'int',
+			'ac_natural'			=> 'int',
+			'action_points'			=> 'int',
+			'character_age'			=> 'int',
+			'alignment'				=> 'sql',
+			'base_attack_bonus'		=> 'int',
+			'deity'					=> 'sql',
+			'eye_color'				=> 'sql',
+			'gender'				=> 'sql',
+			'hair_color'			=> 'sql',
+			'height'				=> 'sql',
+			'hit_points_max'		=> 'int',
+			'hit_points_current'	=> 'int',
+			'race'					=> 'sql',
+			'size'					=> 'sql',
+			'weight'				=> 'int',
+			'initiative_misc'		=> 'int',
+			'nonlethal_damage'		=> 'int',
+			'hit_dice'				=> 'sql',
+			'damage_reduction'		=> 'sql',
+			'speed'					=> 'int'
 		);
 	
 	public $skillsObj;
 	public $armorObj;
 	
-	const tableName= 'csbt_character_attribute_table';
-	const seqName =  'csbt_character_attribute_table_character_attribute_id_seq';
-	const pkeyName = 'character_attribute_id';
+	const tableName= 'csbt_character_table';
+	const seqName =  'csbt_character_table_character_id_seq';
+	const pkeyField = 'character_id';
+	const sheetIdPrefix = 'main';
 	
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $characterIdOrName, $create=false, $playerUid=null) {
 		if(!is_object($dbObj) || get_class($dbObj) != 'cs_phpDB') {
 			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
 		}
-		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyName, $this->cleanStringArr);
+		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr);
 		$this->logger->logCategory = "Character";
 		
 		if($create===false && is_numeric($characterIdOrName) && $characterIdOrName >= 0) {
@@ -135,29 +159,18 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function get_character_data() {
 		if(is_numeric($this->characterId)) {
-			$data = $this->dbObj->run_query("SELECT ca.*, a.attribute FROM csbt_character_attribute_table "
-					."AS ca INNER JOIN csbt_attribute_table AS a USING (attribute_id) "
-					."WHERE ca.character_id=". $this->characterId, 'character_attribute_id');
-			
-			$this->dataCache = array();
-			$this->id2key = array();
-			if(is_array($data)) {
-				foreach($data as $id=>$attribs) {
-					$key = $attribs['attribute'];
-					$this->dataCache[$key] = array(
-						'value'	=> $attribs['attribute_value'],
-						'id'	=> $id
-					);
-					$this->id2key[$id] = $key;
-				}
-				$this->logger->log_by_class("Retrieved ". count($this->dataCache) ." attributes for id=(". $this->characterId .")", 'debug');
+			try {
+				$data = $this->tableHandlerObj->get_single_record(array(self::pkeyField=>$this->characterId));
+			}
+			catch(Exception $e) {
+				throw new exception(__METHOD__ .":: failed to retrieve main record, DETAILS::: ". $e->getMessage());
 			}
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid internal characterId (". $this->characterId .")");
 		}
 		
-		return($this->dataCache);
+		return($data);
 	}//end get_character_data()
 	//-------------------------------------------------------------------------
 	
@@ -165,14 +178,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 	
 	//-------------------------------------------------------------------------
 	public function get_main_character_data() {
-		if(is_numeric($this->characterId)) {
-			$data = $this->dbObj->run_query("SELECT * FROM csbt_character_table " .
-					"WHERE character_id=". $this->characterId);
-		}
-		else {
-			$this->exception_handler(__METHOD__ .": invalid characterId");
-		}
-		return($data);
+		return($this->get_character_data());
 	}//end get_main_character_data()
 	//-------------------------------------------------------------------------
 	
@@ -182,10 +188,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 	public function update_main_character_data(array $data) {
 		if(is_numeric($this->characterId)) {
 			if(is_array($data) && count($data)) {
-				$sql = "UPDATE csbt_character_table SET " .
-						$this->gfObj->string_from_array($data, 'update', null, 'sql') .
-						" WHERE character_id=". $this->characterId;
-				$updateRes = $this->dbObj->run_update($sql);
+				$updateRes = $this->tableHandlerObj->update_record($this->characterId, $data);
 			}
 			else {
 				$this->exception_handler(__METHOD__ .": invalid data");
@@ -242,13 +245,25 @@ cs_debug_backtrace(1);
 	public function get_sheet_data() {
 		
 		try{
-			$retval = $this->get_character_data();
-			if(!is_array($retval)) {
+			$mainCharData = $this->get_character_data();
+			if(is_array($mainCharData)) {
 				$retval = array();
+				foreach($mainCharData as $field=>$val) {
+					$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $field);
+					$retval[$sheetId] = $val;
+				}
+				
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
+			}
+			else {
+				throw new exception("no main character data");
 			}
 			
 			$skillsData = $this->skillsObj->get_sheet_data();
-			$retval = $skillsData;
+			if(is_array($skillsData)) {
+				$retval = array_merge($retval, $skillsData);
+			}
 			
 			
 			$armorData = $this->armorObj->get_sheet_data();
@@ -305,6 +320,14 @@ cs_debug_backtrace(1);
 		}
 		
 		switch($updateType) {
+			case 'main':
+			case 'mainCharacter':
+				$retval = $this->update_main_character_data(array($sheetIdBit=>$newValue));
+				
+				$this->handle_automatic_updates($sheetIdBit, $newValue);
+				break;
+			
+			
 			case 'characterAbility':
 			case 'characterAbilities':
 				//TODO: this call should return the affected ability so automatic updates work; for temporary, don't return anything.
@@ -345,6 +368,75 @@ cs_debug_backtrace(1);
 		
 		return($retval);
 	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	protected function handle_automatic_updates($updatedColumn, $newValue) {
+		$retval = false;
+		switch($updatedColumn) {
+			case 'base_attack_bonus':
+				//TODO: consider updating weapon attack bonus (need to know old value, too)
+				break;
+				
+				
+			case 'hit_points_max':
+				break;
+				
+				
+			case 'hit_points_current':
+				//TODO: update to match hit_points_max if it was previously maxed?
+				break;
+			
+			case 'initiative_misc':
+				//TODO: consider updating initiative_max?
+				break;
+		}
+		return($retval);
+	}//end handle_automatic_updates()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_total_ac_bonus() {
+		try {
+			$totalAc = $this->armorObj->get_ac_bonus();
+			$characterInfo = $this->get_main_character_data();
+			
+			if(is_numeric($characterInfo['ac_size'])) {
+				$totalAc += $characterInfo['ac_size'];
+			}
+			if(is_numeric($characterInfo['ac_misc'])) {
+				$totalAc += $characterInfo['ac_misc'];
+			}
+			if(is_numeric($characterInfo['ac_natural'])) {
+				$totalAc += $characterInfo['ac_natural'];
+			}
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .": failed to retrieve data for ac bonus, DETAILS::: ". $e->getMessage());
+		}
+		return($totalAc);
+	}//end get_total_ac_bonus()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_initiative_bonus() {
+		try {
+			//NOTE: for additional modifiers (i.e. from feats/abilities), those bonuses must be added to the "initiative_misc" field.
+			$characterInfo = $this->get_main_character_data();
+			$initBonus = $characterInfo['initiative_misc'];
+			$initBonus += $this->abilityObj->get_ability_modifier('dex');
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .": failed to retrieve data for initiative, DETAILS::: ". $e->getMessage());
+		}
+		return($initBonus);
+	}//end get_initiative_bonus()
 	//-------------------------------------------------------------------------
 }
 
