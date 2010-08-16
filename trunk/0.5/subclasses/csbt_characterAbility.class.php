@@ -389,7 +389,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 				}
 			}
 			else {
-				throw new exception(__METHOD__ .":: wrong number of bits in (". $updateBits[0] ."), expecting 2 but found (". count($updateBits) .")");
+				throw new exception(__METHOD__ .":: wrong number of bits in (". $updateBitName ."), expecting 2 but found (". count($updateBits) .")");
 			}
 		}
 		else {

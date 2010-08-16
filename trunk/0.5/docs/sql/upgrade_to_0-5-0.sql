@@ -54,6 +54,11 @@ ALTER TABLE csbt_character_table ALTER COLUMN character_age SET DEFAULT 18;
 UPDATE csbt_character_table SET character_age=18;
 ALTER TABLE csbt_character_table ALTER COLUMN character_age SET NOT NULL;
 
+ALTER TABLE csbt_character_table ADD COLUMN character_level text;
+ALTER TABLE csbt_character_table ALTER COLUMN character_level SET DEFAULT '(class/level) EXAMPLE: fighter/1, rogue/3';
+UPDATE csbt_character_table SET character_level='(class/level) EXAMPLE: fighter/1, rogue/3';
+ALTER TABLE csbt_character_table ALTER COLUMN character_level SET NOT NULL;
+
 ALTER TABLE csbt_character_table ADD COLUMN alignment text;
 ALTER TABLE csbt_character_table ALTER COLUMN alignment SET DEFAULT 'Chaotic Neutral';
 UPDATE csbt_character_table SET alignment='Chaotic Neutral';
@@ -109,10 +114,52 @@ ALTER TABLE csbt_character_table ALTER COLUMN hit_dice SET NOT NULL;
 
 ALTER TABLE csbt_character_table ADD COLUMN damage_reduction text;
 
+ALTER TABLE csbt_character_table ADD COLUMN melee_misc integer;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_misc SET DEFAULT 0;
+UPDATE csbt_character_table SET melee_misc=0;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN melee_size integer;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_size SET DEFAULT 0;
+UPDATE csbt_character_table SET melee_size=0;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_size SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN melee_temp integer;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_temp SET DEFAULT 0;
+UPDATE csbt_character_table SET melee_temp=0;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_temp SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN melee_total integer;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_total SET DEFAULT 0;
+UPDATE csbt_character_table SET melee_total=0;
+ALTER TABLE csbt_character_table ALTER COLUMN melee_total SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ranged_misc integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_misc SET DEFAULT 0;
+UPDATE csbt_character_table SET ranged_misc=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_misc SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ranged_size integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_size SET DEFAULT 0;
+UPDATE csbt_character_table SET ranged_size=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_size SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ranged_temp integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_temp SET DEFAULT 0;
+UPDATE csbt_character_table SET ranged_temp=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_temp SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN ranged_total integer;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_total SET DEFAULT 0;
+UPDATE csbt_character_table SET ranged_total=0;
+ALTER TABLE csbt_character_table ALTER COLUMN ranged_total SET NOT NULL;
+
 ALTER TABLE csbt_character_table ADD COLUMN speed integer;
 ALTER TABLE csbt_character_table ALTER COLUMN speed SET DEFAULT 0;
 UPDATE csbt_character_table SET speed=0;
 ALTER TABLE csbt_character_table ALTER COLUMN speed SET NOT NULL;
+
+ALTER TABLE csbt_character_table ADD COLUMN notes text;
 
 
 CREATE TABLE csbt_attribute_table (
@@ -213,6 +260,17 @@ CREATE TABLE csbt_character_gear_table (
 	weight decimal(10,1) NOT NULL DEFAULT 1,
 	quantity integer NOT NULL DEFAULT 1,
 	location text
+);
+
+CREATE TABLE csbt_character_save_table (
+	character_save_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	save_name text NOT NULL,
+	ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id),
+	base_mod integer NOT NULL DEFAULT 0,
+	magic_mod integer NOT NULL DEFAULT 0,
+	misc_mod integer NOT NULL DEFAULT 0,
+	temp_mod integer NOT NULL DEFAULT 0
 );
 
 -- Create a unique set of attributes.

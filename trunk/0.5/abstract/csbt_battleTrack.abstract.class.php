@@ -14,7 +14,7 @@
 
 abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	
-	protected $tableHandlerObj=null;
+	public $tableHandlerObj=null;
 	protected $abilityObj = null;
 	protected $charAbilityObj = null;
 	protected $fields=null;
@@ -49,8 +49,11 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		
 		$this->logger = new cs_webdblogger($dbObj, $this->get_project() .'::'. __CLASS__);
 		
-		$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
-		$upgradeObj->check_versions(true);
+		if(!defined('csbt__UPGRADE') && !defined('SIMPLE_TEST')) {
+			$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
+			define('csbt__UPGRADE', 1);
+			$upgradeObj->check_versions(true);
+		}
 		$this->pkeyField = $pkeyField;
 		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr, $this->characterId);
 		$this->abilityObj = new csbt_ability($this->dbObj);

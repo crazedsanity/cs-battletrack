@@ -38,9 +38,10 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 		
 		$isValid = null;
 		try {
-			$this->run_upgrade_sql_file('upgrade_to_0-2-0.sql');
-			$this->fix_numbered_keys();
-			$this->do_key_changes();
+			$this->run_upgrade_sql_file('upgrade_to_0-5-0.sql');
+			#$this->fix_numbered_keys();
+			#$this->do_key_changes();
+			$this->convert_characters();
 			
 			$isValid = true;
 		}
@@ -203,7 +204,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 				$currentId = $data['attribute_id'];
 			}
 			else {
-				$this->logObj->log_by_class(__METHOD__ .":: failed to retrieve data for (". $old ."), DETAILS:::: ". $e->getMessage(), 'Exception in code');
+				$this->logsObj->log_by_class(__METHOD__ .":: failed to retrieve data for (". $old .")", 'Exception in code');
 			}
 			
 			
@@ -240,6 +241,289 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 			}
 		}
 	}//end do_key_changes()
+	//=========================================================================
+	
+	
+	
+	//=========================================================================
+	private function get_character_attribs($id) {
+		$sql = "SELECT a.attribute, ca.attribute_value FROM csbt_attribute_table "
+			."AS a INNER JOIN csbt_character_attribute_table AS ca USING "
+			."(attribute_id) WHERE character_id=". $id ." ORDER BY a.attribute";
+		
+		try {
+			$records = $this->db->run_query($sql, 'attribute', 'attribute_value');
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .": FATAL ERROR: unable to retrieve attributes for character_id=(". $id ."), DETAILS::: ". $e->getMessage());
+		}
+		return($records);
+	}//end get_character_attribs()
+	//=========================================================================
+	
+	
+	
+	//=========================================================================
+	private function convert_characters() {
+		$this->logsObj->log_by_class(__METHOD__ .": starting", 'debug');
+		$cleanStringArr = array(
+			'uid'				=> 'int',
+			'character_id'		=> 'int',
+			'character_name'	=> 'sql'
+		);
+		$tableObj = new csbt_tableHandler($this->db, 'csbt_character_table', 'csbt_character_table_character_id_seq', 'character_id', $cleanStringArr, null);
+		
+		$characterList = $tableObj->get_records(null, 'character_id');
+		foreach($characterList as $characterId=>$info) {
+			$this->logsObj->log_by_class(__METHOD__ .": starting on character_id=(". $characterId .")", 'debug');
+			$charObj = new csbt_character($this->db, $info['character_name'], true, $info['uid']);
+			
+			$charAttribs = $this->get_character_attribs($characterId);
+			
+			$armorData = array();
+			$weaponData = array();
+			$specialAbilities = array();
+			$gearData = array();
+			$savesData = array();
+			
+			$numConverted = 0;
+			foreach($charAttribs as $n=>$v) {
+				$attribBits = explode('-', $n);
+				switch($attribBits[0]) {
+					case 'abilities':
+						$abilityId = $charObj->abilityObj->get_ability_id($attribBits[1]);
+						if($attribBits[1] == 'base') {
+							$charObj->handle_update('characterAbility__'. $attribBits[1] .'_score', null, $v);
+						}
+						elseif($attribBits[1] == 'temp') {
+							$charObj->handle_update('characterAbility__'. $attribBits[1] .'_temporary_score', null, $v);
+						}
+						break;
+					
+					case 'ac':
+						//do nothing!
+						break;
+					
+					case 'armorSlot':
+						$armorData[$attribBits[1]][$attribBits[2]] = $v;
+						break;
+					
+					case 'class':		//class-total-level
+					case 'class_total':	//class_total-level
+						$charObj->handle_update('main__character_level', null, $v);
+						break;
+					
+					case 'current_class':
+					case 'current':
+						$charObj->update_main_character_data(array('character_level'=>$v));
+						break;
+					
+					case 'featsAbilities':
+						$charObj->specialAbilitiesObj->create_special_ability($v);
+						break;
+					
+					case 'gear':
+						$gearData[$attribBits[1]][$attribBits[2]] = $v;
+						break;
+					
+					case 'generated':
+						break;
+					
+					case 'generic':
+						switch($attribBits[1]) {
+							case 'bab':
+							case 'base': //base-attack-bonus
+							case 'base_attack_bonus':
+								if(is_numeric($v)) {
+									$charObj->update_main_character_data(array('base_attack_bonus'=>$v));
+								}
+								break;
+							
+							case 'action_points':
+								$charObj->update_main_character_data(array('action_points'=>$v));
+								break;
+								
+							case 'age':
+								$charObj->update_main_character_data(array('character_age'=>$v));
+								break;
+								
+							case 'alignment':
+								$charObj->update_main_character_data(array('alignment'=>$v));
+								break;
+								
+							case 'campaign':
+								//TODO: create campaign (or find already-created one)
+								break;
+								
+							case 'class':
+								$charObj->update_main_character_data(array('character_level'=>$v));
+								break;
+								
+							case 'deity':
+								$charObj->update_main_character_data(array('deity'=>$v));
+								break;
+								
+							case 'eyes':
+								$charObj->update_main_character_data(array('eye_color'=>$v));
+								break;
+								
+							case 'gender':
+								$charObj->update_main_character_data(array('gender'=>$v));
+								break;
+								
+							case 'hair':
+								$charObj->update_main_character_data(array('hair_color'=>$v));
+								break;
+								
+							case 'height':
+								$charObj->update_main_character_data(array('height'=>$v));
+								break;
+								
+							case 'hp':
+								$charObj->update_main_character_data(array('hit_points_max'=>$v));
+								break;
+								
+							case 'race':
+								$charObj->update_main_character_data(array('race'=>$v));
+								break;
+								
+							case 'size':
+								$charObj->update_main_character_data(array('size'=>$v));
+								break;
+								
+							case 'weight':
+								$charObj->update_main_character_data(array('weight'=>$v));
+								break;
+								
+							default:
+								throw new exception(__METHOD__ .": unknown generic attribute (". $n .")");
+						}
+						break;
+						
+					case 'init':
+						if($attribBits[1] == 'misc') {
+							$charObj->update_main_character_data(array('initiative_misc'=>$v));
+						}
+						elseif($attribBits[1] == 'total') {
+							//this value is now calculated.
+						}
+						else {
+							throw new exception(__METHOD__ .": invalid initiative item (". $n .")");
+						}
+						break;
+					
+					case 'mainCharacter':
+						break;
+					
+					case 'melee':
+						if(preg_match('/^misc/', $attribBits[1])) {
+							$charObj->update_main_character_data(array('melee_misc'=>$v));
+						}
+						elseif(preg_match('/^size/', $attribBits[1])) {
+							$charObj->update_main_character_data(array('melee_size'=>$v));
+						}
+						elseif(preg_match('/^temp/', $attribBits[1])) {
+							$charObj->update_main_character_data(array('melee_temp'=>$v));
+						}
+						elseif(preg_match('/^total/', $attribBits[1])) {
+							$charObj->update_main_character_data(array('melee_total'=>$v));
+						}
+						else {
+							throw new exception(__METHOD__ .": unknown melee attribute (". $n .")");
+						}
+						break;
+						
+					case 'misc':
+						if($attribBits[1] == 'notes') {
+							$charObj->update_main_character_data(array('notes'=>$v));
+						}
+						else {
+							throw new exception(__METHOD__ .": unknown misc attribute (". $n .")");
+						}
+						break;
+					
+					case 'ranged':
+						if($attribBits[1] == 'misc_mod') {
+							$charObj->update_main_character_data(array('ranged_misc'=>$v));
+						}
+						elseif($attribBits[1] == 'size_mod') {
+							$charObj->update_main_character_data(array('ranged_size'=>$v));
+						}
+						elseif($attribBits[1] == 'temp_mod') {
+							$charObj->update_main_character_data(array('ranged_temp'=>$v));
+						}
+						elseif($attribBits[1] == 'total') {
+							//don't worry about it.
+						}
+						else {
+							throw new exception(__METHOD__ .": unknown ranged value (". $n .")");
+						}
+						break;
+					
+					case 'save':
+						$savesData[$attribBits[1]][$attribBits[2]] = $v;
+						break;
+					
+					case 'status':
+						if(preg_match('/hp$/', $n)) {
+							$charObj->update_main_character_data(array('hit_points_current'=>$v));
+						}
+						elseif(preg_match('/nonlethal/', $n)) {
+							$charObj->update_main_character_data(array('nonlethal_damage'=>$v));
+						}
+						else {
+							throw new exception(__METHOD__ .": unknown generic status (". $n .")");
+						}
+						break;
+					
+					case 'weaponSlot':
+						$weaponData[$attribBits[1]][$attribBits[2]] = $v;
+						break;
+					
+					default:
+						throw new exception(__METHOD__ .": unknown attribute (". $n .")");
+				}
+				$numConverted++;
+				
+				$this->logsObj->log_by_class(__METHOD__ .": finished with attribute (". $n .")", 'debug');
+			}
+			
+			
+			foreach($armorData as $i=>$v) {
+				$name = $v['name'];
+				unset($v['name']);
+				$charObj->armorObj->create_armor($name, $v);
+				$numConverted++;
+			}
+			
+			foreach($weaponData as $i=>$v) {
+				$name = $v['name'];
+				unset($v['name']);
+				$charObj->weaponObj->create_weapon($name, $v);
+				$numConverted++;
+			}
+			
+			foreach($specialAbilities as $i=>$v) {
+				$name = $v['name'];
+				unset($v['name']);
+				$charObj->specialAbilityObj->create_special_ability($name, $v);
+				$numConverted++;
+			}
+			
+			foreach($gearData as $i=>$v) {
+				$name = $v['name'];
+				unset($v['name']);
+				$charObj->gearObj->create_gear($name, $v);
+				$numConverted++;
+			}
+			
+			foreach($savesData as $i=>$v) {
+				
+			}
+			
+			$this->logsObj->log_by_class(__METHOD__ .": converted (". $numConverted .") for characterId (". $characterId .")", 'debug');
+		}
+	}//end convert_characters()
 	//=========================================================================
 }
 

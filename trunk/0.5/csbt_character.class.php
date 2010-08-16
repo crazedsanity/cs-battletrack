@@ -40,6 +40,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			'ac_natural'			=> 'int',
 			'action_points'			=> 'int',
 			'character_age'			=> 'int',
+			'character_level'		=> 'sql',
 			'alignment'				=> 'sql',
 			'base_attack_bonus'		=> 'int',
 			'deity'					=> 'sql',
@@ -56,7 +57,16 @@ class csbt_character extends csbt_battleTrackAbstract {
 			'nonlethal_damage'		=> 'int',
 			'hit_dice'				=> 'sql',
 			'damage_reduction'		=> 'sql',
-			'speed'					=> 'int'
+			'melee_misc'			=> 'int',
+			'melee_size'			=> 'int',
+			'melee_temp'			=> 'int',
+			'melee_total'			=> 'int',
+			'ranged_misc'			=> 'int',
+			'ranged_size'			=> 'int',
+			'ranged_temp'			=> 'int',
+			'ranged_total'			=> 'int',
+			'speed'					=> 'int',
+			'notes'					=> 'sql'
 		);
 	
 	public $skillsObj;
@@ -106,6 +116,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$this->weaponObj = new csbt_characterWeapon($this->dbObj, $this->characterId);
 			$this->gearObj = new csbt_characterGear($this->dbObj, $this->characterId);
 			$this->specialAbilityObj = new csbt_characterSpecialAbility($this->dbObj, $this->characterId);
+			$this->savesObj = new csbt_characterSave($this->dbObj, $this->characterId);
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
@@ -236,6 +247,9 @@ cs_debug_backtrace(1);
 		//now load skills.
 		$this->skillsObj->load_character_defaults();
 		
+		//load saves.
+		$this->savesObj->load_character_defaults();
+		
 	}//end load_character_defaults()
 	//-------------------------------------------------------------------------
 	
@@ -261,33 +275,44 @@ cs_debug_backtrace(1);
 			}
 			
 			$skillsData = $this->skillsObj->get_sheet_data();
-			if(is_array($skillsData)) {
+			if(is_array($skillsData) && count($skillsData)) {
 				$retval = array_merge($retval, $skillsData);
+			}
+			
+			$savesData = $this->savesObj->get_sheet_data();
+			if(is_array($savesData) && count($savesData)) {
+				$retval = array_merge($retval, $savesData);
+			}
+			else {
+				throw new exception(__METHOD__ .": no saves data");
 			}
 			
 			
 			$armorData = $this->armorObj->get_sheet_data();
-			if(is_array($armorData)) {
+			if(is_array($armorData) && count($armorData)) {
 				$retval = array_merge($retval, $armorData);
 			}
 			
 			$charAbilities = $this->abilityObj->get_sheet_data();
-			if(is_array($charAbilities)) {
+			if(is_array($charAbilities) && count($charAbilities)) {
 				$retval = array_merge($retval, $charAbilities);
+			}
+			else {
+				throw new exception(__METHOD__ .": no abilities");
 			}
 			
 			$weaponData = $this->weaponObj->get_sheet_data();
-			if(is_array($weaponData)) {
+			if(is_array($weaponData) && count($weaponData)) {
 				$retval = array_merge($retval, $weaponData);
 			}
 			
 			$gearData = $this->gearObj->get_sheet_data();
-			if(is_array($gearData)) {
+			if(is_array($gearData) && count($gearData)) {
 				$retval = array_merge($retval, $gearData);
 			}
 			
 			$specialAbilityData = $this->specialAbilityObj->get_sheet_data();
-			if(is_array($specialAbilityData)) {
+			if(is_array($specialAbilityData) && count($specialAbilityData)) {
 				$retval = array_merge($retval, $specialAbilityData);
 			}
 		}
@@ -359,6 +384,11 @@ cs_debug_backtrace(1);
 			
 			case 'characterGear':
 			case 'gear':
+				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
+				break;
+			
+			case 'saves':
+			case 'save':
 				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
 				break;
 			

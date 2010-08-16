@@ -18,7 +18,6 @@ class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 	
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr, $characterId) {
-		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
 			$this->gfObj->debugPrintOpt=1;
@@ -59,20 +58,6 @@ class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 		}
 		return($retval);
 	}//end __call()	
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function __get($name) {
-		if(isset($this->$name)) {
-			$retval = $this->$name;
-		}
-		else {
-			throw new exception(__METHOD__ .":: invalid property (". $name .")");
-		}
-		return($retval);
-	}//end __get()
 	//-------------------------------------------------------------------------
 }
 

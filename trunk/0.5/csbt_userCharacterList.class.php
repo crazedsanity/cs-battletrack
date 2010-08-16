@@ -11,15 +11,25 @@
  * $LastChangedBy$
  */
 
-require_once(dirname(__FILE__) .'/characterSheet.class.php');
 
-class csbt_userCharacterList extends csbt_characterSheet {
+class csbt_userCharacterList extends csbt_tableHandler {
 	
 	private $uid;
 	
+	
+	protected $cleanStringArr = array(
+			'uid'					=> 'int',
+			'character_name'		=> 'sql'
+		);
+	
+	const tableName= 'csbt_character_table';
+	const seqName =  'csbt_character_table_character_id_seq';
+	const pkeyField = 'character_id';
+	
 	//-------------------------------------------------------------------------
-	public function __construct($uid) {
-		parent::__construct();
+	public function __construct(cs_phpDB $dbObj, $uid) {
+		$this->dbObj = $dbObj;
+		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr, null);
 		
 		if(is_numeric($uid) && $uid > 0) {
 			$this->uid = $uid;
@@ -43,10 +53,9 @@ class csbt_userCharacterList extends csbt_characterSheet {
 	
 	//-------------------------------------------------------------------------
 	public function get_character_list() {
-		$sql = "SELECT * FROM csbt_character_table WHERE uid=". $this->uid;
 		
 		try {
-			$characterList = $this->dbObj->run_query($sql, 'character_id', 'character_name');
+			$characterList = $this->get_records(array('uid'=>$this->uid));
 		}
 		catch(exception $e) {
 			$this->exception_handler(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());

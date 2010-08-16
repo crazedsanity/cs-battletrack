@@ -31,6 +31,7 @@ CREATE TABLE csbt_character_table (
 	ac_natural integer NOT NULL DEFAULT 0,
 	action_points integer NOT NULL DEFAULT 0,
 	character_age integer NOT NULL DEFAULT 18,
+	character_level text NOT NULL DEFAULT '(class/level) EXAMPLE: fighter/1, rogue/3',
 	alignment text NOT NULL DEFAULT 'Chaotic Neutral',
 	base_attack_bonus integer NOT NULL DEFAULT 1,
 	deity text,
@@ -47,7 +48,16 @@ CREATE TABLE csbt_character_table (
 	nonlethal_damage integer NOT NULL DEFAULT 0,
 	hit_dice text NOT NULL DEFAULT 'd6',
 	damage_reduction text,
-	speed integer NOT NULL DEFAULT 30
+	melee_misc integer NOT NULL DEFAULT 0,
+	melee_size integer NOT NULL DEFAULT 0,
+	melee_temp integer NOT NULL DEFAULT 0,
+	melee_total integer NOT NULL DEFAULT 0,
+	ranged_misc integer NOT NULL DEFAULT 0,
+	ranged_size integer NOT NULL DEFAULT 0,
+	ranged_temp integer NOT NULL DEFAULT 0,
+	ranged_total integer NOT NULL DEFAULT 0,
+	speed integer NOT NULL DEFAULT 30,
+	notes text
 );
 
 CREATE TABLE csbt_attribute_table (
@@ -148,6 +158,17 @@ CREATE TABLE csbt_character_gear_table (
 	weight decimal(10,1) NOT NULL DEFAULT 1,
 	quantity integer NOT NULL DEFAULT 1,
 	location text
+);
+
+CREATE TABLE csbt_character_save_table (
+	character_save_id serial NOT NULL PRIMARY KEY,
+	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
+	save_name text NOT NULL,
+	ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id),
+	base_mod integer NOT NULL DEFAULT 0,
+	magic_mod integer NOT NULL DEFAULT 0,
+	misc_mod integer NOT NULL DEFAULT 0,
+	temp_mod integer NOT NULL DEFAULT 0
 );
 
 
