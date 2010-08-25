@@ -51,11 +51,10 @@ CREATE TABLE csbt_character_table (
 	melee_misc integer NOT NULL DEFAULT 0,
 	melee_size integer NOT NULL DEFAULT 0,
 	melee_temp integer NOT NULL DEFAULT 0,
-	melee_total integer NOT NULL DEFAULT 0,
 	ranged_misc integer NOT NULL DEFAULT 0,
 	ranged_size integer NOT NULL DEFAULT 0,
 	ranged_temp integer NOT NULL DEFAULT 0,
-	ranged_total integer NOT NULL DEFAULT 0,
+	skills_max integer NOT NULL DEFAULT 10,
 	speed integer NOT NULL DEFAULT 30,
 	notes text
 );
@@ -107,7 +106,7 @@ CREATE TABLE csbt_character_skill_table (
 	ability_id integer NOT NULL REFERENCES csbt_ability_table (ability_id),
 	is_class_skill bool NOT NULL DEFAULT false,
 	skill_mod integer NOT NULL default 0,
-	ability_mod integer NOT NULL default 0,
+	ability_mod integer NOT NULL default 0, --TODO: This should be generated!!!
 	ranks integer NOT NULL default 0,
 	misc_mod integer NOT NULL default 0
 );

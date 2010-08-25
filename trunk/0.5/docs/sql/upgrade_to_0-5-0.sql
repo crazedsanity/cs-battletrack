@@ -129,11 +129,6 @@ ALTER TABLE csbt_character_table ALTER COLUMN melee_temp SET DEFAULT 0;
 UPDATE csbt_character_table SET melee_temp=0;
 ALTER TABLE csbt_character_table ALTER COLUMN melee_temp SET NOT NULL;
 
-ALTER TABLE csbt_character_table ADD COLUMN melee_total integer;
-ALTER TABLE csbt_character_table ALTER COLUMN melee_total SET DEFAULT 0;
-UPDATE csbt_character_table SET melee_total=0;
-ALTER TABLE csbt_character_table ALTER COLUMN melee_total SET NOT NULL;
-
 ALTER TABLE csbt_character_table ADD COLUMN ranged_misc integer;
 ALTER TABLE csbt_character_table ALTER COLUMN ranged_misc SET DEFAULT 0;
 UPDATE csbt_character_table SET ranged_misc=0;
@@ -149,10 +144,10 @@ ALTER TABLE csbt_character_table ALTER COLUMN ranged_temp SET DEFAULT 0;
 UPDATE csbt_character_table SET ranged_temp=0;
 ALTER TABLE csbt_character_table ALTER COLUMN ranged_temp SET NOT NULL;
 
-ALTER TABLE csbt_character_table ADD COLUMN ranged_total integer;
-ALTER TABLE csbt_character_table ALTER COLUMN ranged_total SET DEFAULT 0;
-UPDATE csbt_character_table SET ranged_total=0;
-ALTER TABLE csbt_character_table ALTER COLUMN ranged_total SET NOT NULL;
+ALTER TABLE csbt_character_table ADD COLUMN skills_max integer;
+ALTER TABLE csbt_character_table ALTER COLUMN skills_max SET DEFAULT 10;
+UPDATE csbt_character_table SET skills_max=0;
+ALTER TABLE csbt_character_table ALTER COLUMN skills_max SET NOT NULL;
 
 ALTER TABLE csbt_character_table ADD COLUMN speed integer;
 ALTER TABLE csbt_character_table ALTER COLUMN speed SET DEFAULT 0;

@@ -27,17 +27,15 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	protected $updatesByKey = array();
 	
+	protected $baseAbilityCache = null;
+	
 	//-------------------------------------------------------------------------
 	/**
 	 */
-	public function __construct(cs_phpDB $dbObj, $characterId) {
+	public function __construct(cs_phpDB $dbObj, $characterId=null) {
 		
 		if(is_numeric($characterId)) {
 			$this->characterId = $characterId;
-		}
-		else {
-			cs_debug_backtrace(1);
-			throw new exception(__METHOD__ .":: invalid characterId (". $characterId .")");
 		}
 		
 		$this->fields = array(
@@ -48,10 +46,27 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			'temporary_score'			=> 'int'
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
-		$this->abilityObj = new csbt_ability($dbObj);
-		$this->abilityObj->get_ability_list();
+		//NOTE::: the call to 'parent::__construct(...)' was removed because it was causing segmentation faults & memory issues... yuck.
+		#parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->gfObj = new cs_globalFunctions;
+		$this->gfObj->debugPrintOpt=1;
 		
+		if(is_object($dbObj) && get_class($dbObj) == 'cs_phpDB') {
+			$this->dbObj = $dbObj;
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
+		}
+		
+		$this->pkeyField = self::pkeyField;
+		$this->tableHandlerObj = new csbt_tableHandler($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields, $this->characterId);
+		
+		$baseAbilityFields = array(
+			'ability_id'		=> 'int',
+			'ability_name'		=> 'sql'
+		);
+		$this->baseAbilityObj = new csbt_ability($this->dbObj);
+		$this->baseAbilityObj->get_ability_list();
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -62,17 +77,24 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		try {
 			$retval = $this->tableHandlerObj->get_records(array('character_id' => $this->characterId));
 			
-			foreach($retval as $i=>$arr) {
-				$abilityName = $this->abilityObj->get_ability_name($arr['ability_id']);
-				$retval[$i]['ability_name'] = $abilityName;
-				
-				$this->dataCache['abilities'][$abilityName] = array(
-					'score'		=> $arr['ability_score'],
-					'modifier'	=> $this->abilityObj->get_ability_modifier($arr['ability_score']),
-					'temp'		=> $arr['temporary_score'],
-					'temp_mod'	=> $this->abilityObj->get_ability_modifier($arr['temporary_score'])
-				);
-				$this->dataCache['idLinker'][$abilityName] = $arr['character_ability_id'];
+			if(is_array($retval)) {
+				foreach($retval as $i=>$arr) {
+					$abilityName = $this->baseAbilityObj->get_ability_name($arr['ability_id']);
+					$retval[$i]['ability_name'] = $abilityName;
+					
+					$this->dataCache['abilities'][$abilityName] = array(
+						'score'		=> $arr['ability_score'],
+						'modifier'	=> $this->baseAbilityObj->get_ability_modifier($arr['ability_score']),
+						'temp'		=> $arr['temporary_score'],
+						'temp_mod'	=> $this->baseAbilityObj->get_ability_modifier($arr['temporary_score'])
+					);
+					$this->dataCache['idLinker'][$abilityName] = $arr['character_ability_id'];
+				}
+			}
+			else {
+				cs_debug_backtrace(1);
+				$this->gfObj->debug_print($this->tableHandlerObj,1);
+				throw new exception(__METHOD__ .":: unable to retrieve records, DETAILS:::: ". $e->getMessage());
 			}
 		}
 		catch(Exception $e) {
@@ -85,8 +107,8 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	protected function create_ability($abilityId, $score, $temporaryScore=null) {
-		$dataCache = $this->abilityObj->get_ability_list();
+	public function create_ability($abilityId, $score, $temporaryScore=null) {
+		$dataCache = $this->baseAbilityObj->get_ability_list();
 		if(isset($dataCache['byId'][$abilityId])) {
 			$abilityName = $dataCache['byId'][$abilityId];
 			$insertArr = array(
@@ -97,7 +119,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			
 			$this->dataCache['abilities'][$abilityName] = array(
 				'score'		=> $score,
-				'modifier'	=> $this->abilityObj->get_ability_modifier($score)
+				'modifier'	=> $this->baseAbilityObj->get_ability_modifier($score)
 			);
 			
 			if(!is_null($temporaryScore) && is_numeric($temporaryScore)) {
@@ -213,7 +235,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	//-------------------------------------------------------------------------
 	public function get_character_defaults() {
-		$abilityList = $this->abilityObj->get_ability_list();
+		$abilityList = $this->baseAbilityObj->get_ability_list();
 		return($abilityList['byId']);
 	}//end get_character_defaults()
 	//-------------------------------------------------------------------------
@@ -225,10 +247,10 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		$defaults = $this->get_character_defaults();
 		
 		foreach($defaults as $id=>$name) {
-			if($this->abilityObj->get_ability_name($id) == 'str') {
+			if($this->baseAbilityObj->get_ability_name($id) == 'str') {
 				$abilityScore = 16;
 			}
-			elseif($this->abilityObj->get_ability_name($id) == 'int') {
+			elseif($this->baseAbilityObj->get_ability_name($id) == 'int') {
 				$abilityScore = 6;
 			}
 			else {
@@ -247,7 +269,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	public function get_ability_modifier($abilityName) {
 		if(is_numeric($abilityName)) {
 			//trying to get it based on a number...
-			$retval = $this->abilityObj->get_ability_modifier($abilityName);
+			$retval = $this->baseAbilityObj->get_ability_modifier($abilityName);
 		}
 		else {
 			if(!is_array($this->dataCache) || !count($this->dataCache)) {
@@ -263,7 +285,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			}
 			else {
 				if(strlen($abilityName) >= 3 && is_array($this->dataCache) && isset($this->dataCache['abilities'][$abilityName]['score'])) {
-					$retval = $this->abilityObj->get_ability_modifier($this->dataCache['abilities'][$abilityName]['score']);
+					$retval = $this->baseAbilityObj->get_ability_modifier($this->dataCache['abilities'][$abilityName]['score']);
 				}
 				else {
 					throw new exception(__METHOD__ .":: cannot find cached value for (". $abilityName .")");
@@ -272,6 +294,14 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		}
 		return($retval);
 	}//end get_ability_modifier()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_ability_list() {
+		return($this->baseAbilityObj->get_ability_list());
+	}
 	//-------------------------------------------------------------------------
 	
 	
@@ -347,8 +377,8 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			$updateBits = explode('_', $updateBitName);
 			if(count($updateBits) == 2) {
 				try {
-					$abilityId = $this->abilityObj->get_ability_id($updateBits[0]);
-					$abilityName = $this->abilityObj->get_ability_name($abilityId);
+					$abilityId = $this->baseAbilityObj->get_ability_id($updateBits[0]);
+					$abilityName = $this->baseAbilityObj->get_ability_name($abilityId);
 				}
 				catch(Exception $e) {
 					throw new exception(__METHOD__ .":: unable to locate ability_id for (". $updateBits[0] ."), DETAILS::: ". $e->getMessage());
@@ -362,7 +392,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 						}
 						elseif(preg_match('/^ability/', $updateBits[1]) || preg_match('/^score$/', $updateBits[1])) {
 							if(!is_null($newValue) && is_numeric($newValue)) {
-							$fieldToUpdate = 'ability_score';
+								$fieldToUpdate = 'ability_score';
 							}
 							else {
 								cs_debug_backtrace(1);
@@ -404,11 +434,27 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	//-------------------------------------------------------------------------
 	/**
-	 * Wrapper for csbt_ability::get_ability_id().
-	 * @see csbt_ability::get_ability_id()
 	 */
 	public function get_ability_id($name) {
-		return($this->abilityObj->get_ability_id($name));
+		
+		if(is_null($this->dataCache)) {
+			$this->baseAbilityObj->get_ability_list();
+		}
+		
+		//it is a long string... rip out the first 3 characters.
+		if(strlen($name) > 3) {
+			$name = substr($name,0,3);
+		}
+		
+		if(isset($this->baseAbilityObj->dataCache['byName'][$name])) {
+			$retval = $this->baseAbilityObj->dataCache['byName'][$name];
+		}
+		else {
+			$this->gfObj->debug_print($this->baseAbilityObj->dataCache,1);
+			throw new exception(__METHOD__ .":: invalid name (". $name .")");
+		}
+		
+		return($retval);
 	}//end get_ability_id()
 	//-------------------------------------------------------------------------
 	
@@ -416,13 +462,17 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	//-------------------------------------------------------------------------
 	/**
-	 * Wrapper for csbt_ability::get_ability_name().
-	 * 
 	 * @param $id	ability_id
-	 * @see csbt_ability::get_ability_id()
 	 */
 	public function get_ability_name($id) {
-		return($this->abilityObj->get_ability_name($id));
+		if(isset($this->baseAbilityObj->dataCache['byId'][$id])) {
+			$retval = $this->baseAbilityObj->dataCache['byId'][$id];
+		}
+		else {
+			throw new exception(__METHOD__ .":: invalid id (". $id .")");
+		}
+		
+		return($retval);
 	}
 	//-------------------------------------------------------------------------
 }

@@ -65,6 +65,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			'ranged_size'			=> 'int',
 			'ranged_temp'			=> 'int',
 			'ranged_total'			=> 'int',
+			'skills_max'			=> 'int',
 			'speed'					=> 'int',
 			'notes'					=> 'sql'
 		);
@@ -269,6 +270,9 @@ cs_debug_backtrace(1);
 				
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'skills_max_cc')] = floor($mainCharData['skills_max'] / 2);
 			}
 			else {
 				throw new exception("no main character data");
@@ -467,6 +471,32 @@ cs_debug_backtrace(1);
 		}
 		return($initBonus);
 	}//end get_initiative_bonus()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_attack_bonus($type='melee') {
+		$type = strtolower($type);
+		if($type == 'melee' || $type == 'ranged') {
+			$data = $this->get_character_data();
+			
+			$columns = array($type .'_misc', $type .'_size', $type .'_temp');
+			$atkBonus = 0;
+			foreach($columns as $colName) {
+				if(isset($data[$colName])) {
+					$atkBonus += $data[$colName];
+				}
+				else {
+					throw new exception(__METHOD__ .": cannot calculate attack bonus for '". $type ."' without (". $colName .")");
+				}
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": invalid type (". $type .")");
+		}
+		return($atkBonus);
+	}//end get_attack_bonus()
 	//-------------------------------------------------------------------------
 }
 

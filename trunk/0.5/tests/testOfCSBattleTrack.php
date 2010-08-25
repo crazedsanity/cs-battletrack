@@ -146,6 +146,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 				$this->_check_main_character_updates($char);
 			}
 			
+			//test saves.
+			if($this->dependent_test_checker()) {
+				$this->_check_saves($char);
+			}
+			
 			//test initially loaded skills for accuracy, and that they exist in the main sheet data as expected.
 			if($this->dependent_test_checker()){
 				$this->_check_skills($char);
@@ -185,6 +190,8 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			$numCharacters++;
 		}
+		
+		$this->gfObj->debug_print($char->get_sheet_data());
 		
 	}//end test_everything()
 	//--------------------------------------------------------------------------
@@ -837,6 +844,17 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$this->assertEqual($char->characterId, $recordByName['character_id']);
 		}
 	}//end _check_special_abilities()
+	//--------------------------------------------------------------------------
+	
+	
+	
+	//--------------------------------------------------------------------------
+	private function _check_saves($char) {
+		$savesData = $char->savesObj->get_character_saves();
+		
+		$this->assertEqual(count($savesData), 3);
+		
+	}//end _check_saves()
 	//--------------------------------------------------------------------------
 }
 
