@@ -149,8 +149,8 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 				
 				foreach($data as $id=>$weaponInfo) {
 					foreach($makeKeysFrom as $columnName) {
-						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $columnName, $id);
-						$retval[$sheetId] = $weaponInfo[$columnName];
+						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $columnName);
+						$retval[$id][$sheetId] = $weaponInfo[$columnName];
 					}
 				}
 			}

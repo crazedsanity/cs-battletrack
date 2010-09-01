@@ -170,12 +170,15 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			foreach($data as $id=>$skillData) {
 				foreach($makeKeysFrom as $indexName) {
 					if(isset($skillData[$indexName])) {
-						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName, $skillData['character_skill_id']);
-						$retval[$sheetKey] = $data[$id][$indexName];
+						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName);
+						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
 						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
 					}
+					
+					//add a key so the form can be checked (easier to run the form like this)
+					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'is_class_skill_checked')] = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked'));
 				}
 			}
 		}

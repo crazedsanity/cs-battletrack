@@ -56,6 +56,8 @@ class csbt_characterSheet extends csbt_tableHandler {
 			throw new exception(__METHOD__ .": characterId or name of new character is required, given invalid value (". $characterIdOrName .")");
 		}
 		
+		$this->gfObj = new cs_globalFunctions();
+		
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -105,6 +107,64 @@ class csbt_characterSheet extends csbt_tableHandler {
 	public function get_sheet_data() {
 		return($this->characterObj->get_sheet_data());
 	}
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function build_sheet(cs_genericPage $page, $templateFile) {
+		$data = $this->get_sheet_data();
+		
+		$blockRows = $page->rip_all_block_rows('content');
+		
+		$abilityList = $this->characterObj->abilityObj->get_ability_list();
+		$abilityList = $abilityList['byId'];
+		
+		$page->gfObj->debug_print($data,1);
+		
+		
+		foreach($data as $name=>$val) {
+			if(is_array($val)) {
+				//there should be a template row named after the "$name"...
+				$blockRowName = $name .'Slot';
+				if(!isset($page->templateRows[$blockRowName])) {
+					throw new exception(__METHOD__ .": failed to parse data for (". $name ."), missing block row '". $blockRowName ."'");;
+				}
+				
+				$parsedRows = '';
+				foreach($val as $id=>$subArray) {
+					if(is_array($subArray)) {
+						if($name == 'skills') {
+							#$page->gfObj->debug_print($subArray,1);
+							$abilityOptionList = $page->gfObj->array_as_option_list($abilityList, $subArray['skills__ability_name']);
+							
+							$optionListRepArr = array(
+								'skillNum'		=> $id,
+								'optionList'	=> $abilityOptionList
+							);
+							$subArray['abilityDropDown'] = $page->gfObj->mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
+						}
+						
+						$myBlockRow = $page->templateRows[$blockRowName];
+						
+						$subArray[$name .'_id'] = $id;
+						
+						$parsedRows .= $page->gfObj->mini_parser($myBlockRow, $subArray, '{', '}');
+					}
+					else {
+						$blockRowName = $id;
+						$parsedRows = $subArray;
+					}
+				}
+				$page->add_template_var($blockRowName, $parsedRows);
+			}
+			else {
+				$page->add_template_var($name, $val);
+			}
+		}
+		
+		
+	}//end build_sheet()
 	//-------------------------------------------------------------------------
 	
 	

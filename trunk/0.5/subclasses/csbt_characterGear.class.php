@@ -165,9 +165,9 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$makeKeysFrom[] = 'total_weight';
 			foreach($data as $id=>$gearData) {
 				foreach($makeKeysFrom as $indexName) {
-					if(isset($gearData[$indexName])) {
-						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName, $gearData['character_gear_id']);
-						$retval[$sheetKey] = $data[$id][$indexName];
+					if(array_key_exists($indexName, $gearData)) {
+						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName);
+						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
 						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");

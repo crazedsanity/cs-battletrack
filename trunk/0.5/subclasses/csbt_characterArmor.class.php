@@ -138,8 +138,8 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 					#foreach($armorInfo as $k=>$v) {
 					foreach($makeKeysFrom as $k) {
 						$v = $armorInfo[$k];
-						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $k, $id);
-						$retval[$sheetId] = $v;
+						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $k);
+						$retval[$id][$sheetId] = $v;
 					}
 				}
 			}
@@ -194,6 +194,14 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		
 		return($totalBonus);
 	}//end get_ac_bonus()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_ac_flatfooted() {
+		
+	}//end get_ac_flatfooted()
 	//-------------------------------------------------------------------------
 }
 

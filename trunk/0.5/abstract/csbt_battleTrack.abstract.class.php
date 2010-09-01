@@ -19,6 +19,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	protected $charAbilityObj = null;
 	protected $fields=null;
 	protected $pkeyField=null;
+	protected $characterId=null;
 	
 	
 	abstract public function get_sheet_data();
@@ -26,7 +27,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	abstract public function handle_update($sheetBitName, $recId=null, $newValue);
 	
 	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr) {
+	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr, $characterId=null) {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
@@ -34,6 +35,10 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		else {
 			throw new exception(__METHOD__ .": missing required class 'cs_globalFunctions'");
+		}
+		
+		if(!is_null($characterId) && is_numeric($characterId)) {
+			$this->characterId = $characterId;
 		}
 		
 		if(is_object($dbObj) && get_class($dbObj) == 'cs_phpDB') {
@@ -52,20 +57,24 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		$this->pkeyField = $pkeyField;
 		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr, $this->characterId);
-		$this->abilityObj = new csbt_characterAbility($this->dbObj);
+		$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function create_sheet_id($prefix, $name, $id=null) {
+	public function create_sheet_id($prefix=null, $name, $id=null) {
 		if(is_string($name) && strlen($name) >= 1) {
-			$prefix = preg_replace('/_/', '', $prefix);
-			
-			$sheetId = preg_replace('/[^a-z0-9]/', '_', strtolower($name));
-			$sheetId = preg_replace('/_{2,}/', '_', $sheetId);
-			$sheetId = $prefix . '__' . $sheetId;
+			if(!is_null($prefix) && strlen($prefix)) {
+				$prefix = preg_replace('/_/', '', $prefix);
+				$sheetId = preg_replace('/[^a-z0-9]/', '_', $name);
+				$sheetId = preg_replace('/_{2,}/', '_', $sheetId);
+				$sheetId = $prefix .'__'. strtolower($name);
+			}
+			else {
+				$sheetId = strtolower($name);
+			}
 			
 			if(!is_null($id) && is_numeric($id) && $id > 0) {
 				$sheetId .=  '__'. $id;
@@ -131,6 +140,14 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		return($retval);
 	}//end get_columns_for_sheet_keys()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	protected function set_character_id($id) {
+		$this->characterId = $id;
+	}//end set_character_id()
 	//-------------------------------------------------------------------------
 }
 

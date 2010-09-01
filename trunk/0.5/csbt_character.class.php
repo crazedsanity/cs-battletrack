@@ -89,10 +89,12 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if($create===false && is_numeric($characterIdOrName) && $characterIdOrName >= 0) {
 			#$this->get_character_data();
 			$this->set_character_id($characterIdOrName);
+			parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr, $characterIdOrName);
 		}
 		elseif($create===true && is_string($characterIdOrName) && strlen($characterIdOrName) >= 2 && is_numeric($playerUid)) {
 			$newId = $this->create_character($characterIdOrName, $playerUid);
 			$this->set_character_id($newId);
+			parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr, $newId);
 		}
 		else {
 			cs_debug_backtrace(1);
@@ -107,17 +109,31 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function set_character_id($id) {
 		if(is_numeric($id)) {
-			if(is_numeric($this->characterId) && $id != $this->characterId) {
-				$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
-			}
+			#if(is_numeric($this->characterId) && $id != $this->characterId) {
+			#	$this->logger->log_by_class("Changed character from id=(". $this->characterId .") to (". $id .")", 'debug');
+			#}
+			parent::set_character_id($id);
 			$this->characterId = $id;
 			$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
+			$this->abilityObj->_sheetIdPrefix = csbt_characterAbility::sheetIdPrefix;
+			
 			$this->skillsObj = new csbt_skill($this->dbObj,$this->characterId);
+			$this->skillsObj->_sheetIdPrefix = csbt_skill::sheetIdPrefix;
+			
 			$this->armorObj = new csbt_characterArmor($this->dbObj, $this->characterId);
+			$this->armorObj->_sheetIdPrefix = csbt_characterArmor::sheetIdPrefix;
+			
 			$this->weaponObj = new csbt_characterWeapon($this->dbObj, $this->characterId);
+			$this->weaponObj->_sheetIdPrefix = csbt_characterWeapon::sheetIdPrefix;
+			
 			$this->gearObj = new csbt_characterGear($this->dbObj, $this->characterId);
+			$this->gearObj->_sheetIdPrefix = csbt_characterGear::sheetIdPrefix;
+			
 			$this->specialAbilityObj = new csbt_characterSpecialAbility($this->dbObj, $this->characterId);
+			$this->specialAbilityObj->_sheetIdPrefix = csbt_characterSpecialAbility::sheetIdPrefix;
+			
 			$this->savesObj = new csbt_characterSave($this->dbObj, $this->characterId);
+			$this->savesObj->_sheetIdPrefix = csbt_characterSave::sheetIdPrefix;
 		}
 		else {
 			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
@@ -268,6 +284,7 @@ cs_debug_backtrace(1);
 					$retval[$sheetId] = $val;
 				}
 				
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac')] = $this->get_total_ac();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
@@ -280,7 +297,7 @@ cs_debug_backtrace(1);
 			
 			$skillsData = $this->skillsObj->get_sheet_data();
 			if(is_array($skillsData) && count($skillsData)) {
-				$retval = array_merge($retval, $skillsData);
+				$retval[$this->skillsObj->_sheetIdPrefix] = $skillsData;
 			}
 			
 			$savesData = $this->savesObj->get_sheet_data();
@@ -294,7 +311,7 @@ cs_debug_backtrace(1);
 			
 			$armorData = $this->armorObj->get_sheet_data();
 			if(is_array($armorData) && count($armorData)) {
-				$retval = array_merge($retval, $armorData);
+				$retval[$this->armorObj->_sheetIdPrefix] = $armorData;
 			}
 			
 			$charAbilities = $this->abilityObj->get_sheet_data();
@@ -307,17 +324,17 @@ cs_debug_backtrace(1);
 			
 			$weaponData = $this->weaponObj->get_sheet_data();
 			if(is_array($weaponData) && count($weaponData)) {
-				$retval = array_merge($retval, $weaponData);
+				$retval[$this->weaponObj->_sheetIdPrefix] = $weaponData;
 			}
 			
 			$gearData = $this->gearObj->get_sheet_data();
 			if(is_array($gearData) && count($gearData)) {
-				$retval = array_merge($retval, $gearData);
+				$retval[$this->gearObj->_sheetIdPrefix] = $gearData;
 			}
 			
 			$specialAbilityData = $this->specialAbilityObj->get_sheet_data();
 			if(is_array($specialAbilityData) && count($specialAbilityData)) {
-				$retval = array_merge($retval, $specialAbilityData);
+				$retval[$this->specialAbilityObj->_sheetIdPrefix] = $specialAbilityData;
 			}
 		}
 		catch(Exception $e) {
@@ -454,6 +471,15 @@ cs_debug_backtrace(1);
 		}
 		return($totalAc);
 	}//end get_total_ac_bonus()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_total_ac() {
+		$retval = (10 + $this->get_total_ac_bonus() + $this->abilityObj->get_ability_modifier('dex'));
+		return($retval);
+	}//end get_total_ac()
 	//-------------------------------------------------------------------------
 	
 	

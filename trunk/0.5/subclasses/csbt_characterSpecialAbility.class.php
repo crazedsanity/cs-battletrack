@@ -26,7 +26,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 	const tableName = 'csbt_character_sa_table';
 	const tableSeq  = 'csbt_character_sa_table_character_sa_id_seq';
 	const pkeyField = 'character_sa_id';
-	const sheetIdPrefix = 'special_ability';
+	const sheetIdPrefix = 'specialAbility';
 	
 	
 	//-------------------------------------------------------------------------
@@ -164,8 +164,8 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$makeKeysFrom = $this->get_columns_for_sheet_keys();
 			foreach($data as $id=>$special_abilityData) {
 				foreach($makeKeysFrom as $indexName) {
-					if(isset($special_abilityData[$indexName])) {
-						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName, $special_abilityData[self::pkeyField]);
+					if(array_key_exists($indexName, $special_abilityData)) {
+						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName);
 						$retval[$sheetKey] = $data[$id][$indexName];
 					}
 					else {
