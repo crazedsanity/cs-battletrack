@@ -27,7 +27,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	abstract public function handle_update($sheetBitName, $recId=null, $newValue);
 	
 	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr, $characterId=null) {
+	public function __construct(cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr, $characterId=null, $createAbilityObj=true) {
 		
 		if(class_exists('cs_globalFunctions')) {
 			$this->gfObj = new cs_globalFunctions;
@@ -43,6 +43,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		
 		if(is_object($dbObj) && get_class($dbObj) == 'cs_phpDB') {
 			$this->dbObj = $dbObj;
+			$this->logger = new cs_webdblogger($this->dbObj, __METHOD__, false);
 		}
 		else {
 			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
@@ -57,7 +58,9 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		$this->pkeyField = $pkeyField;
 		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr, $this->characterId);
-		$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
+		if($createAbilityObj===true) {
+			$this->abilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
+		}
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -148,6 +151,16 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	protected function set_character_id($id) {
 		$this->characterId = $id;
 	}//end set_character_id()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	protected function do_log($details, $type='update', array $xAttribs=null) {
+		// log_by_class($details, $className="error", $uid=NULL, array $logAttribs=NULL)
+		$retval = $this->logger->log_by_class($details, $type, $xAttribs);
+		return($retval);
+	}//end do_log()
 	//-------------------------------------------------------------------------
 }
 

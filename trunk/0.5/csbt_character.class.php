@@ -29,7 +29,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 	
 	protected $logger;
 	
-	protected $changesByKey=array();
+	public $changesByKey=array();
 	
 	protected $cleanStringArr = array(
 			'uid'					=> 'int',
@@ -235,7 +235,6 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	protected function exception_handler($message) {
 		$logId = $this->logger->log_by_class($message, 'exception in code');
-cs_debug_backtrace(1);
 		throw new exception($message ." -- Logged (id #". $logId .")");
 	}//end exception_handler()
 	//-------------------------------------------------------------------------
@@ -383,12 +382,19 @@ cs_debug_backtrace(1);
 				$abilityName = substr($sheetIdBit, 0, 3);
 				$affectedSkills = $this->skillsObj->get_character_skills($abilityName);
 				
+				foreach($this->abilityObj->updatesByKey as $k=>$v) {
+					$this->changesByKey[$k] = $v;
+				}
+				
 				//update internal ability cache.
 				$this->abilityObj->get_character_abilities();
 				
 				if(is_array($affectedSkills) && count($affectedSkills) > 0) {
 					foreach($affectedSkills as $id=>$skillInfo) {
 						$this->skillsObj->handle_update('ability_mod', $id, $this->abilityObj->get_ability_modifier($abilityName));
+					}
+					foreach($this->skillsObj->updatesByKey as $k=>$v) {
+						$this->changesByKey[$k] = $v;
 					}
 				}
 				break;
@@ -408,6 +414,10 @@ cs_debug_backtrace(1);
 				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
 				break;
 			
+			case 'skills':
+			case 'characterSkills':
+				$retval = $this->skillsObj->handle_update($sheetIdBit, $recordId, $newValue);
+				break;
 			case 'saves':
 			case 'save':
 				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
@@ -416,6 +426,9 @@ cs_debug_backtrace(1);
 			default:
 				throw new exception(__METHOD__ .":: invalid update type (". $updateType .") for sheetId (". $sheetId ."), no class to handle it");
 		}
+		
+		$resultString = $this->gfObj->interpret_bool($retval, array('FAILURE', 'SUCCESS'));
+		$this->do_log(__METHOD__ .": updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), recordId=(". $recordId ."), newValue=(". $newValue ."), RESULT::: (". $resultString .")", 'update');
 		
 		return($retval);
 	}//end handle_update()

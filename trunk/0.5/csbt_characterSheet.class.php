@@ -44,6 +44,8 @@ class csbt_characterSheet extends csbt_tableHandler {
 		$this->dbObj = $dbObj;
 		$this->logger->logCategory = "Character Sheet";
 		
+		$this->playerUid = $playerUid;
+		
 		if(is_numeric($characterIdOrName) && $characterIdOrName >= 0) {
 			$this->set_character_id($characterIdOrName, false, $playerUid);
 			#$this->get_character_data();
@@ -120,8 +122,6 @@ class csbt_characterSheet extends csbt_tableHandler {
 		$abilityList = $this->characterObj->abilityObj->get_ability_list();
 		$abilityList = $abilityList['byId'];
 		
-		$page->gfObj->debug_print($data,1);
-		
 		
 		foreach($data as $name=>$val) {
 			if(is_array($val)) {
@@ -169,6 +169,27 @@ class csbt_characterSheet extends csbt_tableHandler {
 	
 	
 	
+	//-------------------------------------------------------------------------
+	public function handle_update($sheetId, $val) {
+		$result = $this->characterObj->handle_update($sheetId, null, $val);
+		
+		#return($this->characterObj->changesByKey);
+		$retval = array(
+			'result'	=> $result,
+			'changesbykey'	=> $this->characterObj->changesByKey
+		);
+		return($retval);
+	}//end handle_updates()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_character_name() {
+		$data = $this->characterObj->get_character_data();
+		return($data['character_name']);
+	}//end get_character_name()
+	//-------------------------------------------------------------------------
 }
 
 ?>
