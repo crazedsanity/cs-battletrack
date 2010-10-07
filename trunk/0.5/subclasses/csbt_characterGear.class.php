@@ -50,19 +50,19 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 		if(is_null($name) || !strlen($name)) {
 			$name = "  ";//allow blank records (for now) so they can have their "pretty spacing".
 		}
-			$insertArr = array();
-			if(is_array($fields) && count($fields) > 0) {
-				$insertArr = $fields;
-			}
-			$insertArr['gear_name'] = $name;
-			$insertArr['character_id'] = $this->characterId;
-			
-			try {
-				$newId = $this->tableHandlerObj->create_record($insertArr);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create character gear (". $name ."), DETAILS:::: ". $e->getMessage());
-			}
+		$insertArr = array();
+		if(is_array($fields) && count($fields) > 0) {
+			$insertArr = $fields;
+		}
+		$insertArr['gear_name'] = $name;
+		$insertArr['character_id'] = $this->characterId;
+		
+		try {
+			$newId = $this->tableHandlerObj->create_record($insertArr);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to create character gear (". $name ."), DETAILS:::: ". $e->getMessage());
+		}
 		
 		return($newId);
 	}//end create_gear()

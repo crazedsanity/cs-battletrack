@@ -497,6 +497,9 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 						if(!isset($v['weapon_type'])) {
 							$v['weapon_type'] = __METHOD__ .": set me";
 						}
+						if(!isset($v['total_attack_bonus'])) {
+							$v['total_attack_bonus'] = 0;
+						}
 						$charObj->weaponObj->create_weapon($name, $v);
 						$numConverted++;
 					}
