@@ -194,7 +194,6 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 							case 'base': //base-attack-bonus
 							case 'base_attack_bonus':
 								if(is_numeric($v)) {
-									#$charObj->update_main_character_data(array('base_attack_bonus'=>$v));
 									$mainCharData['base_attack_bonus'] = $v;
 								}
 								break;
@@ -204,7 +203,6 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 								break;
 								
 							case 'age':
-								#$charObj->update_main_character_data(array('character_age'=>$v));
 								$mainCharData['character_age'] = $v;
 								break;
 								
@@ -324,7 +322,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 						
 					case 'misc':
 						if($attribBits[1] == 'notes') {
-							$charObj->update_main_character_data(array('notes'=>$v));
+							$mainCharData['notes'] = $v;
 						}
 						else {
 							throw new exception(__METHOD__ .": unknown misc attribute (". $n .")");
@@ -430,154 +428,165 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 					default:
 						throw new exception(__METHOD__ .": unknown attribute (". $n .")");
 				}
-				$numConverted++;
 				
 				#$this->logsObj->log_by_class(__METHOD__ .": finished with attribute (". $n .")", 'debug');
 			}
 			
 			$this->logsObj->log_by_class(__METHOD__ .": finished with attributes, starting to do the major updates...", 'debug');
 			
-			//handle main character updates in one call.
 			try {
-				$charObj->update_main_character_data($mainCharData);
-				$numConverted += count($mainCharData);
-				unset($mainCharData);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .": an error occurred while updating main characterData: ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($mainCharData,0));
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished main_character updates, numConverted=(". $numConverted .")", 'debug');
-			
-			
-			if(is_array($charAbilities ) && count($charAbilities) && count($charAbilities['create']) == 6) {
-				foreach($charAbilities['create'] as $abilityName=>$value) {
-					$tempScore = null;
-					if(isset($charAbilities['update'][$abilityName])) {
-						$tempScore = $charAbilities['update'][$abilityName];
-						unset($charAbilities['update'][$abilityName]);
-					}
-					$charObj->abilityObj->create_ability($charObj->abilityObj->baseAbilityObj->get_ability_id($abilityName), $value, $tempScore);
+				//handle main character updates in one call.
+				try {
+					$charObj->update_main_character_data($mainCharData);
+					$numConverted += count($mainCharData);
+					unset($mainCharData);
 				}
-				if(isset($charAbilities['update']) && count($charAbilities['update'])) {
-					foreach($charAbilities as $updateIndex=>$updateValue) {
-						$charObj->handle_update($updateIndex, null, $updateValue);
+				catch(Exception $e) {
+					throw new exception(__METHOD__ .": an error occurred while updating main characterData for characterId=(". $characterId ."): ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($mainCharData,0));
+				}
+				$this->logsObj->log_by_class(__METHOD__ .": finished main_character updates, numConverted=(". $numConverted .")", 'debug');
+				
+				
+				if(is_array($charAbilities ) && count($charAbilities) && count($charAbilities['create']) == 6) {
+					foreach($charAbilities['create'] as $abilityName=>$value) {
+						$tempScore = null;
+						if(isset($charAbilities['update'][$abilityName])) {
+							$tempScore = $charAbilities['update'][$abilityName];
+							unset($charAbilities['update'][$abilityName]);
+						}
+						$charObj->abilityObj->create_ability($charObj->abilityObj->baseAbilityObj->get_ability_id($abilityName), $value, $tempScore);
+					}
+					if(isset($charAbilities['update']) && count($charAbilities['update'])) {
+						foreach($charAbilities as $updateIndex=>$updateValue) {
+							$charObj->handle_update($updateIndex, null, $updateValue);
+							$numConverted++;
+						}
+					}
+				}
+				else {
+					throw new exception(__METHOD__ .": FATAL: character (". $characterId .") has no abilities... ". $this->gfObj->debug_print($charAttribs,0));
+				}
+				
+				foreach($armorData as $i=>$v) {
+					$name = $v['name'];
+					unset($v['name']);
+					if(!isset($v['armor_type'])) {
+						$v['armor_type'] = __METHOD__ .": set me";
+					}
+					if(!isset($v['max_dex'])) {
+						$v['max_dex'] = 0;
+					}
+					if(!isset($v['ac_bonus'])) {
+						$v['ac_bonus'] = 0;
+					}
+					$charObj->armorObj->create_armor($name, $v);
+					$numConverted++;
+				}
+				$this->logsObj->log_by_class(__METHOD__ .": finished armor updates, numConverted=(". $numConverted .")", 'debug');
+				
+				try {
+					foreach($weaponData as $i=>$v) {
+						$name = $v['name'];
+						unset($v['name']);
+						if(!isset($v['damage'])) {
+							$v['damage'] = __METHOD__ .": set me";
+						}
+						if(!isset($v['critical'])) {
+							$v['critical'] = __METHOD__ .": set me";
+						}
+						if(!isset($v['weapon_type'])) {
+							$v['weapon_type'] = __METHOD__ .": set me";
+						}
+						$charObj->weaponObj->create_weapon($name, $v);
 						$numConverted++;
 					}
 				}
-			}
-			else {
-				throw new exception(__METHOD__ .": FATAL: character (". $characterId .") has no abilities... ". $this->gfObj->debug_print($charAttribs,0));
-			}
-			
-			foreach($armorData as $i=>$v) {
-				$name = $v['name'];
-				unset($v['name']);
-				if(!isset($v['armor_type'])) {
-					$v['armor_type'] = __METHOD__ .": set me";
+				catch(Exception $e) {
+					throw new exception(__METHOD__ .": an error occurred while handling weapons: ". $e->getMessage() ."<hr> DATA::: ". $this->gfObj->debug_print($weaponData,0));
 				}
-				if(!isset($v['max_dex'])) {
-					$v['max_dex'] = 0;
-				}
-				if(!isset($v['ac_bonus'])) {
-					$v['ac_bonus'] = 0;
-				}
-				$charObj->armorObj->create_armor($name, $v);
-				$numConverted++;
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished armor updates, numConverted=(". $numConverted .")", 'debug');
-			
-			try {
-				foreach($weaponData as $i=>$v) {
+				$this->logsObj->log_by_class(__METHOD__ .": finished weapon updates, numConverted=(". $numConverted .")", 'debug');
+				
+				foreach($specialAbilities as $i=>$v) {
 					$name = $v['name'];
 					unset($v['name']);
-					if(!isset($v['damage'])) {
-						$v['damage'] = __METHOD__ .": set me";
-					}
-					if(!isset($v['critical'])) {
-						$v['critical'] = __METHOD__ .": set me";
-					}
-					if(!isset($v['weapon_type'])) {
-						$v['weapon_type'] = __METHOD__ .": set me";
-					}
-					$charObj->weaponObj->create_weapon($name, $v);
+					$charObj->specialAbilityObj->create_special_ability($name, $v);
 					$numConverted++;
 				}
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .": an error occurred while handling weapons: ". $e->getMessage() ."<hr> DATA::: ". $this->gfObj->debug_print($weaponData,0));
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished weapon updates, numConverted=(". $numConverted .")", 'debug');
-			
-			foreach($specialAbilities as $i=>$v) {
-				$name = $v['name'];
-				unset($v['name']);
-				$charObj->specialAbilityObj->create_special_ability($name, $v);
-				$numConverted++;
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished special abilities, numConverted=(". $numConverted .")", 'debug');
-			
-			foreach($gearData as $i=>$v) {
-				$name = $v['name'];
-				unset($v['name']);
-				$charObj->gearObj->create_gear($name, $v);
-				$numConverted++;
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished gear, numConverted=(". $numConverted .")", 'debug');
-			
-			try {
-				$saveToAbility = array(
-					'fort'		=> 'con',
-					'will'		=> 'wis',
-					'reflex'	=> 'dex'
-				);
-				$addSuffixTo=array('base', 'magic', 'misc', 'temp');
-				foreach($savesData as $i=>$v) {
-					if(isset($saveToAbility[$i])) {
-						unset($v['total']);
-						foreach($addSuffixTo as $fixThis) {
-							if(isset($v[$fixThis])) {
-								$v[$fixThis .'_mod'] = $v[$fixThis];
-								unset($v[$fixThis]);
+				$this->logsObj->log_by_class(__METHOD__ .": finished special abilities, numConverted=(". $numConverted .")", 'debug');
+				
+				foreach($gearData as $i=>$v) {
+					$name = $v['name'];
+					unset($v['name']);
+					if(!isset($v['weight']) || !is_numeric($v['weight'])) {
+						$v['weight'] = 1;
+					}
+					$charObj->gearObj->create_gear($name, $v);
+					$numConverted++;
+				}
+				$this->logsObj->log_by_class(__METHOD__ .": finished gear, numConverted=(". $numConverted .")", 'debug');
+				
+				try {
+					$saveToAbility = array(
+						'fort'		=> 'con',
+						'will'		=> 'wis',
+						'reflex'	=> 'dex'
+					);
+					$addSuffixTo=array('base', 'magic', 'misc', 'temp');
+					foreach($savesData as $i=>$v) {
+						if(isset($saveToAbility[$i])) {
+							unset($v['total']);
+							foreach($addSuffixTo as $fixThis) {
+								if(isset($v[$fixThis])) {
+									$v[$fixThis .'_mod'] = $v[$fixThis];
+									unset($v[$fixThis]);
+								}
 							}
+							$createSaveRes = $charObj->savesObj->create_save($i, $saveToAbility[$i], $v);
 						}
-						$createSaveRes = $charObj->savesObj->create_save($i, $saveToAbility[$i], $v);
+						else {
+							throw new exception(__METHOD__ .": cannot create save for '". $i ."' without ability");
+						}
+					}
+				}
+				catch(Exception $e) {
+					throw new exception(__METHOD__ .": error while handling saves (". $i .")::: ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($v,0));
+				}
+				$this->logsObj->log_by_class(__METHOD__ .": finished saves, numConverted=(". $numConverted .")", 'debug');
+				
+				foreach($skillsData as $i=>$v) {
+					if(isset($v['abilitymod'])) {
+						unset($v['abilitymod']);
+					}
+					if(isset($v['total'])) {
+						unset($v['total']);
+					}
+					$name = $v['name'];
+					if(!isset($v['ability'])) {
+						$ability = 'int';
 					}
 					else {
-						throw new exception(__METHOD__ .": cannot create save for '". $i ."' without ability");
+						$ability = strtolower($v['ability']);
 					}
+					unset($v['name'], $v['ability']);
+					#$createSkillRes = $charObj->skillsObj->create_skill($name, $ability, $v);
+					$dataArr = $v;
+					$dataArr['character_id'] = $charObj->characterId;
+					$dataArr['skill_name'] = $name;
+					$dataArr['ability_id'] = $charObj->abilityObj->get_ability_id($ability);
+					
+					//TODO: calling skillsObj->create_skill() for some reason causes a segmentation fault... this could crop-up in the future!!!
+					$createSkillRes = $charObj->skillsObj->tableHandlerObj->create_record($dataArr);
+					$numConverted++;
 				}
+				$this->logsObj->log_by_class(__METHOD__ .": finished skill, numConverted=(". $numConverted .")", 'debug');
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .": error while handling saves (". $i .")::: ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($v,0));
+				$this->logsObj->log_by_class(__METHOD__ .": unable to finish characterId=(". $characterId ."), attempting to continue... error was::: ". $e->getMessage(), 'POSSIBLE FATAL ERROR (Exception)');
+				$attribTableObj = new csbt_tableHandler($this->db, 'csbt_character_attribute_table', 'csbt_character_attribute_table_character_attribute_id_seq', 'character_id', $cleanStringArr, null);
+				$deleteAttribs = $attribTableObj->delete_record($characterId);
+				$deleteResult = $tableObj->delete_record($characterId);
+				$this->logsObj->log_by_class(__METHOD__ .": deleted invalid characterId=(". $characterId ."), deleted attribs=(". $deleteAttribs ."), with result=(". $deleteResult .")");
 			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished saves, numConverted=(". $numConverted .")", 'debug');
-			
-			foreach($skillsData as $i=>$v) {
-				if(isset($v['abilitymod'])) {
-					unset($v['abilitymod']);
-				}
-				if(isset($v['total'])) {
-					unset($v['total']);
-				}
-				$name = $v['name'];
-				if(!isset($v['ability'])) {
-					$ability = 'int';
-				}
-				else {
-					$ability = strtolower($v['ability']);
-				}
-				unset($v['name'], $v['ability']);
-				#$createSkillRes = $charObj->skillsObj->create_skill($name, $ability, $v);
-				$dataArr = $v;
-				$dataArr['character_id'] = $charObj->characterId;
-				$dataArr['skill_name'] = $name;
-				$dataArr['ability_id'] = $charObj->abilityObj->get_ability_id($ability);
-				
-				//TODO: calling skillsObj->create_skill() for some reason causes a segmentation fault... this could crop-up in the future!!!
-				$createSkillRes = $charObj->skillsObj->tableHandlerObj->create_record($dataArr);
-				$numConverted++;
-			}
-			$this->logsObj->log_by_class(__METHOD__ .": finished skill, numConverted=(". $numConverted .")", 'debug');
 			
 			$this->logsObj->log_by_class(__METHOD__ .": converted (". $numConverted .") for characterId (". $characterId .")", 'debug');
 		}

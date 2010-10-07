@@ -70,6 +70,9 @@ $(document).ready(function() {
 			markDirtyInput(this);
 		}
 	});
+	$("select").keyup(function(event) {
+		ajax_processChange($(this).attr('id'));
+	});
 	$("input").blur(function() {
 		
 		if(isDirtyInput(this)) {

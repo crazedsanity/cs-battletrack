@@ -4,10 +4,6 @@
  */
 
 
-require_once(constant('LIBDIR') .'/cs-battletrack/userCharacterList.class.php');
-
-
-$userChar = new userCharacterList($_SESSION['auth']['userInfo']['uid']);
 
 $charList = $userChar->get_character_list();
 
@@ -17,7 +13,8 @@ $rowName = 'characterList';
 if(isset($page->templateRows[$rowName])) {
 	if(is_array($charList)) {
 		$parsedRows = "";
-		foreach($charList as $id=>$name) {
+		foreach($charList as $id=>$info) {
+			$name = $info['character_name'];
 			if(!strlen($name)) {
 				$name = "<font color=\"red\">[Not Applicable]</font>";
 			}

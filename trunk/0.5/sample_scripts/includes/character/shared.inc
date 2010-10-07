@@ -4,13 +4,11 @@
  */
 
 
-require_once(constant('LIBDIR') .'/cs-battletrack/characterSheet.class.php');
-
 $charId = null;
-if($_GET['id']) {
+if(is_numeric($_GET['id'])) {
 	$charId = $_GET['id'];
 }
-$char = new characterSheet($charId);
 
-$page->gfObj->debugPrintOpt=1;
+$playerUid = $_SESSION['auth']['userInfo']['uid'];
+$userChar = new csbt_userCharacterList($page->db, $playerUid);
 ?>

@@ -17,7 +17,6 @@
 	beneath matching; this will cause horrible logic errors, causing an uprade 
 	to get skipped, or an exception to be thrown, potentially leaving the system 
 	in an unstable state.  Unstable is bad, m'kay?</system_note>
-	
 	<examples>
 		<v1.2.0-ALPHA3>
 			<target_version>1.2.0-ALPHA4</target_version>
