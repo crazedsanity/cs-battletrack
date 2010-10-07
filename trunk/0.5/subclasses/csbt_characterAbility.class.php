@@ -25,7 +25,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 	
 	protected $dataCache=array();
 	
-	protected $updatesByKey = array();
+	public $updatesByKey = array();
 	
 	protected $baseAbilityCache = null;
 	
@@ -47,7 +47,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		//NOTE::: the call to 'parent::__construct(...)' was removed because it was causing segmentation faults & memory issues... yuck.
-		#parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields, $characterId, false);
 		$this->gfObj = new cs_globalFunctions;
 		$this->gfObj->debugPrintOpt=1;
 		
@@ -92,9 +92,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 				}
 			}
 			else {
-				cs_debug_backtrace(1);
-				$this->gfObj->debug_print($this->tableHandlerObj,1);
-				throw new exception(__METHOD__ .":: unable to retrieve records, DETAILS:::: ". $e->getMessage());
+				throw new exception(__METHOD__ .":: unable to retrieve records, no data retrieved");
 			}
 		}
 		catch(Exception $e) {
@@ -389,10 +387,12 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 					try {
 						if(preg_match('/^temp/', $updateBits[1])) {
 							$fieldToUpdate = 'temporary_score';
+							$keysToUpdate = array('temp', 'temp_mod');
 						}
 						elseif(preg_match('/^ability/', $updateBits[1]) || preg_match('/^score$/', $updateBits[1])) {
 							if(!is_null($newValue) && is_numeric($newValue)) {
 								$fieldToUpdate = 'ability_score';
+								$keysToUpdate = array('score', 'modifier');
 							}
 							else {
 								cs_debug_backtrace(1);
@@ -405,10 +405,29 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 						}
 						
 						//attempt the update.
-						$recordId = $this->dataCache['idLinker'][$updateBits[0]];
+						#$recordId = $this->dataCache['idLinker'][$updateBits[0]];
+						$this->get_character_abilities();
+						$recordId = $this->dataCache['idLinker'][$abilityName];
 						$retval = $this->tableHandlerObj->update_record($recordId, array($fieldToUpdate=>$newValue), false);
 						
+						
 						//TODO: add entr(ies) to $this->updateByKeys[{sheetIdKey}]
+						$this->get_character_abilities();
+						foreach($keysToUpdate as $index) {
+							$keyName = $this->create_sheet_id(self::sheetIdPrefix, $abilityName .'_'. $index);
+							$keyValue = $this->dataCache['idLinker'][$abilityName][$index];
+							$this->updatesByKey[$keyName] = $keyValue;
+						}
+						
+						//depending upon the stat, we will also need to update other things (skills are taken care of elsewhere)
+						switch($abilityName) {
+							case 'str':
+								$extraStats = $this->get_strength_stats($this->dataCache['abilities']['str']['score']);
+								foreach($extraStats as $k=>$v) {
+									$this->updatesByKey[$k]=$v;
+								}
+								break;
+						}
 					}
 					catch(Exception $e) {
 						throw new exception(__METHOD__ .":: error while attempting update, DETAILS::: ". $e->getMessage());

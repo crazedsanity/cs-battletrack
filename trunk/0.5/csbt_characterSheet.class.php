@@ -135,14 +135,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 				foreach($val as $id=>$subArray) {
 					if(is_array($subArray)) {
 						if($name == 'skills') {
-							#$page->gfObj->debug_print($subArray,1);
-							$abilityOptionList = $page->gfObj->array_as_option_list($abilityList, $subArray['skills__ability_name']);
-							
-							$optionListRepArr = array(
-								'skillNum'		=> $id,
-								'optionList'	=> $abilityOptionList
-							);
-							$subArray['abilityDropDown'] = $page->gfObj->mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
+							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, $id, $subArray['skills__ability_name']);
 						}
 						
 						$myBlockRow = $page->templateRows[$blockRowName];
@@ -162,6 +155,9 @@ class csbt_characterSheet extends csbt_tableHandler {
 				$page->add_template_var($name, $val);
 			}
 		}
+		
+		//build an ability list for adding new skills.
+		$page->add_template_var('newSkill__abilityDropDown', $this->create_ability_select($page, $abilityList));
 		
 		
 	}//end build_sheet()
@@ -189,6 +185,23 @@ class csbt_characterSheet extends csbt_tableHandler {
 		$data = $this->characterObj->get_character_data();
 		return($data['character_name']);
 	}//end get_character_name()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function create_ability_select(cs_genericPage $page, array $abilityList, $skillId=null, $selectThis=null) {
+		$abilityOptionList = $page->gfObj->array_as_option_list($abilityList, $selectThis);
+		if(is_null($skillId)) {
+			$skillId = 'new';
+		}
+		$optionListRepArr = array(
+			'skillNum'		=> $skillId,
+			'optionList'	=> $abilityOptionList
+		);
+		$retval = $page->gfObj->mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
+		return($retval);
+	}//end create_ability_select()
 	//-------------------------------------------------------------------------
 }
 

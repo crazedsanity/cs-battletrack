@@ -130,11 +130,17 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_saves() {
+	public function get_character_saves($byAbilityId=null) {
 		
 		$sql = "SELECT s.*, a.ability_name FROM ". self::tableName ." AS s INNER JOIN "
 			. "csbt_ability_table AS a USING (ability_id) WHERE s.character_id="
-			. $this->characterId ." ORDER BY save_name";
+			. $this->characterId ;
+		
+		if(is_numeric($byAbilityId)) {
+			$sql .= " AND s.ability_id=". $byAbilityId;
+		}
+		
+		$sql .= " ORDER BY save_name";
 		
 		try {
 			$retval = $this->dbObj->run_query($sql, 'character_save_id');

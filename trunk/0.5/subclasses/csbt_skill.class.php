@@ -14,6 +14,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
+	public $updatesByKey = array();
 	
 	const tableName = 'csbt_character_skill_table';
 	const tableSeq  = 'csbt_character_skill_table_character_skill_id_seq';
@@ -297,16 +298,22 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			
 			//now perform the update.
 			$oldSkillVals[$updateBitName] = $newValue;
+			$newSkillMod = $this->calculate_skill_mod($oldSkillVals);
 			$updatesArr = array(
 				$updateBitName	=> $newValue,
-				'skill_Mod'		=> $this->calculate_skill_mod($oldSkillVals)
+				'skill_mod'		=> $newSkillMod
 			);
-			$this->update_skill($recordId, $updatesArr);
+			$retval = $this->update_skill($recordId, $updatesArr);
+			
+			//Update the updatesByKey array.
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod', $recordId)] = $newSkillMod;
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
+		return($retval);	
 	}//end handle_update()
 	//-------------------------------------------------------------------------
 }

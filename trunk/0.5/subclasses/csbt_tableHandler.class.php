@@ -52,6 +52,7 @@ class csbt_tableHandler extends cs_singleTableHandlerAbstract {
 		if(method_exists($this, $methodName)) {
 			//TODO: seems like it should be able to be called using "$this" or something...
 			$retval = call_user_func_array('cs_singleTableHandlerAbstract::'. $methodName, $args);
+			$this->do_log("Called (". $methodName ."), RETVAL=(". $retval ."), args:::". $this->gfObj->debug_print($args,0,1,false), 'debug');
 		}
 		else {
 			throw new exception(__METHOD__ .':: unknown method ('. $methodName .')');

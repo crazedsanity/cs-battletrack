@@ -83,8 +83,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if(!is_object($dbObj) || get_class($dbObj) != 'cs_phpDB') {
 			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
 		}
-		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr);
 		$this->logger->logCategory = "Character";
+		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr);
 		
 		if($create===false && is_numeric($characterIdOrName) && $characterIdOrName >= 0) {
 			#$this->get_character_data();
@@ -363,6 +363,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if(isset($bits[1])) {
 			$recordId = $bits[1];
 		}
+		$this->do_log(__METHOD__ .": handling update, updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), newValue=(". $newValue .")", 'debug');
 		
 		switch($updateType) {
 			case 'main':
