@@ -47,7 +47,9 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function create_gear($name, array $fields=null) {
-		if(is_string($name) && strlen($name)) {
+		if(is_null($name) || !strlen($name)) {
+			$name = "  ";//allow blank records (for now) so they can have their "pretty spacing".
+		}
 			$insertArr = array();
 			if(is_array($fields) && count($fields) > 0) {
 				$insertArr = $fields;
@@ -61,10 +63,6 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to create character gear (". $name ."), DETAILS:::: ". $e->getMessage());
 			}
-		}
-		else {
-			throw new exception(__METHOD__ .":: unable to create gear without name");
-		}
 		
 		return($newId);
 	}//end create_gear()
