@@ -363,8 +363,26 @@ Define page printing to be Letter size with a 5in margin or more.
   cursor: help;
 }
 
+
+/************************************************************************/
+/*  ROW COLORING */
+.oddrowweapon {
+	background: #FF8A8A;
+}
+.evenrowweapon {
+	background: #FFCECE;
+}
+
+.oddrowarmor {
+	background: #A27AFE;
+}
+.evenrowarmor {
+	background: #D0BCFE;
+}
 /************************************************************************/
 
+
+/************************************************************************/
 table.weapon
 , table.armor
 {
@@ -432,6 +450,7 @@ table.weapon input.left
 #skillcontainer
 {
   width: 50%;
+  vertical-align: top;
 }
 #skillsandgear .spacer
 {
@@ -997,17 +1016,14 @@ border: 1px solid gray;
 
 /* Beginning of CS-BattleTrack stuff */
 
-.redFade {
-	background-image: url('/images/fade__red-to-white.gif');
+.dirtyInput {
+	background-color: #33FF99;
 }
-.yellowFade {
-	background-image: url('/images/fade__yellow-to-white.gif');
-}
-.redBg {
-	background-color: #F72424;
-}
-.yellowBg {
+.updatedInput {
 	background-color: #EDF14E;
+}
+.processingInput {
+	background-color: #F72424;
 }
 
 /* These classes are for selecting things with the given abilities, so they can be automatically updated. */
