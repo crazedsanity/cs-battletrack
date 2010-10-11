@@ -141,7 +141,6 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 							#$charObj->handle_update('characterAbility__'. $attribBits[1] .'_temporary_score', null, $v);
 							$charAbilities['update'][$attribBits[1]] = $v;
 						}
-						$this->logsObj->log_by_class(__METHOD__ .": attribute name = (". $n ."), charAbilities::: ". $this->gfObj->debug_print($charAbilities,0), 'debug');
 						break;
 					
 					case 'ac':
@@ -178,7 +177,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 						break;
 					
 					case 'featsAbilities':
-						$charObj->specialAbilityObj->create_special_ability($v);
+						$specialAbilities[] = $v;
 						break;
 					
 					case 'gear':
@@ -432,7 +431,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 				#$this->logsObj->log_by_class(__METHOD__ .": finished with attribute (". $n .")", 'debug');
 			}
 			
-			$this->logsObj->log_by_class(__METHOD__ .": finished with attributes, starting to do the major updates...", 'debug');
+			$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished with attributes, starting to do the major updates...", 'debug');
 			
 			try {
 				//handle main character updates in one call.
@@ -444,7 +443,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 				catch(Exception $e) {
 					throw new exception(__METHOD__ .": an error occurred while updating main characterData for characterId=(". $characterId ."): ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($mainCharData,0));
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished main_character updates, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished main_character updates, numConverted=(". $numConverted .")", 'debug');
 				
 				
 				if(is_array($charAbilities ) && count($charAbilities) && count($charAbilities['create']) == 6) {
@@ -467,6 +466,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 					throw new exception(__METHOD__ .": FATAL: character (". $characterId .") has no abilities... ". $this->gfObj->debug_print($charAttribs,0));
 				}
 				
+				$counter=0;
 				foreach($armorData as $i=>$v) {
 					$name = $v['name'];
 					unset($v['name']);
@@ -481,10 +481,12 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 					}
 					$charObj->armorObj->create_armor($name, $v);
 					$numConverted++;
+					$counter++;
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished armor updates, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished armor updates (". $counter ."/". count($armorData)  ."), total converted=(". $numConverted .")", 'debug');
 				
 				try {
+					$counter = 0;
 					foreach($weaponData as $i=>$v) {
 						$name = $v['name'];
 						unset($v['name']);
@@ -502,31 +504,37 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 						}
 						$charObj->weaponObj->create_weapon($name, $v);
 						$numConverted++;
+						$counter++;
 					}
 				}
 				catch(Exception $e) {
 					throw new exception(__METHOD__ .": an error occurred while handling weapons: ". $e->getMessage() ."<hr> DATA::: ". $this->gfObj->debug_print($weaponData,0));
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished weapon updates, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished weapon updates (". $counter ."/". count($weaponData) ."), total converted=(". $numConverted .")", 'debug');
 				
+				$counter = 0;
 				foreach($specialAbilities as $i=>$v) {
-					$name = $v['name'];
-					unset($v['name']);
-					$charObj->specialAbilityObj->create_special_ability($name, $v);
+					$charObj->specialAbilityObj->create_special_ability($v);
 					$numConverted++;
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished special abilities, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished special abilities (". $count ."/". count($specialAbilities) ."), total converted=(". $numConverted ."/". count($specialAbilities) .")", 'debug');
 				
+$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") GEAR::: ". $this->gfObj->debug_print($gearData,0), 'debug');
+				$counter = 0;
 				foreach($gearData as $i=>$v) {
-					$name = $v['name'];
-					unset($v['name']);
+					$name = null;
+					if(isset($v['name'])) {
+						$name = $v['name'];
+						unset($v['name']);
+					}
 					if(!isset($v['weight']) || !is_numeric($v['weight'])) {
 						$v['weight'] = 1;
 					}
 					$charObj->gearObj->create_gear($name, $v);
 					$numConverted++;
+					$counter++;
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished gear, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished gear (". $counter ."/". count($gearData) ."), total converted=(". $numConverted .")", 'debug');
 				
 				try {
 					$saveToAbility = array(
@@ -535,6 +543,7 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 						'reflex'	=> 'dex'
 					);
 					$addSuffixTo=array('base', 'magic', 'misc', 'temp');
+					$counter = 0;
 					foreach($savesData as $i=>$v) {
 						if(isset($saveToAbility[$i])) {
 							unset($v['total']);
@@ -545,6 +554,8 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 								}
 							}
 							$createSaveRes = $charObj->savesObj->create_save($i, $saveToAbility[$i], $v);
+							$numConverted++;
+							$counter++;
 						}
 						else {
 							throw new exception(__METHOD__ .": cannot create save for '". $i ."' without ability");
@@ -554,8 +565,9 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 				catch(Exception $e) {
 					throw new exception(__METHOD__ .": error while handling saves (". $i .")::: ". $e->getMessage() ."<hr>DATA::: ". $this->gfObj->debug_print($v,0));
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished saves, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished saves (". $counter ."/". count($savesData) ."), total converted=(". $numConverted .")", 'debug');
 				
+				$counter = 0;
 				foreach($skillsData as $i=>$v) {
 					if(isset($v['abilitymod'])) {
 						unset($v['abilitymod']);
@@ -580,8 +592,9 @@ class upgradeTo_0_5_0 extends cs_webdblogger {
 					//TODO: calling skillsObj->create_skill() for some reason causes a segmentation fault... this could crop-up in the future!!!
 					$createSkillRes = $charObj->skillsObj->tableHandlerObj->create_record($dataArr);
 					$numConverted++;
+					$counter++;
 				}
-				$this->logsObj->log_by_class(__METHOD__ .": finished skill, numConverted=(". $numConverted .")", 'debug');
+				$this->logsObj->log_by_class(__METHOD__ .": (". $characterId .") finished skills (". $counter ."/". count($skillsData) ."), numConverted=(". $numConverted .")", 'debug');
 			}
 			catch(Exception $e) {
 				$this->logsObj->log_by_class(__METHOD__ .": unable to finish characterId=(". $characterId ."), attempting to continue... error was::: ". $e->getMessage(), 'POSSIBLE FATAL ERROR (Exception)');
