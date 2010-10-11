@@ -395,7 +395,6 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 								$keysToUpdate = array('score', 'modifier');
 							}
 							else {
-								cs_debug_backtrace(1);
 								throw new exception("invalid new value (". $newValue .")");
 							}
 						}
@@ -408,15 +407,21 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 						#$recordId = $this->dataCache['idLinker'][$updateBits[0]];
 						$this->get_character_abilities();
 						$recordId = $this->dataCache['idLinker'][$abilityName];
+						$isTempUpdate=false;
+						if($fieldToUpdate == 'temporary_score' && !is_numeric($newValue)) {
+							$newValue = NULL;
+							$isTempUpdate = true;
+						}
 						$retval = $this->tableHandlerObj->update_record($recordId, array($fieldToUpdate=>$newValue), false);
 						
-						
-						//TODO: add entr(ies) to $this->updateByKeys[{sheetIdKey}]
 						$this->get_character_abilities();
 						foreach($keysToUpdate as $index) {
 							$keyName = $this->create_sheet_id(self::sheetIdPrefix, $abilityName .'_'. $index);
-							$keyValue = $this->dataCache['idLinker'][$abilityName][$index];
+							$keyValue = $this->dataCache['abilities'][$abilityName][$index];
 							$this->updatesByKey[$keyName] = $keyValue;
+						}
+						if($isTempUpdate) {
+							$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $abilityName .'_temp_mod')] = '';
 						}
 						
 						//depending upon the stat, we will also need to update other things (skills are taken care of elsewhere)

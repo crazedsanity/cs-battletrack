@@ -14,6 +14,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
+	public $updatesByKey = array();
 	
 	const tableName = 'csbt_character_gear_table';
 	const tableSeq  = 'csbt_character_gear_table_character_gear_id_seq';
@@ -195,6 +196,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 		try {
 			//now perform the update.
 			$retval = $this->update_gear($recordId, array($updateBitName => $newValue));
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());

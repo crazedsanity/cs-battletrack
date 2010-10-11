@@ -14,6 +14,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
+	public $updatesByKey = array();
 	
 	const tableName = 'csbt_character_save_table';
 	const tableSeq  = 'csbt_character_save_table_character_save_id_seq';

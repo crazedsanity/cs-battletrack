@@ -357,6 +357,9 @@ class csbt_character extends csbt_battleTrackAbstract {
 		$updateType = array_shift($bits);
 		
 		$sheetIdBit = $bits[0];
+		if(preg_match('/"/', $newValue)) {
+			$newValue = preg_replace('/"/', '\'\'', $newValue);
+		}
 		
 		//Record ID (usually only supplied for lists of things like skills, skipped for unique items like abilities).
 		$recordId = null;
@@ -368,8 +371,11 @@ class csbt_character extends csbt_battleTrackAbstract {
 		switch($updateType) {
 			case 'main':
 			case 'mainCharacter':
+				if(!strlen($newValue)) {
+					$newValue = NULL;
+				}
 				$retval = $this->update_main_character_data(array($sheetIdBit=>$newValue));
-				
+				$this->changesByKey[$sheetId] = $newValue;
 				$this->handle_automatic_updates($sheetIdBit, $newValue);
 				break;
 			
@@ -382,10 +388,6 @@ class csbt_character extends csbt_battleTrackAbstract {
 				//TODO: handle automatic updates for skills.
 				$abilityName = substr($sheetIdBit, 0, 3);
 				$affectedSkills = $this->skillsObj->get_character_skills($abilityName);
-				
-				foreach($this->abilityObj->updatesByKey as $k=>$v) {
-					$this->changesByKey[$k] = $v;
-				}
 				
 				//update internal ability cache.
 				$this->abilityObj->get_character_abilities();
@@ -421,7 +423,12 @@ class csbt_character extends csbt_battleTrackAbstract {
 				break;
 			case 'saves':
 			case 'save':
-				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
+				$retval = $this->savesObj->handle_update($sheetIdBit, $recordId, $newValue);
+				break;
+			
+			case 'specialAbility':
+			case 'specialAbilities':
+				$retval = $this->specialAbilityObj->handle_update($sheetIdBit, $recordId, $newValue);
 				break;
 			
 			default:
@@ -431,6 +438,10 @@ class csbt_character extends csbt_battleTrackAbstract {
 		$resultString = $this->gfObj->interpret_bool($retval, array('FAILURE', 'SUCCESS'));
 		$this->do_log(__METHOD__ .": updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), recordId=(". $recordId ."), newValue=(". $newValue ."), RESULT::: (". $resultString .")", 'update');
 		
+		$objectList = array('skillsObj', 'abilityObj', 'armorObj', 'weaponObj', 'gearObj', 'savesObj', 'specialAbilityObj');
+		foreach($objectList as $oName) {
+			$this->process_updates_by_key($this->$oName);
+		}
 		return($retval);
 	}//end handle_update()
 	//-------------------------------------------------------------------------
@@ -537,6 +548,26 @@ class csbt_character extends csbt_battleTrackAbstract {
 		}
 		return($atkBonus);
 	}//end get_attack_bonus()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	private function process_updates_by_key($object) {
+		if(is_object($object)) {
+			if(is_array($object->updatesByKey)) {
+				foreach($object->updatesByKey as $k=>$v) {
+					$this->changesByKey[$k] = $v;
+				}
+			}
+			else {
+				throw new exception(__METHOD__ .": attempted to access updatesByKey in (". get_class($object) ."), but found non-array");
+			}
+		}
+		else {
+			throw new exception(__METHOD__ .": attempt to access member of non-object (". $object .")");
+		}
+	}//end process_updates_by_key()
 	//-------------------------------------------------------------------------
 }
 

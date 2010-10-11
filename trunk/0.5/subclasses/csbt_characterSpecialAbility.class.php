@@ -21,6 +21,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
+	public $updatesByKey = array();
 	
 	//To fix a shortcoming in (PHP/PostgreSQL) with regard to length of sequences, part of it had to be shorted to "sa" instead of "special_ability".
 	const tableName = 'csbt_character_sa_table';
@@ -52,23 +53,21 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function create_special_ability($name, array $fields=null) {
-		if(is_string($name) && strlen($name)) {
-			$insertArr = array();
-			if(is_array($fields) && count($fields) > 0) {
-				$insertArr = $fields;
-			}
-			$insertArr['special_ability_name'] = $name;
-			$insertArr['character_id'] = $this->characterId;
-			
-			try {
-				$newId = $this->tableHandlerObj->create_record($insertArr);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create character special_ability (". $name ."), DETAILS:::: ". $e->getMessage());
-			}
+		if(is_null($name) || !strlen($name)) {
+			$name = "    ";
 		}
-		else {
-			throw new exception(__METHOD__ .":: unable to create special_ability without name");
+		$insertArr = array();
+		if(is_array($fields) && count($fields) > 0) {
+			$insertArr = $fields;
+		}
+		$insertArr['special_ability_name'] = $name;
+		$insertArr['character_id'] = $this->characterId;
+		
+		try {
+			$newId = $this->tableHandlerObj->create_record($insertArr);
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: failed to create character special_ability (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\nDATA::: ". $this->gfObj->debug_print($insertArr,0) ."\n\nFIELDS::: ". $this->gfObj->debug_print($fields,0));
 		}
 		
 		return($newId);
@@ -166,7 +165,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 				foreach($makeKeysFrom as $indexName) {
 					if(array_key_exists($indexName, $special_abilityData)) {
 						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName);
-						$retval[$sheetKey] = $data[$id][$indexName];
+						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
 						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
@@ -194,7 +193,13 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 		
 		try {
 			//now perform the update.
-			$retval = $this->update_special_ability($recordId, array($updateBitName => $newValue));
+			if($updateBitName == 'new') {
+				$retval = $this->create_special_ability($newValue);
+			}
+			else {
+				$retval = $this->update_special_ability($recordId, array($updateBitName => $newValue));
+			}
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());

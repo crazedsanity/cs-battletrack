@@ -122,7 +122,6 @@ class csbt_characterSheet extends csbt_tableHandler {
 		$abilityList = $this->characterObj->abilityObj->get_ability_list();
 		$abilityList = $abilityList['byId'];
 		
-		
 		foreach($data as $name=>$val) {
 			if(is_array($val)) {
 				//there should be a template row named after the "$name"...
@@ -132,6 +131,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 				}
 				
 				$parsedRows = '';
+				$rowsParsed = 0;
 				foreach($val as $id=>$subArray) {
 					if(is_array($subArray)) {
 						if($name == 'skills') {
@@ -143,13 +143,15 @@ class csbt_characterSheet extends csbt_tableHandler {
 						$subArray[$name .'_id'] = $id;
 						
 						$parsedRows .= $page->gfObj->mini_parser($myBlockRow, $subArray, '{', '}');
+						$rowsParsed++;
 					}
 					else {
-						$blockRowName = $id;
-						$parsedRows = $subArray;
+						$page->add_template_var($id, $subArray);
 					}
 				}
-				$page->add_template_var($blockRowName, $parsedRows);
+				if($rowsParsed > 0) {
+					$page->add_template_var($blockRowName, $parsedRows);
+				}
 			}
 			else {
 				$page->add_template_var($name, $val);
@@ -196,9 +198,17 @@ class csbt_characterSheet extends csbt_tableHandler {
 			$skillId = 'new';
 		}
 		$optionListRepArr = array(
-			'skillNum'		=> $skillId,
-			'optionList'	=> $abilityOptionList
+			'skill_id'						=> $skillId,
+			'optionList'					=> $abilityOptionList,
+			'skills__selectAbility__extra'	=> 'class="newRecord"'
 		);
+		if(is_numeric($skillId)) {
+			$optionListRepArr['skills__selectAbility__extra'] = 'disabled="disabled"';
+		}
+		else {
+			$optionListRepArr['skillNum'] = 'new';
+			$optionListRepArr['skill_id'] = 'new';
+		}
 		$retval = $page->gfObj->mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
 		return($retval);
 	}//end create_ability_select()

@@ -14,6 +14,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
 	protected $fields;
+	public $updatesByKey = array();
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_weapon_table';
