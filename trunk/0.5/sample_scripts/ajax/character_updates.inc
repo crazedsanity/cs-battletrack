@@ -6,20 +6,57 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 	#$char->characterObj->logger->log_by_class("Testing... ". $page->gfObj->debug_print($_POST,0), 'debug');
 	
 	$xmlData = array(
-		'test'	=> "Got it",
 		'character_id_was'	=> $_POST['character_id'],
-		'id_was'	=> $_POST['name'],
-		'value_was'	=> $_POST['value']
 	);
 	
 	//okay, try to do the update.
 	try {
-		#$xmlData['result'] = $char->handle_update($_POST['name'], $_POST['value']);
-		$returned = $char->handle_update($_POST['name'], $_POST['value']);
-		foreach($returned as $i=>$v) {
-			$xmlData[$i] = $v;
+		$type = 'update';
+		if(isset($_POST['type'])) {
+			$type = $_POST['type'];
 		}
-		$xmlData['callback_success'] = 'ajax_showUpdatedInput';
+		$returned = array('error'=>"No valid data submitted");
+		$xmlData['callback_success'] = 'callback_showUpdatedInput';
+		switch($type) {
+			case 'newRecord':
+				//get the "new" items....
+				$extraData = array();
+				$recordType = $type;
+				$returned = array('error'=>"No valid data");
+				if(isset($_POST['nameField'])) {
+					$name = $_POST[$_POST['nameField']];
+					$bits = explode('__', $_POST['nameField']);
+					$recordType = $bits[0];
+					unset($_POST[$_POST['nameField']], $_POST['nameField']);
+				}
+				foreach($_POST as $k=>$v) {
+					if(preg_match('/__new$/', $k)) {
+						$newKey = preg_replace('/__new$/', '', $k);
+						$extraData[$newKey] = $v;
+					}
+				}
+				if(!is_null($recordType) && !is_null($name)) {
+					$returned = $char->handle_new_record($recordType, $name, $extraData);
+				}
+				else {
+					$returned['nodata__name'] = $name;
+					$returned['nodata__type'] = $type;
+				}
+				$xmlData['callback_success'] = 'callback_processNewRecord';
+				break;
+
+			case 'update':
+			default:
+				$xmlData['id_was'] = $_POST['name'];
+				$xmlData['value_was'] = $_POST['value'];
+				$returned = $char->handle_update($_POST['name'], $_POST['value']);
+		}
+		unset($returned['error']);
+		if(is_array($returned)) {
+			foreach($returned as $i=>$v) {
+				$xmlData[$i] = $v;
+			}
+		}
 	}
 	catch(Exception $e) {
 		$xmlData['result'] = $e->getMessage();

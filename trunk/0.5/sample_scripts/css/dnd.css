@@ -1,28 +1,4 @@
 @charset "utf-8";
-/*
-  main.css
-
-  3EProfiler (tm) character sheet source file.
-  Copyright (C) 2003  Michael J. Eggertson.
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your opxion) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-  **
-
-  Defines the implementation of the 3EProfiler character sheet.
-*/
 
 /************************************************************************/
 
@@ -52,21 +28,9 @@ input
 {
   width: 100%;
 }
-#main
-{
-  width: 7.5in;
-}
 
 /************************************************************************/
 
-/*
-Define page printing to be Letter size with a 5in margin or more.
-*/
-#page
-{
-	height: 10in;
-	width: 7.25in;
-}
 
 #info
 {
@@ -194,10 +158,12 @@ Define page printing to be Letter size with a 5in margin or more.
 {
   width: 8%;
 }
-#hp td.char
-{
-  width: 1em;
-  text-align: center;
+
+.char {
+	width: 1em;
+	text-align: center;
+	margin: 0px;
+	padding: 0px;
 }
 #hp td.char span
 {
@@ -218,11 +184,6 @@ Define page printing to be Letter size with a 5in margin or more.
 #init td
 {
   padding: 0;
-}
-#init td.char
-{
-  width: 1em;
-  text-align: center;
 }
 #init td.unit
 {
@@ -293,11 +254,6 @@ Define page printing to be Letter size with a 5in margin or more.
 {
   width: 11%;
 }
-#saves td.char
-{
-  width: 1em;
-  text-align: center;
-}
 #saves input
 {
   border: 1px solid black;
@@ -317,11 +273,6 @@ Define page printing to be Letter size with a 5in margin or more.
 #attacks td.unit
 {
   width: 8%;
-}
-#attacks td.char
-{
-  width: 1em;
-  text-align: center;
 }
 #attacks input
 {
@@ -531,10 +482,6 @@ table.weapon input.left
 {
   padding: 1px 3px 0 1px;
 }
-#skills tr.skillslot td.char
-{
-  width: 1em;
-}
 #skills tr.skillslot td.unit
 {
   width: 2.5em;
@@ -583,11 +530,11 @@ table.weapon input.left
   vertical-align: top;
 }
 
-#feats
+#specialAbility
 {
   width: 100%;
 }
-#feats tr.title td
+#specialAbility tr.title td
 {
   color: white;
   background-color: black;
@@ -597,20 +544,20 @@ table.weapon input.left
   font-family: Arial, sans-serif;
   padding: 1px 1px 1px .5em;
 }
-#feats td
+#specialAbility td
 {
   width: 50%;
 }
-#feats table
+#specialAbility table
 {
   width: 100%;
 }
-#feats table td
+#specialAbility td
 {
   width: 100%;
   padding: 1px 1px 0 1px;
 }
-#feats input
+#specialAbility tr.slot input
 {
   border-style: none;
   border-top: 1px solid white;
@@ -655,13 +602,12 @@ table.weapon input.left
 {
   width: 5em;
 }
-#gear input
+#gear tr.slot input
 {
   width: 100%;
   border-style: none;
   border-top: 1px solid white;
   border-bottom: 1px solid black;
-  text-align: center;
   font-size: 9px
 }
 #gear input.name
@@ -1025,24 +971,19 @@ border: 1px solid gray;
 .processingInput {
 	background-color: #F72424;
 }
-
-/* These classes are for selecting things with the given abilities, so they can be automatically updated. */
-.autoUpdate_str {}
-.autoUpdate_strMod {}
-
-.autoUpdate_dex {}
-.autoUpdate_dexMod {}
-
-.autoUpdate_con {}
-.autoUpdate_conMod {}
-
-.autoUpdate_int {}
-.autoUpdate_intMod {}
-
-.autoUpdate_wis {}
-.autoUpdate_wisMod {}
-
-.autoUpdate_cha {}
-.autoUpdate_chaMod {}
+input[readonly] {
+	background:#DDDDDD;
+	color:#999999;
+}
 
 
+.nowrap {
+	white-space: nowrap;
+}
+.highlight {
+	background-color: #66FF00;
+}
+
+.hidden {
+	display: none;
+}

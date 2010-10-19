@@ -1,6 +1,7 @@
 
-var originalValue = [];
-
+/*======================================
+       ++ INPUT MARKING...
+  ====================================*/
 function markDirtyInput(object) {
 	clearUpdatedInput(object);
 	$(object).addClass('dirtyInput');
@@ -27,14 +28,24 @@ function markUpdatedInput(object, newVal, forceChange) {
 		forceChange=false;
 	}
 	clearDirtyInput(object);
-	if($(object).val() != newVal || forceChange) {
+	//if($(object).val() != newVal || forceChange) {
 		$(object).val(newVal);
+		//$(object).data("last_value", newVal);
 		$(object).addClass("updatedInput");
-	}
+		
+		/* Special: update any input that has a class name that matches the given id: this 
+		 * helps deal with things like the "base attack bonus" field for ranged/melee, as 
+		 * they are technically repeats of the original/master value.
+		//*/
+		$("." + $(object).attr('id')).val(newVal).addClass("updatedInput");;
+	//}
+	//else {
+	//	alert("Not updating ("+ $(object).attr("id") +"), newVal=("+ newVal +"), currentVal=("+ $(object).val() +")");
+	//}
 	if($(object).attr("id") == 'main__character_name') {
-		//
+		//Character name changed, update the page title!
 		var bits = document.title.split(" - ");
-		document.title = $("#main__character_name").val() + " - " + bits[1];
+		document.title = $("#main__character_name").val() + " - " + bits[(bits.length -1)];
 	}
 }
 function clearUpdatedInput(object) {
@@ -51,18 +62,13 @@ function isUpdatedInput(object) {
 }
 
 function markProcessingInput(object) {
-	if($(object).attr('id').match(/__new__/)) {
-		//special handling for "NEW" records...
-		//If the ID is "gear__new__stuff", this will remove the "stuff" table & replace it with a loading image.
-		var bits = $(object).attr('id').split('__');
-		$("#"+ bits[2]).slideUp();
-		$("#"+ bits[2] +" input").attr("disabled", "disabled");
-		$("#"+ bits[2]).html('<img src="/images/ajax-loader.gif">Loading new '+ bits[2]);
-		$("#"+ bits[2]).slideDown();
-	}
-	else {
-		$(object).addClass("processingInput");
-	}
+	clearDirtyInput(object);
+	$(object).addClass("processingInput");
+	$(object).attr("readonly",true);
+	$(object).attr("disabled",true);
+	
+	//Update the "last_value" info, it doesn't attempt to get processed again WHILE it is being processed.
+	$(object).data("last_value", $(object).val());
 }
 function isProcessingInput(object) {
 	var retval = false;
@@ -74,29 +80,65 @@ function isProcessingInput(object) {
 function clearProcessingInput(object) {
 	if($(object).hasClass("processingInput")) {
 		$(object).removeClass("processingInput");
+		$(object).attr("readonly",false);
+		$(object).attr("disabled",false);
 	}
 }
+/*======================================
+       XX INPUT MARKING...
+  ====================================*/
 
+
+/*======================================
+       ++ AJAX STUFF
+  ====================================*/
 function ajax_processChange(divId) {
+	var myVal = $("#"+divId).val();
+	if($("#"+ divId).attr("type") == "checkbox") {
+		myVal = $("#"+ divId).attr("checked");
+	}
 	var postArray = {
 		'character_id'	: $("#form_character_id").val(),
 		'name'			: divId,
-		'value'			: $("#"+divId).val()
+		'value'			: myVal
 	}
 	
 	ajax_doPost("member/ttorp/character_updates", postArray);
 }
 function ajax_processNewRecord(tableName) {
 	var postArray = {
+		'type'			: "newRecord",
+		'tableName'		: tableName,
 		'character_id'	: $("#form_character_id").val()
 	}
-	$("#" + tableName +" .newRecord").each(function(tIndex,tObject) {
-		postArray[$(tObject).attr("id")] = $(tObject).val();
+	var numItems = 0;
+	var numWithVals = 0;
+	$("#" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord").each(function(tIndex,tObject) {
+		numItems++;
+		if($(tObject).val().length > 0) {
+			var myVal = $(tObject).val();
+			if($(tObject).attr("type") == "checkbox") {
+				myVal = $(tObject).attr("checked");
+			}
+			postArray[$(tObject).attr("id")] = myVal;
+			console.debug("Adding to POST ("+ $(tObject).attr("id") +")=("+ myVal +")");
+			numWithVals++;
+			if($(tObject).hasClass('nameField')) {
+				postArray['nameField'] = $(tObject).attr('id');
+			}
+		}
 	});
-	ajax_doPost("member/ttorp/character_updates", postArray);
+	if(numItems > 0) {
+		ajax_doPost("member/ttorp/character_updates", postArray);
+	}
+	else {
+		alert("No items to process in ("+ tableName +")");
+	}
 }
-function ajax_showUpdatedInput(xmlObj) {
-	$("input").removeClass("updatedInput");
+
+function callback_showUpdatedInput(xmlObj) {
+	//TODO: limit the call below to only the affected input...
+	$("input,select").removeClass("updatedInput");
 	var forceNameChange=null;
 	if($(xmlObj).find('id_was').text()) {
 		forceNameChange = $(xmlObj).find('id_was').text();
@@ -126,27 +168,144 @@ function ajax_showUpdatedInput(xmlObj) {
 		}
 	}
 }
+function callback_processNewRecord(xmlObj) {
+	//All we really need is the new ID...
+	if($(xmlObj).find('newRecordId').val() != null && $(xmlObj).find('tableName') != null) {
+		var newId = $(xmlObj).find('newRecordId').text();
+		var tableName = $(xmlObj).find('tableName').text();
+		console.debug("callback_processNewRecord(): newRecordId=("+ newId +"), tableName=("+ tableName +")");
+		//console.debug("callback_processNewRecord(): tableName=("+ tableName +"), newId=("+ newId +")");
+		cloneRow(tableName, newId);
+		callback_showUpdatedInput(xmlObj);
+	}
+	else {
+		//TODO: handle this more elegantly, like by putting it in a "growl" box or something.
+		alert("unable to finalize new record, could not find newRecordId...");
+	}
+}
+/*======================================
+       XX AJAX STUFF...
+  ====================================*/
 
 function processChange(object) {
-	if(isDirtyInput(object) && $(object).not(".newRecord")) {
-		//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
-		$("#"+ $(object).attr('id')).attr('readonly', 'readonly');
-		ajax_processChange($(object).attr('id'));
-		markProcessingInput(object);
+	if(isDirtyInput(object)) {
+		if($(object).hasClass("newRecord")) {
+			//only process the change if they're on a TEXT input whose ID ends in "__new"
+			if($(object).attr("id").match(/__new/)) {
+				//get the table name based on the ID.
+				var bits = $(object).attr("id").split("__");
+				var tableName = bits[0];
+				var inputName = tableName +"__new";
+				
+				//this is a NEW RECORD; there's record cloning and ID changing to be done.
+				//BEFORE the change, do some stuff so they know the change is pending...
+				
+				loaderId = tableName +"__loader";
+				$("#"+ loaderId).show();
+				
+				//process the actual change...
+				ajax_processNewRecord(tableName);
+				
+				//mark it as being processed.
+				markProcessingInput(object);
+			}
+		}
+		else {
+			//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
+			var id = $(object).attr('id');
+			$("#"+ id).attr('readonly', 'readonly');
+			ajax_processChange(id);
+			markProcessingInput(object);
+		}
 	}
 }
 function handlePendingChanges() {
 	//this will submit changes for all pending (dirty) inputs (that are NOT new records).
-	$("input.dirtyInput").not(".newRecord").each(function(item, object){
-		//alert("found dirty input: "+ $(object).attr("id") +")");
+	//NOTE::: this is intended as a "fail-safe", and probably only for testing...
+	$("input.dirtyInput").each(function(item, object){
 		processChange(object);
 	});
+}
+
+function doHighlighting(object, mouseEvent) {
+	var myMouseEvent = mouseEvent;
+	if(mouseEvent != 'over' && mouseEvent != 'out') {
+		myMouseEvent = 'out';
+	}
+	if($(object).attr("class") != undefined) {
+		var bits = $(object).attr("class").split(' ');
+		var littleBits = undefined;
+		for(i=0; i<bits.length; i++) {
+			if(bits[i].match(/^hl--/)) {
+				littleBits = bits[i].split('--', 2);
+				highlightField(littleBits[1]);
+			}
+		}
+	}
+}
+function highlightField(id) {
+	//NOTE: readonly inputs won't show color unless it is manually set...
+	var giveColor = $("#"+ id).css("background-color");
+	if($("#"+ id).hasClass("highlight")) {
+		$("#"+ id).css("background-color", $("#"+ id).data("old_bgcolor"));
+		$("#"+ id).removeClass("highlight");
+	}
+	else {
+		$("#"+ id).css("background-color","#66FF00");
+		$("#"+ id).addClass("highlight");
+	}
+}
+
+function cloneRow(tableName, newId) {
+//console.debug("cloneRow("+ tableName +","+ newId +")");
+	//create a clone of an existing row...
+	var newRow = $("#"+ tableName +" tr.slot:last").clone(true);
+	
+	//now change ID's of inputs for that existing record...
+	newRow.find("input,select").attr('id', function(){
+		var newRowId = $(this).attr("id");
+		var updatedId = newRowId.replace(/__[0-9]{1,}$/, "__"+ newId);
+		return(updatedId);
+	}); 
+	
+	//update values...
+	newRow.find("input,select").each(function() {
+		if($(this).attr("id") != null && $(this).attr("id") != undefined) {
+			var oldValueId = $(this).attr("id").replace(/__[0-9]{1,}$/, "__new");
+			//Transfer values from the "new record" row to the cloned row...
+			$(this).val($("#"+ oldValueId).val());
+			markProcessingInput($(this));
+			
+			//now clear values from the new row.
+			$("#"+ oldValueId).val("");
+			clearDirtyInput($("#"+ oldValueId));
+			
+			//remove the "disabled" status from inputs that are NOT marked readonly.
+			if(!$("#"+ oldValueId).attr("readonly")) {
+				$("#"+ oldValueId).attr("disabled",false);
+			}
+		}
+	});
+	
+	//Remove the "newRecord" and "footer" classes so things work properly afterward.
+	newRow.find("*").each(function() {
+		$(this).removeClass("newRecord");
+		clearDirtyInput(this);
+	});
+	
+	//append it to the bottom of the table.
+	$("#"+ tableName).append(newRow);
+	
+	//TODO: move the "footer" row to the bottom...
+	$("#"+ tableName).append($("#"+ tableName +" tr.footer"));
+	$("#"+ tableName +" tr.newRecord").find("input[type='text']").attr("value", "");
 }
 
 
 $(document).ready(function() {
 	$("input,select,textarea").each(function(i) {
 		  $(this).data('last_value', $(this).val());
+		  $(this).data('old_bgcolor', $(this).css("background-color"));
 	});
 	
 	$("input,select,textarea").keyup(function() {
@@ -155,38 +314,23 @@ $(document).ready(function() {
 		}
 	});
 	$("input,select,textarea").bind('paste', function() {
-		//alert("Something was pasted... (" + $(this).attr("id") + ")");
 		markDirtyInput(this);
 	});
 	$("input,select,textarea").blur(function() {
+		if(isDirtyInput(this)) {
+			processChange(this);
+		}
+	});
+	$("input:checkbox").not(".newRecord").click(function() {
+		markDirtyInput(this);
 		processChange(this);
 	});
 	
-	/*
-	$("input").focus(function(event) {
-		//store the original value so the AJAX is called only when something has actually changed 
-		//	(protects against submitting non-changes when user presses <tab>, etc)
-		//originalValue[$(this).attr("id")] = $(this).val();
+	//Highlighting associated fields (i.e. highlight the main "base attack bonus" for melee/ranged so they know what to modify).
+	$("input[class*='hl--']").mouseover(function(){
+		doHighlighting(this);
 	});
-	$("textarea").focus(function(event) {
-		//originalValue[$(this).attr("id")] = $(this).val();
+	$("input[class*='hl--']").mouseout(function(){
+		doHighlighting(this);
 	});
-	$("input").keyup(function(event) {
-		setInputDirty(this);
-	});
-	//TODO: make this event work!!!
-	$("select").keyup(function(event) {
-		//ajax_processChange($(this).attr('id'));
-		processChange(this);
-	});
-	$("input").blur(function() {
-		processChange(this);
-	});
-	$("textarea").change(function(event) {
-		markDirtyInput(this);
-	});
-	$("textarea").blur(function() {
-		processChange(this);
-	});
-	//*/
 });
