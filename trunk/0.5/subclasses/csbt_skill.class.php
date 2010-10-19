@@ -37,8 +37,6 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			'skill_name'		=> 'sql',
 			'ability_id'		=> 'int',
 			'is_class_skill'	=> 'bool',
-			'skill_mod'			=> 'int',
-			'ability_mod'		=> 'int',
 			'ranks'				=> 'int'
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
@@ -75,6 +73,18 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				}
 				
 				$newId = $this->tableHandlerObj->create_record($insertArr);
+				
+				//add stuff to internal "updatesByKey", so the sheet can be updated properly.
+				try {
+				$myData = $this->get_skill_by_id($newId);
+				foreach($myData as $k=>$v) {
+					$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $k, $newId)] = $v;
+				}
+				//$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod', $recordId)] = $newSkillMod;
+				}
+				catch(Exception $e) {
+					throw new exception(__METHOD__ .": failed to get data for newId (". $newId .")... ". $e->getMessage());
+				}
 			}
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage());
@@ -165,10 +175,10 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			$retval = array();
 			
 			$makeKeysFrom = array(
-				'skill_name', 'ability_name', 'is_class_skill', 'skill_mod', 
-				'ability_mod', 'ranks', 'misc_mod'
+				'skill_name', 'ability_name', 'is_class_skill', 'ranks', 'misc_mod'
 			);
 			foreach($data as $id=>$skillData) {
+				$skillModData = array();
 				foreach($makeKeysFrom as $indexName) {
 					if(isset($skillData[$indexName])) {
 						$sheetKey = $this->create_sheet_id(self::sheetIdPrefix, $indexName);
@@ -180,7 +190,17 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 					
 					//add a key so the form can be checked (easier to run the form like this)
 					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'is_class_skill_checked')] = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked'));
+					$skillModData[$indexName] = $data[$id][$indexName];
 				}
+				
+				//get ability modifier.
+				$abilityMod = $this->abilityObj->get_ability_modifier($data[$id]['ability_name']);
+				$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'ability_mod')] = $abilityMod;
+				$skillModData['ability_mod'] = $abilityMod;
+				
+				//set skill modifier...
+				//TODO: remove "skill_mod" column!
+				$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod')] = $this->calculate_skill_mod($skillModData);
 			}
 		}
 		catch(Exception $e) {
@@ -298,10 +318,8 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			
 			//now perform the update.
 			$oldSkillVals[$updateBitName] = $newValue;
-			$newSkillMod = $this->calculate_skill_mod($oldSkillVals);
 			$updatesArr = array(
 				$updateBitName	=> $newValue,
-				'skill_mod'		=> $newSkillMod
 			);
 			$retval = $this->update_skill($recordId, $updatesArr);
 			

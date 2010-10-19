@@ -105,8 +105,6 @@ CREATE TABLE csbt_character_skill_table (
 	skill_name text NOT NULL,
 	ability_id integer NOT NULL REFERENCES csbt_ability_table (ability_id),
 	is_class_skill bool NOT NULL DEFAULT false,
-	skill_mod integer NOT NULL default 0,
-	ability_mod integer NOT NULL default 0, --TODO: This should be generated!!!
 	ranks integer NOT NULL default 0,
 	misc_mod integer NOT NULL default 0
 );

@@ -425,13 +425,17 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 						}
 						
 						//depending upon the stat, we will also need to update other things (skills are taken care of elsewhere)
+						$keyUpdates = array();
 						switch($abilityName) {
 							case 'str':
-								$extraStats = $this->get_strength_stats($this->dataCache['abilities']['str']['score']);
-								foreach($extraStats as $k=>$v) {
-									$this->updatesByKey[$k]=$v;
-								}
+								//get strength stats.
+								$keyUpdates = $this->get_strength_stats($this->dataCache['abilities']['str']['score']);
 								break;
+						}
+						if(is_array($keyUpdates) && count($keyUpdates)) {
+							foreach($keyUpdates as $k=>$v) {
+								$this->updatesByKey[$k]=$v;
+							}
 						}
 					}
 					catch(Exception $e) {

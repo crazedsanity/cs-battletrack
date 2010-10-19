@@ -114,7 +114,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 	
 	
 	//-------------------------------------------------------------------------
-	public function build_sheet(cs_genericPage $page, $templateFile) {
+	public function build_sheet(cs_genericPage $page) {
 		$data = $this->get_sheet_data();
 		
 		$blockRows = $page->rip_all_block_rows('content');
@@ -177,7 +177,60 @@ class csbt_characterSheet extends csbt_tableHandler {
 			'changesbykey'	=> $this->characterObj->changesByKey
 		);
 		return($retval);
-	}//end handle_updates()
+	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	/**
+	 * Handles creation of new records; returns new data to populate page sections.
+	 */
+	public function handle_new_record($type, $name, array $extraData=null) {
+		$retval = array();
+		switch($type) {
+			case 'gear':
+				$retval['newRecordId'] = $this->characterObj->gearObj->create_gear($name, $extraData);
+				break;
+
+			case 'skills':
+				if(isset($extraData['skills__ability_id'])) {
+					$abilityId = $extraData['skills__ability_id'];
+					unset($extraData['skills__ability_id']);
+					$myExtraData = array();
+					foreach($extraData as $k=>$v) {
+						$k = preg_replace('/^'. $type .'_/', '', $k);
+						$myExtraData[$k] = $v;
+					}
+					$abilityName = $this->characterObj->abilityObj->get_ability_name($abilityId);
+					$retval['newRecordId'] = $this->characterObj->skillsObj->create_skill($name, $abilityName, $myExtraData);
+					
+					//TODO: add changesByKey (so data in the new record can be updated to be correct).
+					$this->characterObj->process_updates_by_key();
+				}
+				break;
+
+			case 'specialAbility':
+				$retval['newRecordId'] = $this->characterObj->specialAbilityObj->create_special_ability($name, $extraData);
+				break;
+
+			default:
+				throw new exception(__METHOD__ .": invalid type (". $type .")");
+		}
+		$retval['tableName'] = $type;
+		$retval['hnr__type'] = $type;
+		$retval['hnr__name'] = $name;
+		$retval['changesbykey'] = $this->characterObj->changesByKey;
+		
+		if(is_array($extraData) && count($extraData)) {
+			$xText = "";
+			foreach($extraData as $k=>$v) {
+				$xText = $this->gfObj->create_list($xText, $k ."==". $v);
+			}
+			$retval['hnr__extra'] = $xText;
+		}
+		return($retval);
+	}//end handle_new_record()
 	//-------------------------------------------------------------------------
 	
 	

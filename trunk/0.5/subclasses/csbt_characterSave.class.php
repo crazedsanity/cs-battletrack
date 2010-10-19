@@ -158,11 +158,12 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_sheet_data() {
+	public function get_sheet_data($byAbilityId=null) {
 		try {
-			$data = $this->get_character_saves();
+			$data = $this->get_character_saves($byAbilityId);
 			$retval = array();
 			$makeKeysFrom = $this->get_columns_for_sheet_keys();
+			$makeKeysFrom[] = 'ability_name';
 			unset($makeKeysFrom[array_search('ability_id', $makeKeysFrom)]);
 			
 			foreach($data as $id=>$saveInfo) {

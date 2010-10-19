@@ -400,6 +400,25 @@ class csbt_character extends csbt_battleTrackAbstract {
 						$this->changesByKey[$k] = $v;
 					}
 				}
+
+				//now get affected saves, if any...
+				try {
+					$abilityId = $this->abilityObj->get_ability_id($abilityName);
+					$affectedSaves = $this->savesObj->get_sheet_data($abilityId);
+					
+					if(is_array($affectedSaves)) {
+						foreach($affectedSaves as $k=>$v) {
+							$this->changesByKey[$k] = $v;
+						}
+					}
+				}
+				catch(Exception $e) {
+					//that's okay (probably trying to use an ability that doesn't have an associated save).
+				}
+				
+				//now get updated melee/ranged stuff.
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
 				break;
 			
 			case 'characterArmor':
@@ -438,10 +457,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 		$resultString = $this->gfObj->interpret_bool($retval, array('FAILURE', 'SUCCESS'));
 		$this->do_log(__METHOD__ .": updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), recordId=(". $recordId ."), newValue=(". $newValue ."), RESULT::: (". $resultString .")", 'update');
 		
-		$objectList = array('skillsObj', 'abilityObj', 'armorObj', 'weaponObj', 'gearObj', 'savesObj', 'specialAbilityObj');
-		foreach($objectList as $oName) {
-			$this->process_updates_by_key($this->$oName);
-		}
+		$this->process_updates_by_key();
 		return($retval);
 	}//end handle_update()
 	//-------------------------------------------------------------------------
@@ -532,7 +548,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if($type == 'melee' || $type == 'ranged') {
 			$data = $this->get_character_data();
 			
-			$columns = array($type .'_misc', $type .'_size', $type .'_temp');
+			$columns = array($type .'_misc', $type .'_size', $type .'_temp', 'base_attack_bonus');
 			$atkBonus = 0;
 			foreach($columns as $colName) {
 				if(isset($data[$colName])) {
@@ -542,6 +558,11 @@ class csbt_character extends csbt_battleTrackAbstract {
 					throw new exception(__METHOD__ .": cannot calculate attack bonus for '". $type ."' without (". $colName .")");
 				}
 			}
+			$abilityName = 'str';
+			if($type == 'ranged') {
+				$abilityName = 'dex';
+			}
+			$atkBonus += $this->abilityObj->get_ability_modifier($abilityName);
 		}
 		else {
 			throw new exception(__METHOD__ .": invalid type (". $type .")");
@@ -553,19 +574,22 @@ class csbt_character extends csbt_battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	private function process_updates_by_key($object) {
-		if(is_object($object)) {
-			if(is_array($object->updatesByKey)) {
-				foreach($object->updatesByKey as $k=>$v) {
-					$this->changesByKey[$k] = $v;
+	public function process_updates_by_key() {
+		$objectList = array('skillsObj', 'abilityObj', 'armorObj', 'weaponObj', 'gearObj', 'savesObj', 'specialAbilityObj');
+		foreach($objectList as $object) {
+			if(is_object($this->$object)) {
+				if(is_array($this->$object->updatesByKey)) {
+					foreach($this->$object->updatesByKey as $k=>$v) {
+						$this->changesByKey[$k] = $v;
+					}
+				}
+				else {
+					throw new exception(__METHOD__ .": attempted to access updatesByKey in (". get_class($this->$object) ."), but found non-array");
 				}
 			}
 			else {
-				throw new exception(__METHOD__ .": attempted to access updatesByKey in (". get_class($object) ."), but found non-array");
+				throw new exception(__METHOD__ .": attempt to access member of non-object (". $this->$object .")");
 			}
-		}
-		else {
-			throw new exception(__METHOD__ .": attempt to access member of non-object (". $object .")");
 		}
 	}//end process_updates_by_key()
 	//-------------------------------------------------------------------------
