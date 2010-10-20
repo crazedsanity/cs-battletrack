@@ -65,7 +65,7 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 }
 else {
 	$xmlData = array(
-		'result'	=> "missing characterId (". $_POST['character_id'] .")"
+		'result'	=> "missing characterId (". $_POST['character_id'] .") or no data POSTed"
 	);
 }
 
