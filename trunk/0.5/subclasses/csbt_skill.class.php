@@ -62,15 +62,6 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			try {
 				//get their ability modifier.
 				$charAbilityObj = new csbt_characterAbility($this->dbObj, $this->characterId);
-				$insertArr['ability_mod'] = $charAbilityObj->get_ability_modifier($ability);
-
-				$insertArr['skill_mod'] = $insertArr['ability_mod'];
-				if(isset($insertArr['ranks'])) {
-					$insertArr['skill_mod'] += $insertArr['ranks'];
-				}
-				if(isset($insertArr['misc_mod'])) {
-					$insertArr['skill_mod'] += $insertArr['misc_mod'];
-				}
 				
 				$newId = $this->tableHandlerObj->create_record($insertArr);
 				
