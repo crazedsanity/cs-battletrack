@@ -987,3 +987,6 @@ input[readonly] {
 .hidden {
 	display: none;
 }
+
+.bottomSpacer {
+}

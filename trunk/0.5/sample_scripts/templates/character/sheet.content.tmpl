@@ -21,9 +21,9 @@ body {
               <div id="div_main_character_name"></div><td colspan="2"><input title="Your character's name" id="main__character_name" value="{main__character_name}" type="text"><br>Character Name</td></div>
               <td colspan="2"><input name="generated__player-FIXME" title="Player name [display name for your account]" id="generated__player" value="FIXME{generated__player}" disabled="disabled"><br>Player</td>
               <td><input title="Alignment" id="main__alignment" value="{main__alignment}" type="text"><br>Alignment</td>
-              <td><input title="Current XP" id="xp-total-FIXME" value="FIXME{xp-total}" type="text"><br>Current XP</td>
-              <td><input title="XP to next level" id="xp-next-FIXME" value="FIXME{xp-next}" type="text"><br>Next Level XP</td>
-              <td><input title="Add this value to the current XP (so you don't have to calculate anything)" id="xp-change-FIXME" value="FIXME{xp-change}" type="text"><br>XP Change</td>
+              <td><input title="Current XP" id="main__xp_current" value="{main__xp_current}" type="text" disabled="disabled"><br>Current XP</td>
+              <td><input title="XP to next level" id="main__xp_next" value="{main__xp_next}" type="text"><br>Next Level XP</td>
+              <td><input title="Add this value to the current XP (so you don't have to calculate anything)" id="main__xp_change" value="" type="text"><br>XP Change</td>
             </tr>
             <tr>
               <td colspan="2"><input title="Class(es)" id="main__character_level" value="{main__character_level}" type="text"><br>Class</td>
@@ -110,29 +110,30 @@ body {
               <td colspan="2" class="top">
                 
                 <table id="hp">
-                  <tbody><tr>
-                    <td>
-                    </td><td class="header"><br>TOTAL</td>
-                    <td>
-                    </td><td class="header" colspan="3">Current HP</td>
-                    <td>
-                    </td><td class="header" colspan="3">Nonlethal Damage</td>
-                    <td>
-                    </td><td class="header" colspan="3">Hit Dice</td>
-                    <td>
-                    </td><td class="header" colspan="3"><span title="Damage Reduction" class="help">Damage Reduction</span></td>
+                  <tbody>
+				  	<tr>
+                    <td></td>
+					<td class="header"><br>TOTAL</td>
+                    <td></td>
+					<td class="header" colspan="3">Current HP</td>
+                    <td></td>
+					<td class="header" colspan="3">Nonlethal Damage</td>
+                    <td></td>
+					<td class="header" colspan="3">Hit Dice</td>
+                    <td></td>
+					<td class="header" colspan="3"><span title="Damage Reduction" class="help">Damage Reduction</span></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Hit Points" class="help">HP</span></td>
                     <td><input title="Total Hit Points" id="main__hit_points_max" value="{main__hit_points_max}" type="text"></td>
-                    <td>
-                    </td><td colspan="3"><input title="Current hit points" id="main__hit_points_current" value="{main__hit_points_current}" type="text"></td>
-                    <td>
-                    </td><td colspan="3"><input title="Nonlethal damage" id="main__nonlethal_damage" value="{main__nonlethal_damage}" type="text"></td>
-                    <td>
-                    </td><td colspan="3"><input title="Hit dice for your CURRENT class" id="main__hit_dice" value="{main__hit_dice}" type="text"></td>
-                    <td>
-                    </td><td colspan="3"><input title="Damage Reduction" id="main__damage_reduction" value="{main__damage_reduction}" type="text"></td>
+                    <td></td>
+					<td colspan="3"><input title="Current hit points" id="main__hit_points_current" value="{main__hit_points_current}" type="text"></td>
+                    <td></td>
+					<td colspan="3"><input title="Nonlethal damage" id="main__nonlethal_damage" value="{main__nonlethal_damage}" type="text"></td>
+                    <td></td>
+					<td colspan="3" class="nowrap char basenum">d<input title="Hit dice for your CURRENT class (just the number, like '12' in 'd12')" id="main__hit_dice" value="{main__hit_dice}" type="text"></td>
+                    <td></td>
+					<td colspan="3"><input title="Damage Reduction" id="main__damage_reduction" value="{main__damage_reduction}" type="text"></td>
                   </tr>
                   <tr>
                     <td class="tag"><span title="Armor Class" class="help">AC</span></td>
@@ -383,70 +384,72 @@ body {
           <!--
             table.weapon are weapon slots.
           -->
+          <div style="display:inline" class="weaponSlot" id="weaponSlot_{characterWeapon_id}">
+          <table class="weapon" id="characterWeapon" cellspacing="0">
+		  <tbody>
           <!-- BEGIN characterWeaponSlot -->
-          <div style="display:inline" class="weaponSlot" id="weaponSlot_{wsNum}">
-          <table class="weapon" cellspacing="0">
-            <tbody><tr class="header">
-              <td class="type wide">Weapon</td>
+           <tr class="slot header {addClassName}">
+              <td class="type wide" title="Weapon ID #{characterWeapon_id}">Weapon</td>
               <td class="wide">Total Attack Bonus</td>
               <td class="medium">Damage</td>
               <td class="small">Critical</td>
               <td class="small">Range</td>
             </tr>
-            <tr>
-              <td><input class="left" title="Weapon's name" id="characterWeapon__weapon_name__{characterWeapon_id}" value="{characterWeapon__weapon_name}"></td>
+            <tr class="slot {addClassName} multiRowFirst">
+              <td><input class="left nameField {addClassName}" title="Weapon's name" id="characterWeapon__weapon_name__{characterWeapon_id}" value="{characterWeapon__weapon_name}"></td>
               <td><input title="Total attack bonus for this weapon" id="characterWeapon__total_attack_bonus__{characterWeapon_id}" value="{characterWeapon__total_attack_bonus}"></td>
               <td><input title="Damage" id="characterWeapon__damage__{characterWeapon_id}" value="{characterWeapon__damage}"></td>
               <td><input title="Critical threat range" id="characterWeapon__critical__{characterWeapon_id}" value="{characterWeapon__critical}"></td>
               <td><input title="Range increment (applies only to throwable weapons)" id="characterWeapon__range__{characterWeapon_id}" value="{characterWeapon__range}"></td>
             </tr>
-            <tr class="header">
+            <tr class="slot header {addClassName}">
               <td>Special Properties</td>
               <td>Ammunition</td>
               <td>Weight</td>
               <td>Size</td>
               <td>Type</td>
             </tr>
-            <tr>
+            <tr class="slot bottomSpacer {addClassName} multiRowSecond">
               <td><input class="left" title="Special properties" id="characterWeapon__special__{characterWeapon_id}" value="{characterWeapon__special}"></td>
               <td><input title="Current ammunition (for ranged weapons)" id="characterWeapon__ammunition__{characterWeapon_id}" value="{characterWeapon__ammunition}"></td>
               <td><input title="Weight" id="characterWeapon__weight__{characterWeapon_id}" value="{characterWeapon__weight}"></td>
               <td><input title="Size ([S]mall, [M]edium, [L]arge, [H]oly shit)" id="characterWeapon__size__{characterWeapon_id}" value="{characterWeapon__size}"></td>
               <td><input title="Damage type (slashing bludgeoning, etc)" id="characterWeapon__weapon_type__{characterWeapon_id}" value="{characterWeapon__weapon_type}"></td>
             </tr>
-          </tbody></table></div>
           <!-- END characterWeaponSlot -->
+          </tbody></table></div>
           
+          <table id="characterArmor" class="armor" cellspacing="0">
+		  <tbody>
           <!-- BEGIN characterArmorSlot -->
-          <table class="armor" cellspacing="0">
-            <tbody><tr class="header">
-              <td class="type wide">Armor/Protective Item</td>
+            <tr class="slot header {addClassName}">
+              <td class="type wide" title="Armor ID #{characterArmor_id}">Armor/Protective Item</td>
               <td class="small">Type</td>
               <td class="small">AC Bonus</td>
               <td class="small">Check Pen</td>
               <td class="small">Max Dex</td>
             </tr>
-            <tr>
-              <td><input class="left" title="Armor (or protective item)'s name" id="characterArmor__armor_name__{characterArmor_id}" value="{characterArmor__armor_name}"></td>
+            <tr class="slot {addClassName}">
+              <td><input class="left nameField {addClassName}" title="Armor (or protective item)'s name" id="characterArmor__armor_name__{characterArmor_id}" value="{characterArmor__armor_name}"></td>
               <td><input title="Type of armor (light, medium, heavy)" id="characterArmor__armor_type__{characterArmor_id}" value="{characterArmor__armor_type}"></td>
               <td><input title="AC Bonus" id="characterArmor__ac_bonus__{characterArmor_id}" value="{characterArmor__ac_bonus}"></td>
               <td><input title="Armor check penalty" id="characterArmor__check_penalty__{characterArmor_id}" value="{characterArmor__check_penalty}"></td>
               <td><input title="Maximum dexterity bonus" id="characterArmor__max_dex__{characterArmor_id}" value="{characterArmor__max_dex}"></td>
             </tr>
-            <tr class="header">
+            <tr class="slot header {addClassName}">
               <td colspan="2">Special Properties</td>
               <td>Weight</td>
               <td>Spell Fail</td>
               <td>Speed</td>
             </tr>
-            <tr>
+            <tr class="slot {addClassName}">
               <td colspan="2"><input class="left" title="Special properties" id="characterArmor__special__{characterArmor_id}" value="{characterArmor__special}"></td>
               <td><input title="Weight of armor (or item)" id="characterArmor__weight__{characterArmor_id}" value="{characterArmor__weight}"></td>
               <td><input title="Arcane spell failure %" id="characterArmor__spell_fail__{characterArmor_id}" value="{characterArmor__spell_fail}"></td>
               <td><input title="Maximum speed while wearing this armor" id="characterArmor__max_speed__{characterArmor_id}" value="{characterArmor__max_speed}"></td>
             </tr>
-          </tbody></table>
           <!-- END characterArmorSlot -->
+          </tbody></table>
 
 
           <table id="skillsandgear">
@@ -479,8 +482,8 @@ body {
                     </td><td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
                   </tr>
                   <!-- BEGIN skillsSlot -->
-		          <tr class="skillslot slot">
-                    <td class="name"><input class="text" title="Name of skill (#{skills_id})" id="skills__skill_name__{skills_id}" value="{skills__skill_name}" type="text"></td>
+		          <tr class="skillslot slot {addClassName}">
+                    <td class="name"><input class="text nameField" title="Name of skill (#{skills_id})" id="skills__skill_name__{skills_id}" value="{skills__skill_name}" type="text"></td>
                     <td class="unit">{abilityDropDown}</td>
                     <td class="char"><input class="chk" {skills__is_class_skill_checked} id="skills__is_class_skill__{skills_id}" type="checkbox" title="Checkmark indicates it is a CLASS SKILL"></td>
                     <td class="unit"><input class="text skills__skill_mod__{skills_id}" title="Total skill modifier" value="{skills__skill_mod}" type="text" disabled="disabled"></td>
@@ -495,18 +498,6 @@ body {
                   <!-- BEGIN skills__selectAbility --><select id="skills__ability_id__%%skill_id%%" %%skills__selectAbility__extra%%>
                   %%optionList%%
                   </select><!-- END skills__selectAbility -->
-                  <tr class="footer skillslot">
-                  	<td class="name"><input class="newRecord text nameField" title="Name of NEW skill" id="skills__skill_name__new" value="" type="text"></td>
-					<td class="char">{newSkill__abilityDropDown}</td>
-					<td class="char"><input type="checkbox" class="chk newRecord" id="skills_is_class_skill__new" title="Checkmark indicates it is a CLASS SKILL"></td>
-                    <td class="unit"><input class="newRecord text" title="Total skill modifier" id="skills__skill_mod__new" value="" type="text" disabled="disabled" readonly="readonly"></td>
-                    <td class="char">=</td>
-                    <td class="unit"><input class="newRecord text" title="Ability Modifier" id="skills__ability_mod__new" value="" type="text" disabled="disabled" readonly="readonly"></td>
-                    <td class="char">+</td>
-                    <td class="unit"><input class="newRecord text" title="Ranks" id="skills__ranks__new" value="" type="text" disabled="disabled"></td>
-                    <td class="char">+</td>
-                    <td class="unit"><input class="newRecord text" title="Miscellaneous Modifier" id="skills__misc_mod__new" value="" type="text" disabled="disabled"></td>
-                  </tr>
                   
                 </tbody></table>
 
@@ -520,16 +511,13 @@ body {
                     <td colspan="4">Feats &amp; Special Abilities</td>
                   </tr>
                   <!-- BEGIN specialAbilitySlot -->
-                  <tr class="specialAbilitySlot slot">
+                  <tr class="specialAbilitySlot slot {addClassName}">
                     <td>
-                      <input class="text" title="This is a feat (or a special ability)" id="specialAbility__special_ability_name__{specialAbility_id}" value="{specialAbility__special_ability_name}" type="text">
+                      <input class="text nameField" title="This is a feat (or a special ability)" id="specialAbility__special_ability_name__{specialAbility_id}" value="{specialAbility__special_ability_name}" type="text">
                     </td>
 
                   </tr>
                   <!-- END specialAbilitySlot -->
-                  <tr class="newRecord footer">
-					<td>Add a new record: <input class="newRecord text nameField" title="Add a new feat/special ability..." id="specialAbility__special_ability_name__new" type="text"/></td>
-                  </tr>
                 </tbody></table>
 
                 <table id="gear" cellspacing="0">
@@ -543,21 +531,17 @@ body {
                   </tr>
 
 				<!-- BEGIN gearSlot -->
-                  <tr class="slot">
-                    <td><input class="name" title="Item name/description" id="gear__gear_name__{gear_id}" value="{gear__gear_name}" type="text"></td>
-                    <td><input title="Item weight" id="gear_weight__{gear_id}" value="{gear_weight}" type="text"></td>
+                  <tr class="slot {addClassName}">
+                    <td><input class="name nameField" title="Item name/description" id="gear__gear_name__{gear_id}" value="{gear__gear_name}" type="text"></td>
+                    <td><input title="Item weight" id="gear_weight__{gear_id}" value="{gear__total_weight}" type="text"></td>
                     <td><input title="Location of item #{gear_id}" id="gear__location__{gear_id}" value="{gear__location}" type="text"></td>
                   </tr>
 				<!-- END gearSlot -->
                   <tr class="footer">
                     <td>Total Weight:</td>
-                    <td class="total"><span id="totalweight" title="Includes only items in this list.">{total_weight_carried}</span></td>
+                    <td class="total"><span id="totalweight" title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
                     <td>
                   </td></tr>
-				<tr class="newRecord footer">
-					<td colspan="2"><div>Add an item...<input class="newRecord nameField" title="Type something & press 'Go'" id="gear__gear_name__new" type="text" /></div></td>
-					<td><div class="hidden"></div></td>
-				</tr>
 		
                 </tbody></table>
 

@@ -24,6 +24,7 @@ function isDirtyInput(object) {
 	return(retval);
 }
 function markUpdatedInput(object, newVal, forceChange) {
+//console.log("markUpdatedInput(): id=("+ $(object).attr("id") +"), newVal=("+ newVal +")");
 	if(forceChange == undefined || forceChange == null) {
 		forceChange=false;
 	}
@@ -37,7 +38,9 @@ function markUpdatedInput(object, newVal, forceChange) {
 		 * helps deal with things like the "base attack bonus" field for ranged/melee, as 
 		 * they are technically repeats of the original/master value.
 		//*/
-		$("." + $(object).attr('id')).val(newVal).addClass("updatedInput");;
+		if($("." + $(object).attr('id')).length >0) {
+			$("." + $(object).attr('id')).val(newVal).addClass("updatedInput");
+		}
 	//}
 	//else {
 	//	alert("Not updating ("+ $(object).attr("id") +"), newVal=("+ newVal +"), currentVal=("+ $(object).val() +")");
@@ -116,7 +119,9 @@ function ajax_processNewRecord(tableName) {
 	}
 	var numItems = 0;
 	var numWithVals = 0;
-	$("#" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord").each(function(tIndex,tObject) {
+	console.log("ajax_processNewRecord("+ tableName +"): starting...");
+	//$("#" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord").each(function(tIndex,tObject) {
+	$("#"+ tableName +" tr.newRecord input, #"+ tableName +" tr.newRecord text, #"+ tableName +" tr.newRecord select").each(function(tIndex,tObject) {
 		numItems++;
 		if($(tObject).val().length > 0) {
 			var myVal = $(tObject).val();
@@ -135,13 +140,14 @@ function ajax_processNewRecord(tableName) {
 		ajax_doPost("member/ttorp/character_updates", postArray);
 	}
 	else {
+		console.log("Test this selector::: #" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord");
 		alert("No items to process in ("+ tableName +")");
 	}
 }
 
 function callback_showUpdatedInput(xmlObj) {
-	//TODO: limit the call below to only the affected input...
-	$("input,select").removeClass("updatedInput");
+	//TODO: limit the call below to avoid removing the "updatedInput" status from places where it was just added...
+	//$("input,select").removeClass("updatedInput");
 	var forceNameChange=null;
 	if($(xmlObj).find('id_was').text()) {
 		forceNameChange = $(xmlObj).find('id_was').text();
@@ -179,6 +185,11 @@ function callback_processNewRecord(xmlObj) {
 		console.debug("callback_processNewRecord(): newRecordId=("+ newId +"), tableName=("+ tableName +")");
 		//console.debug("callback_processNewRecord(): tableName=("+ tableName +"), newId=("+ newId +")");
 		cloneRow(tableName, newId);
+		
+		//Re-enable the "nameField" in the new record...
+		$("#"+ tableName +" .newRecord .nameField").attr("readonly",false).each(function() {
+			clearDirtyInput(this);
+		});
 		callback_showUpdatedInput(xmlObj);
 	}
 	else {
@@ -192,7 +203,11 @@ function callback_processNewRecord(xmlObj) {
 
 function processChange(object) {
 	if(isDirtyInput(object)) {
-		if($(object).hasClass("newRecord")) {
+		//remove "updated" status from any updated inputs.
+		$("input,select").removeClass("updatedInput");
+		
+		if($(object).hasClass("newRecord") || $(object).attr("id").match(/__new/)) {
+console.log("Processing as a new record ("+ $(object).attr("id") +")");
 			//only process the change if they're on a TEXT input whose ID ends in "__new"
 			if($(object).attr("id").match(/__new/)) {
 				//get the table name based on the ID.
@@ -214,6 +229,7 @@ function processChange(object) {
 			}
 		}
 		else {
+console.log("Processing as an UPDATE ("+ $(object).attr("id") +")");
 			//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
 			var id = $(object).attr('id');
 			$("#"+ id).attr('readonly', 'readonly');
@@ -260,55 +276,29 @@ function highlightField(id) {
 }
 
 function cloneRow(tableName, newId) {
-//console.debug("cloneRow("+ tableName +","+ newId +")");
 	//create a clone of an existing row...
-	var newRow = $("#"+ tableName +" tr.slot:last").clone(true);
+	var newRow = $("#"+ tableName +" tr.newRecord");
+	var copiedNewRow = $("#"+ tableName +" tr.newRecord").clone(true);
 	
 	//now change ID's of inputs for that existing record...
-	newRow.find("input,select").attr('id', function(){
-		var newRowId = $(this).attr("id");
-		var updatedId = newRowId.replace(/__[0-9]{1,}$/, "__"+ newId);
-		return(updatedId);
-	}); 
-	
-	//update values...
 	newRow.find("input,select").each(function() {
-		if($(this).attr("id") != null && $(this).attr("id") != undefined) {
-			var oldValueId = $(this).attr("id").replace(/__[0-9]{1,}$/, "__new");
-console.log("cloneRow("+ tableName +", "+ newId +"): id=("+ $(this).attr("id") +"), oldValueId=("+ oldValueId +")");
-			if(oldValueId != null && oldValueId.length > 0) {
-				//Transfer values from the new record to the cloned row...
-				var myValueToSet = "";
-				if($("#"+ oldValueId).val() != undefined && $("#"+ oldValueId).val().length) {
-					myValueToSet = $("#"+ oldValueId).val();
-console.log("cloneRow("+ tableName +", "+ newId +"): setting value into id=("+ $(this).attr("id") +"), oldValueId=("+ oldValueId +"), val=("+ $("#"+ oldValueId).val() +")");
-				}
-				else {
-console.log("cloneRow("+ tableName +", "+ newId +"): setting value into id=("+ $(this).attr("id") +"), oldValueId=("+ oldValueId +"), val=("+ $("#"+ oldValueId).val() +") -- UNDEFINED!!!");
-				}
-				$(this).val(myValueToSet);
-				markProcessingInput($(this));
-				
-				//now clear values from the new row.
-				$("#"+ oldValueId).val("");
-				clearDirtyInput($("#"+ oldValueId));
-				
-				//remove the "disabled" status from inputs that are NOT marked readonly.
-				if(!$("#"+ oldValueId).attr("readonly")) {
-					$("#"+ oldValueId).attr("disabled",false);
-				}
-			}
-		}
+		//update the ID properly.
+		var currentId = $(this).attr("id");
+		var updatedId = currentId.replace(/__new$/, "__"+ newId);
+		$(this).attr("id", updatedId);
+		//console.log("cloneRow("+ tableName +", "+ newId +"): changed currentId ("+ currentId +") to updatedId ("+ updatedId +")");
+		
+		//show that it has been updated...
+		markUpdatedInput(this);
+		
+		//console.log("cloneRow("+ tableName +", "+ newId +"): val=("+ $(this).val() +")");
 	});
 	
-	//Remove the "newRecord" and "footer" classes so things work properly afterward.
-	newRow.find("*").each(function() {
-		$(this).removeClass("newRecord");
-		clearDirtyInput(this);
-	});
+	//remove the "newRecord" class from everything BEFORE appending the copied record.
+	$("#"+ tableName +" .newRecord").removeClass("newRecord").removeClass("footer");
 	
 	//append it to the bottom of the table.
-	$("#"+ tableName).append(newRow);
+	$("#"+ tableName).append(copiedNewRow);
 	
 	//TODO: move the "footer" row to the bottom...
 	$("#"+ tableName).append($("#"+ tableName +" tr.footer"));
@@ -347,4 +337,11 @@ $(document).ready(function() {
 	$("input[class*='hl--']").mouseout(function(){
 		doHighlighting(this);
 	});
+	
+	//Disable non-name inputs for new record rows...
+	$("#characterWeapon tr.newRecord input").not(".nameField").attr("readonly",true);
+	$("#characterArmor tr.newRecord input").not(".nameField").attr("readonly",true);
+	$("#skills tr.newRecord input").not(".nameField").attr("readonly",true);
+	$("#specialAbility tr.newRecord input").not(".nameField").attr("readonly",true);
+	$("#gear tr.newRecord input").not(".nameField").attr("readonly",true);
 });
