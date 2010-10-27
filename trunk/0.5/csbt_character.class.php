@@ -393,11 +393,12 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$this->abilityObj->get_character_abilities();
 				
 				if(is_array($affectedSkills) && count($affectedSkills) > 0) {
-					foreach($affectedSkills as $id=>$skillInfo) {
-						$this->skillsObj->handle_update('ability_mod', $id, $this->abilityObj->get_ability_modifier($abilityName));
-					}
-					foreach($this->skillsObj->updatesByKey as $k=>$v) {
-						$this->changesByKey[$k] = $v;
+					foreach($affectedSkills as $skillId=>$skillData) {
+						foreach($skillData as $n=>$v) {
+							//create_sheet_id($prefix=null, $name, $id=null)
+							$k = $this->skillsObj->create_sheet_id(csbt_skill::sheetIdPrefix, $n, $skillId);
+							$this->changesByKey[$k] = $v;
+						}
 					}
 				}
 
@@ -417,8 +418,9 @@ class csbt_character extends csbt_battleTrackAbstract {
 				}
 				
 				//now get updated melee/ranged stuff.
-				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
-				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
+
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
 				break;
 			
 			case 'characterArmor':

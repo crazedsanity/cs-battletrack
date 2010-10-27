@@ -160,9 +160,9 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_sheet_data() {
+	public function get_sheet_data($byAbilityName=null) {
 		try {
-			$data = $this->get_character_skills();
+			$data = $this->get_character_skills($byAbilityName);
 			$retval = array();
 			
 			$makeKeysFrom = array(
@@ -296,7 +296,6 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 		try {
 			$oldSkillVals = $this->get_skill_by_id($recordId);
 			switch($updateBitName) {
-				case 'ability_mod':
 				case 'skill_name':
 				case 'ranks':
 				case 'misc_mod':

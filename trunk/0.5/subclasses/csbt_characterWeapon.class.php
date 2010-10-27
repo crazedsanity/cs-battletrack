@@ -95,17 +95,20 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	public function create_weapon($name, array $miscData=null) {
 		if(is_array($miscData) && count($miscData)) {
 			$sqlArr = $miscData;
-			$sqlArr['weapon_name'] = $name;
-			$sqlArr['character_id'] = $this->characterId;
-			try {
-				$newId = $this->tableHandlerObj->create_record($sqlArr);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: error while creating weapon record, DETAILS::: ". $e->getMessage());
+		}
+		$sqlArr['weapon_name'] = $name;
+		$sqlArr['character_id'] = $this->characterId;
+		try {
+			$newId = $this->tableHandlerObj->create_record($sqlArr);
+			
+			//now get all the data created, so it can be added to updatesByKey
+			$newRecord = $this->get_weapon_by_id($newId);
+			foreach($newRecord as $field=>$val) {
+				$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $field, $newId)] = $val;
 			}
 		}
-		else {
-			throw new exception(__METHOD__ .":: missing data");
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: error while creating weapon record, DETAILS::: ". $e->getMessage());
 		}
 		return($newId);
 	}//end create_weapon()

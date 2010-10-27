@@ -150,6 +150,20 @@ class csbt_characterSheet extends csbt_tableHandler {
 					}
 				}
 				if($rowsParsed > 0) {
+					if(preg_match('/slot$/i', $blockRowName)) {
+						//ends in "[sS]lot", add another row.
+						$subArray = array();
+						$subArray[$name .'_id'] = 'new';
+						$subArray['addClassName'] = 'newRecord footer';
+						$subArray['addClassName_multi'] = " multiRowCopy";
+						
+						if($name == 'skills') {
+							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, 'new');
+						}
+						$parsedRows .= $page->gfObj->mini_parser($myBlockRow, $subArray, '{', '}');
+						$rowsParsed++;
+					}
+					
 					$page->add_template_var($blockRowName, $parsedRows);
 				}
 			}
@@ -204,19 +218,27 @@ class csbt_characterSheet extends csbt_tableHandler {
 					}
 					$abilityName = $this->characterObj->abilityObj->get_ability_name($abilityId);
 					$retval['newRecordId'] = $this->characterObj->skillsObj->create_skill($name, $abilityName, $myExtraData);
-					
-					//TODO: add changesByKey (so data in the new record can be updated to be correct).
-					$this->characterObj->process_updates_by_key();
 				}
 				break;
 
 			case 'specialAbility':
 				$retval['newRecordId'] = $this->characterObj->specialAbilityObj->create_special_ability($name, $extraData);
 				break;
+			
+			case 'characterWeapon':
+				$retval['newRecordId'] = $this->characterObj->weaponObj->create_weapon($name, $extraData);
+				break;
+			
+			case 'characterArmor':
+				$retval['newRecordId'] = $this->characterObj->armorObj->create_armor($name, $extraData);
+				break;
 
 			default:
 				throw new exception(__METHOD__ .": invalid type (". $type .")");
 		}
+		//update changes list so it can get to the sheet.
+		$this->characterObj->process_updates_by_key();
+		
 		$retval['tableName'] = $type;
 		$retval['hnr__type'] = $type;
 		$retval['hnr__name'] = $name;

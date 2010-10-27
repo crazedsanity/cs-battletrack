@@ -56,6 +56,8 @@ CREATE TABLE csbt_character_table (
 	ranged_temp integer NOT NULL DEFAULT 0,
 	skills_max integer NOT NULL DEFAULT 10,
 	speed integer NOT NULL DEFAULT 30,
+	xp_current integer NOT NULL DEFAULT 0,
+	xp_next integer NOT NULL DEFAULT 0,
 	notes text
 );
 
@@ -113,15 +115,15 @@ CREATE TABLE csbt_character_weapon_table (
 	character_weapon_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	weapon_name text NOT NULL,
-	total_attack_bonus integer NOT NULL,
-	damage text NOT NULL,
-	critical text NOT NULL,
+	total_attack_bonus integer NOT NULL DEFAULT 0,
+	damage text NOT NULL DEFAULT 0,
+	critical text NOT NULL DEFAULT '20 x 2',
 	range text NOT NULL DEFAULT 'melee',
 	special text,
 	ammunition text,
 	weight text,
 	size text NOT NULL DEFAULT 'medium',
-	weapon_type text NOT NULL,
+	weapon_type text NOT NULL DEFAULT 'slashing',
 	in_use boolean NOT NULL DEFAULT true
 );
 
@@ -129,10 +131,10 @@ CREATE TABLE csbt_character_armor_table (
 	character_armor_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
 	armor_name text NOT NULL,
-	armor_type text NOT NULL,
-	ac_bonus integer NOT NULL,
+	armor_type text NOT NULL DEFAULT 'update me',
+	ac_bonus integer NOT NULL DEFAULT 0,
 	check_penalty integer NOT NULL DEFAULT 0,
-	max_dex integer NOT NULL,
+	max_dex integer NOT NULL DEFAULT 5,
 	special text,
 	weight text,
 	spell_fail integer NOT NULL DEFAULT 0,

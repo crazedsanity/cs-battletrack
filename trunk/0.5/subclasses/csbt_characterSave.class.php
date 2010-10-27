@@ -166,24 +166,26 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 			$makeKeysFrom[] = 'ability_name';
 			unset($makeKeysFrom[array_search('ability_id', $makeKeysFrom)]);
 			
-			foreach($data as $id=>$saveInfo) {
-				$total=0;
-				foreach($makeKeysFrom as $name) {
-					$saveName = $saveInfo['save_name'] .'_'. $name;
-					$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $saveName);
-					$retval[$sheetId] = $saveInfo[$name];
-					
-					if(preg_match('/_mod$/', $name)) {
-						$total += $saveInfo[$name];
+			if(is_array($data)) {
+				foreach($data as $id=>$saveInfo) {
+					$total=0;
+					foreach($makeKeysFrom as $name) {
+						$saveName = $saveInfo['save_name'] .'_'. $name;
+						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $saveName);
+						$retval[$sheetId] = $saveInfo[$name];
+						
+						if(preg_match('/_mod$/', $name)) {
+							$total += $saveInfo[$name];
+						}
 					}
+					
+					//add ability modifier.
+					$abilityMod = $this->abilityObj->get_ability_modifier($saveInfo['ability_name']);
+					$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_ability_mod')] = $abilityMod;
+					$total += $abilityMod;
+					
+					$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_total')] = $total;
 				}
-				
-				//add ability modifier.
-				$abilityMod = $this->abilityObj->get_ability_modifier($saveInfo['ability_name']);
-				$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_ability_mod')] = $abilityMod;
-				$total += $abilityMod;
-				
-				$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_total')] = $total;
 			}
 		}
 		catch(Exception $e) {

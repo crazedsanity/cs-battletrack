@@ -98,19 +98,23 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function create_armor($name, array $miscData=null) {
-		if(is_array($miscData) && count($miscData)) {
-			$sqlArr = $miscData;
-			$sqlArr['armor_name'] = $name;
-			$sqlArr['character_id'] = $this->characterId;
-			try {
-				$newId = $this->tableHandlerObj->create_record($sqlArr);
-			}
-			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: error while creating armor record, DETAILS::: ". $e->getMessage());
+		if(is_null($miscData)) {
+			$miscData = array();
+		}
+		$sqlArr = $miscData;
+		$sqlArr['armor_name'] = $name;
+		$sqlArr['character_id'] = $this->characterId;
+		try {
+			$newId = $this->tableHandlerObj->create_record($sqlArr);
+			
+			//get the record & put it into updatesByKey...
+			$newRecord = $this->get_armor_by_id($newId);
+			foreach($newRecord as $field=>$val) {
+				$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $field, $newId)] = $val;
 			}
 		}
-		else {
-			throw new exception(__METHOD__ .":: missing data");
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .":: error while creating armor record, DETAILS::: ". $e->getMessage());
 		}
 		return($newId);
 	}//end create_armor()
@@ -201,6 +205,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function get_ac_flatfooted() {
+		//touch is its (full AC) - (any armor or natural armor bonus), and flatfooted is (full AC) - (any dex bonus).
 		
 	}//end get_ac_flatfooted()
 	//-------------------------------------------------------------------------
