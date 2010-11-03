@@ -118,6 +118,12 @@ class csbt_characterSheet extends csbt_tableHandler {
 		$data = $this->get_sheet_data();
 		
 		$blockRows = $page->rip_all_block_rows('content');
+		$parsedSlots = array();
+		foreach($page->templateRows as $n=>$garbage) {
+			if(preg_match('/slot/i', $n)) {
+				$parsedSlots[$n] = 0;
+			}
+		}
 		
 		$abilityList = $this->characterObj->abilityObj->get_ability_list();
 		$abilityList = $abilityList['byId'];
@@ -144,6 +150,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 						
 						$parsedRows .= $page->gfObj->mini_parser($myBlockRow, $subArray, '{', '}');
 						$rowsParsed++;
+						$parsedSlots[$blockRowName] = $rowsParsed;
 					}
 					else {
 						$page->add_template_var($id, $subArray);
@@ -154,8 +161,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 						//ends in "[sS]lot", add another row.
 						$subArray = array();
 						$subArray[$name .'_id'] = 'new';
-						$subArray['addClassName'] = 'newRecord footer';
-						$subArray['addClassName_multi'] = " multiRowCopy";
+						$subArray['addClassName'] = 'newRecord';
 						
 						if($name == 'skills') {
 							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, 'new');
@@ -164,6 +170,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 						$rowsParsed++;
 					}
 					
+					//$parsedRows .= '{'. $blockRowName .'__newRecordRow}';
 					$page->add_template_var($blockRowName, $parsedRows);
 				}
 			}
@@ -171,9 +178,24 @@ class csbt_characterSheet extends csbt_tableHandler {
 				$page->add_template_var($name, $val);
 			}
 		}
+		foreach($parsedSlots as $name=>$numRecords) {
+			if($numRecords== 0) {
+				//get the "id" based on the name of the block row.
+				$idPrefix = preg_replace('/slot$/i','', $name);
+				
+				$subArray = array(
+					$idPrefix .'_id'	=> "new",
+					'addClassName'		=> "newRecord"
+				);
+				if($name == 'skills') {
+					$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, 'new');
+				}
+				$page->add_template_var($name, $page->gfObj->mini_parser($page->templateRows[$name], $subArray, '{', '}'));
+			}
+		}
 		
 		//build an ability list for adding new skills.
-		$page->add_template_var('newSkill__abilityDropDown', $this->create_ability_select($page, $abilityList));
+		#$page->add_template_var('newSkill__abilityDropDown', $this->create_ability_select($page, $abilityList));
 		
 		
 	}//end build_sheet()
@@ -213,7 +235,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 					unset($extraData['skills__ability_id']);
 					$myExtraData = array();
 					foreach($extraData as $k=>$v) {
-						$k = preg_replace('/^'. $type .'_/', '', $k);
+						$k = preg_replace('/^'. $type .'__/', '', $k);
 						$myExtraData[$k] = $v;
 					}
 					$abilityName = $this->characterObj->abilityObj->get_ability_name($abilityId);
@@ -274,13 +296,13 @@ class csbt_characterSheet extends csbt_tableHandler {
 		}
 		$optionListRepArr = array(
 			'skill_id'						=> $skillId,
-			'optionList'					=> $abilityOptionList,
-			'skills__selectAbility__extra'	=> 'class="newRecord"'
+			'optionList'					=> $abilityOptionList
 		);
+		
 		if(is_numeric($skillId)) {
-			$optionListRepArr['skills__selectAbility__extra'] = 'disabled="disabled"';
 		}
 		else {
+			$optionListRepArr['skills__selectAbility__extra'] = 'class="newRecord"';
 			$optionListRepArr['skillNum'] = 'new';
 			$optionListRepArr['skill_id'] = 'new';
 		}

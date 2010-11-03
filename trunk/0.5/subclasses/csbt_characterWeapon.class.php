@@ -118,7 +118,12 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function update_weapon($weaponId, array $updates) {
-		return($this->tableHandlerObj->update_record($weaponId, $updates));
+		$retval = $this->tableHandlerObj->update_record($weaponId, $updates);
+		$data = $this->get_weapon_by_id($weaponId);
+		foreach($data as $f=>$v) {
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $f, $weaponId)] = $v;
+		}
+		return($retval);
 	}//end update_weapon()
 	//-------------------------------------------------------------------------
 	

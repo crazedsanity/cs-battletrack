@@ -285,6 +285,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 				
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac')] = $this->get_total_ac();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
+				$retval[$this->create_sheet_id('generated', 'ac_touch')] = $this->get_total_ac_touch();
+				$retval[$this->create_sheet_id('generated', 'ac_flatfooted')] = $this->get_total_ac_flatfooted();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
@@ -374,8 +376,18 @@ class csbt_character extends csbt_battleTrackAbstract {
 				if(!strlen($newValue)) {
 					$newValue = NULL;
 				}
+				$showUpdatedValue = $newValue;
+				if($sheetIdBit == 'xp_change') {
+					//add this to xp_current.
+					$info = $this->get_character_data();
+					$oldVal = $info['xp_current'];
+					$sheetIdBit = 'xp_current';
+					$newValue = ($oldVal + $newValue);
+					$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'xp_current')] = $newValue;
+					$showUpdatedValue = "";
+				}
 				$retval = $this->update_main_character_data(array($sheetIdBit=>$newValue));
-				$this->changesByKey[$sheetId] = $newValue;
+				$this->changesByKey[$sheetId] = $showUpdatedValue;
 				$this->handle_automatic_updates($sheetIdBit, $newValue);
 				break;
 			
@@ -472,6 +484,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 		switch($updatedColumn) {
 			case 'base_attack_bonus':
 				//TODO: consider updating weapon attack bonus (need to know old value, too)
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
 				break;
 				
 				
@@ -484,7 +498,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 				break;
 			
 			case 'initiative_misc':
-				//TODO: consider updating initiative_max?
+				//show other updates...
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
 				break;
 		}
 		return($retval);
@@ -494,18 +509,27 @@ class csbt_character extends csbt_battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_total_ac_bonus() {
+	public function get_total_ac_bonus($type=null) {
+		//touch is its (full AC) - (any armor or natural armor bonus), and flatfooted is (full AC) - (any dex bonus).
 		try {
-			$totalAc = $this->armorObj->get_ac_bonus();
+			$totalAc = 0;
 			$characterInfo = $this->get_main_character_data();
+
+			if(is_null($type) || preg_match('/^flat/i', $type)) {
+				//full=yes; touch=no; flat=yes;
+				$totalAc = $this->armorObj->get_ac_bonus();
+			}
 			
 			if(is_numeric($characterInfo['ac_size'])) {
+				//full=yes; touch=yes; flat=yes;
 				$totalAc += $characterInfo['ac_size'];
 			}
 			if(is_numeric($characterInfo['ac_misc'])) {
+				//full=yes; touch=yes; flat=yes
 				$totalAc += $characterInfo['ac_misc'];
 			}
-			if(is_numeric($characterInfo['ac_natural'])) {
+			if(is_numeric($characterInfo['ac_natural']) && preg_match('/^flat/i', $type)) {
+				//full=yes; touch=no; flat=yes
 				$totalAc += $characterInfo['ac_natural'];
 			}
 		}
@@ -519,10 +543,30 @@ class csbt_character extends csbt_battleTrackAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_total_ac() {
-		$retval = (10 + $this->get_total_ac_bonus() + $this->abilityObj->get_ability_modifier('dex'));
+	public function get_total_ac($type=null) {
+		$retval = (10 + $this->get_total_ac_bonus($type) + $this->abilityObj->get_ability_modifier('dex'));
 		return($retval);
 	}//end get_total_ac()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_total_ac_flatfooted() {
+		//flatfooted is (full AC) - (any dex bonus)
+		$retval = (10 + $this->get_total_ac_bonus('flat'));
+		return($retval);
+	}//end get_total_ac_flatfooted()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_total_ac_touch() {
+		//touch is its (full AC) - (any armor or natural armor bonus)
+		$retval = $this->get_total_ac('touch');
+		return($retval);
+	}//end get_total_ac_touch()
 	//-------------------------------------------------------------------------
 	
 	

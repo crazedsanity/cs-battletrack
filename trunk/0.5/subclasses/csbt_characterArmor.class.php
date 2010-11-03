@@ -124,7 +124,13 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function update_armor($armorId, array $updates) {
-		return($this->tableHandlerObj->update_record($armorId, $updates));
+		#return($this->tableHandlerObj->update_record($armorId, $updates));
+		$retval = $this->tableHandlerObj->update_record($armorId, $updates);
+		$data = $this->get_armor_by_id($armorId);
+		foreach($data as $f=>$v) {
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $f, $armorId)] = $v;
+		}
+		return($retval);
 	}//end update_armor()
 	//-------------------------------------------------------------------------
 	

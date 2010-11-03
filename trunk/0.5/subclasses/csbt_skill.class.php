@@ -78,7 +78,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				}
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage());
+				throw new exception(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\n". $this->gfObj->debug_print($fields,0));
 			}
 		}
 		else {
@@ -96,6 +96,10 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 		if(is_numeric($skillId) && $skillId > 0 && is_array($updates) && count($updates) > 0) {
 			try {
 				$retval = $this->tableHandlerObj->update_record($skillId, $updates, true);
+				$data = $this->get_skill_by_id($skillId);
+				foreach($data as $k=>$v) {
+					$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $k, $skillId)] = $v;
+				}
 			}
 			catch(Exception $e) {
 				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
@@ -129,6 +133,18 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	public function get_skill_by_id($skillId) {
 		$data = $this->tableHandlerObj->get_single_record(array(self::pkeyField => $skillId));
 		$data['ability_name'] = $this->abilityObj->get_ability_name($data['ability_id']);
+		$data['ability_mod'] = $this->abilityObj->get_ability_modifier($data['ability_name']);
+		$skillMod = 0;
+		try {
+			$skillMod = $this->calculate_skill_mod($data);
+		}
+		catch(Exception $e) {
+			$skillMod = 0;
+		}
+		if(!is_numeric($skillMod)) {
+			$skillMod = 0;
+		}
+		$data['skill_mod'] = $skillMod;
 		
 		return($data);
 	}//end get_skill_by_id()
@@ -300,6 +316,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				case 'ranks':
 				case 'misc_mod':
 				case 'is_class_skill':
+				case 'ability_id':
 					break;
 				
 				default:
@@ -314,7 +331,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			$retval = $this->update_skill($recordId, $updatesArr);
 			
 			//Update the updatesByKey array.
-			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod', $recordId)] = $newSkillMod;
+			#$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod', $recordId)] = $newSkillMod;
 			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
