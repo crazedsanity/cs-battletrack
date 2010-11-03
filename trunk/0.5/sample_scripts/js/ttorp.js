@@ -10,7 +10,7 @@ function clearDirtyInput(object) {
 	if($(object).hasClass('dirtyInput')) {
 		$(object).removeClass('dirtyInput');
 	}
-	if($(object).attr("readonly") == true) {
+	if($(object).attr("readonly") == true && !$(object).hasClass("derived")) {
 		$(object).attr("readonly",false);
 	}
 	clearUpdatedInput(object);
@@ -24,27 +24,27 @@ function isDirtyInput(object) {
 	return(retval);
 }
 function markUpdatedInput(object, newVal, forceChange) {
-//console.log("markUpdatedInput(): id=("+ $(object).attr("id") +"), newVal=("+ newVal +")");
 	if(forceChange == undefined || forceChange == null) {
 		forceChange=false;
 	}
 	clearDirtyInput(object);
-	//if($(object).val() != newVal || forceChange) {
+	if($(object).val() != newVal || forceChange) {
 		$(object).val(newVal);
-		//$(object).data("last_value", newVal);
+		$(object).data("last_value", newVal);
 		$(object).addClass("updatedInput");
 		
-		/* Special: update any input that has a class name that matches the given id: this 
-		 * helps deal with things like the "base attack bonus" field for ranged/melee, as 
-		 * they are technically repeats of the original/master value.
-		//*/
-		if($("." + $(object).attr('id')).length >0) {
-			$("." + $(object).attr('id')).val(newVal).addClass("updatedInput");
+		if($(object).attr('id')) {
+			var myId = $(object).attr('id');
+			
+			/* Special: update any input that has a class name that matches the given id: this 
+			 * helps deal with things like the "base attack bonus" field for ranged/melee, as 
+			 * they are technically repeats of the original/master value.
+			//*/
+			if(myId != undefined && $("."+ myId).length >0) {
+				$("."+ myId).val(newVal).addClass("updatedInput");
+			}
 		}
-	//}
-	//else {
-	//	alert("Not updating ("+ $(object).attr("id") +"), newVal=("+ newVal +"), currentVal=("+ $(object).val() +")");
-	//}
+	}
 	if($(object).attr("id") == 'main__character_name') {
 		//Character name changed, update the page title!
 		var bits = document.title.split(" - ");
@@ -119,7 +119,6 @@ function ajax_processNewRecord(tableName) {
 	}
 	var numItems = 0;
 	var numWithVals = 0;
-	console.log("ajax_processNewRecord("+ tableName +"): starting...");
 	//$("#" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord").each(function(tIndex,tObject) {
 	$("#"+ tableName +" tr.newRecord input, #"+ tableName +" tr.newRecord text, #"+ tableName +" tr.newRecord select").each(function(tIndex,tObject) {
 		numItems++;
@@ -129,7 +128,6 @@ function ajax_processNewRecord(tableName) {
 				myVal = $(tObject).attr("checked");
 			}
 			postArray[$(tObject).attr("id")] = myVal;
-			console.debug("Adding to POST ("+ $(tObject).attr("id") +")=("+ myVal +")");
 			numWithVals++;
 			if($(tObject).hasClass('nameField')) {
 				postArray['nameField'] = $(tObject).attr('id');
@@ -140,7 +138,6 @@ function ajax_processNewRecord(tableName) {
 		ajax_doPost("member/ttorp/character_updates", postArray);
 	}
 	else {
-		console.log("Test this selector::: #" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord");
 		alert("No items to process in ("+ tableName +")");
 	}
 }
@@ -182,8 +179,6 @@ function callback_processNewRecord(xmlObj) {
 	if($(xmlObj).find('newRecordId').val() != null && $(xmlObj).find('tableName') != null) {
 		var newId = $(xmlObj).find('newRecordId').text();
 		var tableName = $(xmlObj).find('tableName').text();
-		console.debug("callback_processNewRecord(): newRecordId=("+ newId +"), tableName=("+ tableName +")");
-		//console.debug("callback_processNewRecord(): tableName=("+ tableName +"), newId=("+ newId +")");
 		cloneRow(tableName, newId);
 		
 		//Re-enable the "nameField" in the new record...
@@ -207,7 +202,6 @@ function processChange(object) {
 		$("input,select").removeClass("updatedInput");
 		
 		if($(object).hasClass("newRecord") || $(object).attr("id").match(/__new/)) {
-console.log("Processing as a new record ("+ $(object).attr("id") +")");
 			//only process the change if they're on a TEXT input whose ID ends in "__new"
 			if($(object).attr("id").match(/__new/)) {
 				//get the table name based on the ID.
@@ -229,7 +223,6 @@ console.log("Processing as a new record ("+ $(object).attr("id") +")");
 			}
 		}
 		else {
-console.log("Processing as an UPDATE ("+ $(object).attr("id") +")");
 			//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
 			var id = $(object).attr('id');
 			$("#"+ id).attr('readonly', 'readonly');
@@ -263,14 +256,10 @@ function doHighlighting(object, mouseEvent) {
 	}
 }
 function highlightField(id) {
-	//NOTE: readonly inputs won't show color unless it is manually set...
-	var giveColor = $("#"+ id).css("background-color");
 	if($("#"+ id).hasClass("highlight")) {
-		$("#"+ id).css("background-color", $("#"+ id).data("old_bgcolor"));
 		$("#"+ id).removeClass("highlight");
 	}
 	else {
-		$("#"+ id).css("background-color","#66FF00");
 		$("#"+ id).addClass("highlight");
 	}
 }
@@ -286,12 +275,23 @@ function cloneRow(tableName, newId) {
 		var currentId = $(this).attr("id");
 		var updatedId = currentId.replace(/__new$/, "__"+ newId);
 		$(this).attr("id", updatedId);
-		//console.log("cloneRow("+ tableName +", "+ newId +"): changed currentId ("+ currentId +") to updatedId ("+ updatedId +")");
+		
+		//if there is a "title" on the input with an ID, fix it.
+		if($(this).attr("title") && $(this).attr("title").match(/ID #new/)) {
+			var myTitle = $(this).attr("title").replace(/ID #new/, "ID #"+ newId);
+			$(this).attr("title", myTitle);
+		}
 		
 		//show that it has been updated...
 		markUpdatedInput(this);
-		
-		//console.log("cloneRow("+ tableName +", "+ newId +"): val=("+ $(this).val() +")");
+	});
+	
+	//minor changes for title tags...
+	newRow.find("td").each(function() {
+		if($(this).attr("title").match(/ID #new/)) {
+			var myTitle = $(this).attr("title").replace(/ID #new/, "ID #"+ newId);
+			$(this).attr("title", myTitle);
+		}
 	});
 	
 	//remove the "newRecord" class from everything BEFORE appending the copied record.
@@ -312,20 +312,24 @@ $(document).ready(function() {
 		  $(this).data('old_bgcolor', $(this).css("background-color"));
 	});
 	
-	$("input,select,textarea").keyup(function() {
+	$("input,textarea").not(".derived").keyup(function() {
 		if ($(this).val() != $(this).data('last_value')) {
 			markDirtyInput(this);
 		}
 	});
-	$("input,select,textarea").bind('paste', function() {
+	$("input,textarea").not(".derived").bind('paste', function() {
 		markDirtyInput(this);
 	});
-	$("input,select,textarea").blur(function() {
+	$("input,textarea").not(".derived").blur(function() {
 		if(isDirtyInput(this)) {
 			processChange(this);
 		}
 	});
 	$("input[type=checkbox]").not(".newRecord").click(function() {
+		markDirtyInput(this);
+		processChange(this);
+	});
+	$("select").not(".newRecord").change(function() {
 		markDirtyInput(this);
 		processChange(this);
 	});

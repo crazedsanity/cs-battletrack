@@ -32,10 +32,12 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 				foreach($_POST as $k=>$v) {
 					if(preg_match('/__new$/', $k)) {
 						$newKey = preg_replace('/__new$/', '', $k);
+						$v = preg_replace('/"/', "''", $v);
 						$extraData[$newKey] = $v;
 					}
 				}
 				if(!is_null($recordType) && !is_null($name)) {
+					$name = preg_replace('/"/', "''", $name);
 					$returned = $char->handle_new_record($recordType, $name, $extraData);
 				}
 				else {
@@ -49,6 +51,9 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 			default:
 				$xmlData['id_was'] = $_POST['name'];
 				$xmlData['value_was'] = $_POST['value'];
+				
+				//Change values so a doublequote (") becomes two single quotes (''), so the HTML doesn't break.
+				$_POST['value'] = preg_replace('/"/', "''", $_POST['value']);
 				$returned = $char->handle_update($_POST['name'], $_POST['value']);
 		}
 		unset($returned['error']);

@@ -965,12 +965,24 @@ border: 1px solid gray;
 .dirtyInput {
 	background-color: #33FF99;
 }
+
+
+/* NOTE::: readonly inputs should NEVER need to be marked dirty or processing (the "input[readonly]" rule handles it then) */
 .updatedInput {
 	background-color: #EDF14E;
 }
+
+input[readonly].updatedInput {
+	background-color: #EDF14E;
+}
+
+
 .processingInput {
 	background-color: #F72424;
 }
+
+
+
 input[readonly] {
 	background:#DDDDDD;
 	color:#999999;
@@ -981,6 +993,9 @@ input[readonly] {
 	white-space: nowrap;
 }
 .highlight {
+	background-color: #66FF00;
+}
+input[readonly].highlight {
 	background-color: #66FF00;
 }
 
