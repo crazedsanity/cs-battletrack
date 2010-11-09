@@ -201,7 +201,9 @@ class csbt_characterSheet extends csbt_tableHandler {
 		//build an ability list for adding new skills.
 		#$page->add_template_var('newSkill__abilityDropDown', $this->create_ability_select($page, $abilityList));
 		
-		
+		//add some version info & stuff.
+		$page->add_template_var('CSBT_project_name', $this->characterObj->get_project());
+		$page->add_template_var('CSBT_version', $this->characterObj->get_version());
 	}//end build_sheet()
 	//-------------------------------------------------------------------------
 	

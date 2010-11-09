@@ -50,6 +50,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		}
 		
 		parent::__construct(true);
+		$this->set_version_file_location(dirname(__FILE__) . '/../VERSION');
 		
 		if(!defined('csbt__UPGRADE') && !defined('SIMPLE_TEST')) {
 			$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
