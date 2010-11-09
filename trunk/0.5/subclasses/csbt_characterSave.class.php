@@ -170,21 +170,21 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 				foreach($data as $id=>$saveInfo) {
 					$total=0;
 					foreach($makeKeysFrom as $name) {
-						$saveName = $saveInfo['save_name'] .'_'. $name;
-						$sheetId = $this->create_sheet_id(self::sheetIdPrefix, $saveName);
-						$retval[$sheetId] = $saveInfo[$name];
-						
-						if(preg_match('/_mod$/', $name)) {
-							$total += $saveInfo[$name];
-						}
+						$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, $name)] = $saveInfo[$name];
 					}
 					
 					//add ability modifier.
 					$abilityMod = $this->abilityObj->get_ability_modifier($saveInfo['ability_name']);
-					$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_ability_mod')] = $abilityMod;
-					$total += $abilityMod;
+					$saveInfo['ability_mod'] = $abilityMod;
+					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'ability_mod')] = $abilityMod;
 					
-					$retval[$this->create_sheet_id(self::sheetIdPrefix, $saveInfo['save_name'] .'_total')] = $total;
+					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'total')] = $this->calculate_save_mod($saveInfo);
+					if($saveInfo['save_name'] == 'fort') {
+						$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'display_name')] = 'FORTITUDE';
+					}
+					else {
+						$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'display_name')] = strtoupper($saveInfo['save_name']);
+					}
 				}
 			}
 		}
@@ -200,7 +200,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function calculate_save_mod(array $saveData) {
-		$requiredIndexes = array('ability_mod', 'ranks', 'misc_mod');
+		$requiredIndexes = array('ability_mod', 'base_mod', 'misc_mod', 'magic_mod', 'temp_mod');
 		$saveMod = 0;
 		foreach($requiredIndexes as $indexName) {
 			if(isset($saveData[$indexName])) {
@@ -222,28 +222,33 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 		try {
 			$oldSkillVals = $this->get_save_by_id($recordId);
 			switch($updateBitName) {
-				case 'ability_mod':
-				case 'save_name':
-				case 'ranks':
+				case 'base_mod':
+				case 'magic_mod':
 				case 'misc_mod':
-				case 'is_class_save':
+				case 'temp_mod':
 					break;
 				
 				default:
 					throw new exception(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
 			}
-			
-			//now perform the update.
-			$oldSkillVals[$updateBitName] = $newValue;
 			$updatesArr = array(
 				$updateBitName	=> $newValue,
-				'save_Mod'		=> $this->calculate_save_mod($oldSkillVals)
 			);
-			$this->update_save($recordId, $updatesArr);
+			$retval = $this->update_save($recordId, $updatesArr);
+			
+			//now show what all was changed...
+			$data = $this->get_save_by_id($recordId);
+			foreach($data as $k=>$v) {
+				$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $k, $recordId)] = $v;
+			}
+			$data['ability_mod'] = $this->abilityObj->get_ability_modifier($data['ability_name']);
+			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'total', $recordId)] = $this->calculate_save_mod($data);
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
+		
+		return($retval);
 		
 	}//end handle_update()
 	//-------------------------------------------------------------------------

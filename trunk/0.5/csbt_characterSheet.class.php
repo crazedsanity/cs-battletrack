@@ -132,6 +132,10 @@ class csbt_characterSheet extends csbt_tableHandler {
 			if(is_array($val)) {
 				//there should be a template row named after the "$name"...
 				$blockRowName = $name .'Slot';
+				if($name == 'saves') {
+					//changed name of the saves row so it doesn't get an extra row automatically...
+					$blockRowName = 'characterSaveRow';
+				}
 				if(!isset($page->templateRows[$blockRowName])) {
 					throw new exception(__METHOD__ .": failed to parse data for (". $name ."), missing block row '". $blockRowName ."'");;
 				}

@@ -303,7 +303,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			
 			$savesData = $this->savesObj->get_sheet_data();
 			if(is_array($savesData) && count($savesData)) {
-				$retval = array_merge($retval, $savesData);
+				$retval[$this->savesObj->_sheetIdPrefix] = $savesData;
 			}
 			else {
 				throw new exception(__METHOD__ .": no saves data");
@@ -388,7 +388,6 @@ class csbt_character extends csbt_battleTrackAbstract {
 				}
 				$retval = $this->update_main_character_data(array($sheetIdBit=>$newValue));
 				$this->changesByKey[$sheetId] = $showUpdatedValue;
-				$this->handle_automatic_updates($sheetIdBit, $newValue);
 				break;
 			
 			
@@ -467,6 +466,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			default:
 				throw new exception(__METHOD__ .":: invalid update type (". $updateType .") for sheetId (". $sheetId ."), no class to handle it");
 		}
+		$this->handle_automatic_updates($sheetIdBit, $newValue);
 		
 		$resultString = $this->gfObj->interpret_bool($retval, array('FAILURE', 'SUCCESS'));
 		$this->do_log(__METHOD__ .": updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), recordId=(". $recordId ."), newValue=(". $newValue ."), RESULT::: (". $resultString .")", 'update');
@@ -501,6 +501,15 @@ class csbt_character extends csbt_battleTrackAbstract {
 				//show other updates...
 				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'initiative_bonus')] = $this->get_initiative_bonus();
 				break;
+			case 'ac_natural':
+			case 'ac_size':
+			case 'ac_misc':
+				//update touch, flat-footed, and total AC values.
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac')] = $this->get_total_ac();
+				$this->changesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
+				$this->changesByKey[$this->create_sheet_id('generated', 'ac_touch')] = $this->get_total_ac_touch();
+				$this->changesByKey[$this->create_sheet_id('generated', 'ac_flatfooted')] = $this->get_total_ac_flatfooted();
+				break;
 		}
 		return($retval);
 	}//end handle_automatic_updates()
@@ -528,7 +537,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				//full=yes; touch=yes; flat=yes
 				$totalAc += $characterInfo['ac_misc'];
 			}
-			if(is_numeric($characterInfo['ac_natural']) && preg_match('/^flat/i', $type)) {
+			if(is_numeric($characterInfo['ac_natural']) || preg_match('/^flat/i', $type)) {
 				//full=yes; touch=no; flat=yes
 				$totalAc += $characterInfo['ac_natural'];
 			}
