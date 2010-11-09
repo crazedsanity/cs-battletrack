@@ -198,36 +198,48 @@ function callback_processNewRecord(xmlObj) {
 
 function processChange(object) {
 	if(isDirtyInput(object)) {
-		//remove "updated" status from any updated inputs.
-		$("input,select").removeClass("updatedInput");
-		
-		if($(object).hasClass("newRecord") || $(object).attr("id").match(/__new/)) {
-			//only process the change if they're on a TEXT input whose ID ends in "__new"
-			if($(object).attr("id").match(/__new/)) {
-				//get the table name based on the ID.
-				var bits = $(object).attr("id").split("__");
-				var tableName = bits[0];
-				var inputName = tableName +"__new";
-				
-				//this is a NEW RECORD; there's record cloning and ID changing to be done.
-				//BEFORE the change, do some stuff so they know the change is pending...
-				
-				loaderId = tableName +"__loader";
-				$("#"+ loaderId).show();
-				
-				//process the actual change...
-				ajax_processNewRecord(tableName);
-				
-				//mark it as being processed.
-				markProcessingInput(object);
-			}
+		if(isNaN($(object).val()) && !$(object).hasClass('freestyle') && $(object).attr("type") != 'checkbox') {
+			//let 'em know they did a stupid.
+			//alert("ERROR: input ("+ $(object).attr('id') +") requires numeric input... ("+ isNaN($(object).val()) +")");
+			//alert("STUPID! That input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
+			$.growlUI("WRONG DATA TYPE", "That input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
+			
+			//reset the data.
+			$(object).val($(object).data('last_value'));
+			clearDirtyInput($(object));
 		}
 		else {
-			//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
-			var id = $(object).attr('id');
-			$("#"+ id).attr('readonly', 'readonly');
-			ajax_processChange(id);
-			markProcessingInput(object);
+			//remove "updated" status from any updated inputs.
+			$("input,select").removeClass("updatedInput");
+			
+			if($(object).hasClass("newRecord") || $(object).attr("id").match(/__new/)) {
+				//only process the change if they're on a TEXT input whose ID ends in "__new"
+				if($(object).attr("id").match(/__new/)) {
+					//get the table name based on the ID.
+					var bits = $(object).attr("id").split("__");
+					var tableName = bits[0];
+					var inputName = tableName +"__new";
+					
+					//this is a NEW RECORD; there's record cloning and ID changing to be done.
+					//BEFORE the change, do some stuff so they know the change is pending...
+					
+					loaderId = tableName +"__loader";
+					$("#"+ loaderId).show();
+					
+					//process the actual change...
+					ajax_processNewRecord(tableName);
+					
+					//mark it as being processed.
+					markProcessingInput(object);
+				}
+			}
+			else {
+				//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
+				var id = $(object).attr('id');
+				$("#"+ id).attr('readonly', 'readonly');
+				ajax_processChange(id);
+				markProcessingInput(object);
+			}
 		}
 	}
 }

@@ -967,7 +967,6 @@ border: 1px solid gray;
 }
 
 
-/* NOTE::: readonly inputs should NEVER need to be marked dirty or processing (the "input[readonly]" rule handles it then) */
 .updatedInput {
 	background-color: #EDF14E;
 }
@@ -978,6 +977,9 @@ input[readonly].updatedInput {
 
 
 .processingInput {
+	background-color: #F72424;
+}
+input[readonly].processingInput {
 	background-color: #F72424;
 }
 
