@@ -32,6 +32,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 		);
 		
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Ability";
 		$this->get_ability_list();
 	}//end __construct()
 	//-------------------------------------------------------------------------
@@ -51,11 +52,11 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			if(count($this->dataCache['byId']) !== count($this->dataCache['byName'])) {
 				$this->gfObj->debug_print($data,1);
 				$this->gfObj->debug_print($this->dataCache,1);
-				throw new exception(__METHOD__ .":: FATAL ERROR: couldn't get lists to line-up, so the kittens ate their mittens... ");
+				$this->_exception_handler(__METHOD__ .":: FATAL ERROR: couldn't get lists to line-up, so the kittens ate their mittens... ");
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: FATAL ERROR::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: FATAL ERROR::: ". $e->getMessage());
 		}
 		
 		return($this->dataCache);
@@ -70,7 +71,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			$retval = $this->dataCache['byId'][$id];
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid id (". $id .")");
+			$this->_exception_handler(__METHOD__ .":: invalid id (". $id .")");
 		}
 		
 		return($retval);
@@ -92,7 +93,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 		}
 		else {
 			$this->gfObj->debug_print($this->dataCache,1);
-			throw new exception(__METHOD__ .":: invalid name (". $name .")");
+			$this->_exception_handler(__METHOD__ .":: invalid name (". $name .")");
 		}
 		
 		return($retval);
@@ -111,7 +112,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			$modifier = null;
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid score (". $score .")");
+			$this->_exception_handler(__METHOD__ .":: invalid score (". $score .")");
 		}
 		return($modifier);
 	}//get_ability_modifier()

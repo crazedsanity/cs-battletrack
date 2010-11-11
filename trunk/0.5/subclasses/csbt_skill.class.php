@@ -29,7 +29,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -41,6 +41,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Skill";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -74,15 +75,15 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				//$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'skill_mod', $recordId)] = $newSkillMod;
 				}
 				catch(Exception $e) {
-					throw new exception(__METHOD__ .": failed to get data for newId (". $newId .")... ". $e->getMessage());
+					$this->_exception_handler(__METHOD__ .": failed to get data for newId (". $newId .")... ". $e->getMessage());
 				}
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\n". $this->gfObj->debug_print($fields,0));
+				$this->_exception_handler(__METHOD__ .":: failed to create character skill (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\n". $this->gfObj->debug_print($fields,0));
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .":: unable to create skill without name");
+			$this->_exception_handler(__METHOD__ .":: unable to create skill without name");
 		}
 		
 		return($newId);
@@ -102,11 +103,11 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				}
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
 			}
 		}
 		else {
-				throw new exception(__METHOD__ .":: invalid skillId (". $skillId .") or invalid/not enough fields");
+				$this->_exception_handler(__METHOD__ .":: invalid skillId (". $skillId .") or invalid/not enough fields");
 		}
 		return($retval);
 	}//end update_skill()
@@ -167,7 +168,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			$retval = $this->dbObj->run_query($sql, 'character_skill_id');
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_skills()
@@ -192,7 +193,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
-						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
+						$this->_exception_handler(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
 					}
 					
 					//add a key so the form can be checked (easier to run the form like this)
@@ -211,7 +212,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);
@@ -297,7 +298,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 				$skillMod += $skillData[$indexName];
 			}
 			else {
-				throw new exception(__METHOD__ .":: missing required index (". $indexName .")");
+				$this->_exception_handler(__METHOD__ .":: missing required index (". $indexName .")");
 			}
 		}
 		return($skillMod);
@@ -320,7 +321,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 					break;
 				
 				default:
-					throw new exception(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
+					$this->_exception_handler(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
 			}
 			
 			//now perform the update.
@@ -335,7 +336,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);	

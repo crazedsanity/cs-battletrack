@@ -28,7 +28,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -46,6 +46,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Armor";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -57,14 +58,14 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			$data = $this->tableHandlerObj->get_record_by_id($armorId);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve armor with record id (". $armorId ."), DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve armor with record id (". $armorId ."), DETAILS:::: ". $e->getMessage());
 		}
 		
 		if(isset($data[$armorId])) {
 			$retval = $data[$armorId];
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $armorId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
+			$this->_exception_handler(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $armorId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
 		}
 		return($retval);
 	}//end get_armor_by_id()
@@ -87,7 +88,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS:::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -114,7 +115,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: error while creating armor record, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: error while creating armor record, DETAILS::: ". $e->getMessage());
 		}
 		return($newId);
 	}//end create_armor()
@@ -156,7 +157,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: fatal error while retrieving armor records, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: fatal error while retrieving armor records, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);
@@ -179,7 +180,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			$retval = $this->update_armor($recordId, array($updateBitName => $newValue));
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid column name (". $updateBitName .")");
+			$this->_exception_handler(__METHOD__ .":: invalid column name (". $updateBitName .")");
 		}
 		
 		return($retval);
@@ -200,7 +201,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .": error while retrieving armor, DETAILS::: .". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .": error while retrieving armor, DETAILS::: .". $e->getMessage());
 		}
 		
 		return($totalBonus);

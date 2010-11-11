@@ -28,7 +28,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -47,6 +47,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Weapon";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -58,14 +59,14 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			$data = $this->tableHandlerObj->get_record_by_id($weaponId);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve weapon with record id (". $weaponId ."), DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve weapon with record id (". $weaponId ."), DETAILS:::: ". $e->getMessage());
 		}
 		
 		if(isset($data[$weaponId])) {
 			$retval = $data[$weaponId];
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $weaponId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
+			$this->_exception_handler(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $weaponId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
 		}
 		return($retval);
 	}//end get_weapon_by_id()
@@ -82,7 +83,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS:::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -108,7 +109,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: error while creating weapon record, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: error while creating weapon record, DETAILS::: ". $e->getMessage());
 		}
 		return($newId);
 	}//end create_weapon()
@@ -139,7 +140,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve weapons, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve weapons, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_weapon()
@@ -165,7 +166,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve character weapons, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve character weapons, DETAILS::: ". $e->getMessage());
 		}
 
 		return($retval);
@@ -188,7 +189,7 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 			$retval = $this->update_weapon($recordId, array($updateBitName=>$newValue));
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to perform update, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to perform update, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end handle_update()

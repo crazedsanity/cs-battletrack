@@ -35,7 +35,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -46,6 +46,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Special Ability";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -67,7 +68,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$newId = $this->tableHandlerObj->create_record($insertArr);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to create character special_ability (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\nDATA::: ". $this->gfObj->debug_print($insertArr,0) ."\n\nFIELDS::: ". $this->gfObj->debug_print($fields,0));
+			$this->_exception_handler(__METHOD__ .":: failed to create character special_ability (". $name ."), DETAILS:::: ". $e->getMessage() ."\n\nDATA::: ". $this->gfObj->debug_print($insertArr,0) ."\n\nFIELDS::: ". $this->gfObj->debug_print($fields,0));
 		}
 		
 		return($newId);
@@ -83,11 +84,11 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 				$retval = $this->tableHandlerObj->update_record($special_abilityId, $updates, true);
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
 			}
 		}
 		else {
-				throw new exception(__METHOD__ .":: invalid special_abilityId (". $special_abilityId .") or invalid/not enough fields");
+				$this->_exception_handler(__METHOD__ .":: invalid special_abilityId (". $special_abilityId .") or invalid/not enough fields");
 		}
 		return($retval);
 	}//end update_special_ability()
@@ -105,7 +106,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$data = $this->tableHandlerObj->get_single_record($filterArr);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -124,7 +125,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$data = $this->tableHandlerObj->get_single_record($filterArr);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve special_ability, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -140,7 +141,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$retval = $this->tableHandlerObj->get_records(array('character_id'=>$this->characterId));
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve character special_ability, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve character special_ability, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_special_abilities()
@@ -154,7 +155,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$data = $this->get_character_special_abilities();
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
 		}
 		
 		$retval = array();
@@ -168,7 +169,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
-						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
+						$this->_exception_handler(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
 					}
 				}
 			}
@@ -202,7 +203,7 @@ class csbt_characterSpecialAbility extends csbt_battleTrackAbstract	 {
 			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);

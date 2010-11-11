@@ -140,7 +140,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 			$retval = array_keys($myFields);
 		}
 		else {
-			throw new exception(__METHOD__ .":: failed to create list of columns for sheet keys, no list of fields available");
+			$this->_exception_handler(__METHOD__ .":: failed to create list of columns for sheet keys, no list of fields available");
 		}
 		return($retval);
 	}//end get_columns_for_sheet_keys()
@@ -162,6 +162,15 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		$retval = $this->logger->log_by_class($details, $type, $xAttribs);
 		return($retval);
 	}//end do_log()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function _exception_handler($message) {
+		$this->do_log($message, $type='exception');
+		throw new exception($message);
+	}//end _exception_handler()
 	//-------------------------------------------------------------------------
 }
 

@@ -29,7 +29,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -41,6 +41,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Gear";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -62,7 +63,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$newId = $this->tableHandlerObj->create_record($insertArr);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to create character gear (". $name ."), DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to create character gear (". $name ."), DETAILS:::: ". $e->getMessage());
 		}
 		
 		return($newId);
@@ -78,11 +79,11 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 				$retval = $this->tableHandlerObj->update_record($gearId, $updates, true);
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
 			}
 		}
 		else {
-				throw new exception(__METHOD__ .":: invalid gearId (". $gearId .") or invalid/not enough fields");
+				$this->_exception_handler(__METHOD__ .":: invalid gearId (". $gearId .") or invalid/not enough fields");
 		}
 		return($retval);
 	}//end update_gear()
@@ -101,7 +102,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$data = $this->calculate_gear_weight($data);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -121,7 +122,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$data = $this->calculate_gear_weight($data);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve gear, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($data);
@@ -140,7 +141,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve character gear, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve character gear, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_gear()
@@ -154,7 +155,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$data = $this->get_character_gear();
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
 		}
 		
 		$retval = array();
@@ -169,7 +170,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 						$retval[$id][$sheetKey] = $data[$id][$indexName];
 					}
 					else {
-						throw new exception(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
+						$this->_exception_handler(__METHOD__ .":: failed to create key for missing index '". $indexName ."'");
 					}
 				}
 			}
@@ -199,7 +200,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, $updateBitName, $recordId)] = $newValue;
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);
@@ -221,7 +222,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 			
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve all character gear, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve all character gear, DETAILS::: ". $e->getMessage());
 		}
 		return($totalWeight);
 	}//end get_total_weight()
@@ -241,7 +242,7 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 						$retval[$id]['total_weight'] = round(($gearInfo['quantity'] * $gearInfo['weight']),1);
 					}
 					else {
-						throw new exception(__METHOD__ .":: invalid quantity (". $gearInfo['quantity'] .") or weight (". $gearInfo['weight'] .") for item #". $id);
+						$this->_exception_handler(__METHOD__ .":: invalid quantity (". $gearInfo['quantity'] .") or weight (". $gearInfo['weight'] .") for item #". $id);
 					}
 				}
 			}
@@ -250,11 +251,11 @@ class csbt_characterGear extends csbt_battleTrackAbstract	 {
 				$retval['total_weight'] = round(($data['quantity'] * $data['weight']),1);
 			}
 			else {
-				throw new exception(__METHOD__ .":: missing data from array or invalid format, cannot calculate weight");
+				$this->_exception_handler(__METHOD__ .":: missing data from array or invalid format, cannot calculate weight");
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid data, cannot calculate weight");
+			$this->_exception_handler(__METHOD__ .":: invalid data, cannot calculate weight");
 		}
 		
 		return($retval);

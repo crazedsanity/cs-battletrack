@@ -29,7 +29,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	 */
 	public function __construct(cs_phpDB $dbObj, $characterId) {
 		if(is_null($characterId) || !is_numeric($characterId)) {
-			throw new exception(__METHOD__ .":: invalid character id (". $characterId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid character id (". $characterId .")");
 		}
 		$this->characterId = $characterId;
 		$this->fields = array(
@@ -43,6 +43,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 		);
 		//cs_phpDB $dbObj, $tableName, $seqName, $pkeyField, array $cleanStringArr
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
+		$this->logger->logCategory = "Character Save";
 	}//end __construct()
 	//-------------------------------------------------------------------------
 	
@@ -72,11 +73,11 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 				$newId = $this->tableHandlerObj->create_record($insertData);
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create record, DETAILS::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to create record, DETAILS::: ". $e->getMessage());
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .":: unable to create save without name");
+			$this->_exception_handler(__METHOD__ .":: unable to create save without name");
 		}
 		
 		return($newId);
@@ -92,11 +93,11 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 				$retval = $this->tableHandlerObj->update_record($saveId, $updates, true);
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to perform update, details::: ". $e->getMessage());
 			}
 		}
 		else {
-				throw new exception(__METHOD__ .":: invalid saveId (". $saveId .") or invalid/not enough fields");
+				$this->_exception_handler(__METHOD__ .":: invalid saveId (". $saveId .") or invalid/not enough fields");
 		}
 		return($retval);
 	}//end update_save()
@@ -149,7 +150,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 			//TODO: get ability modifier (ability_mod) and total (save_total)
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve character saves, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve character saves, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_saves()
@@ -189,7 +190,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve data, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);
@@ -207,7 +208,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 				$saveMod += $saveData[$indexName];
 			}
 			else {
-				throw new exception(__METHOD__ .":: missing required index (". $indexName .")");
+				$this->_exception_handler(__METHOD__ .":: missing required index (". $indexName .")");
 			}
 		}
 		return($saveMod);
@@ -229,7 +230,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 					break;
 				
 				default:
-					throw new exception(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
+					$this->_exception_handler(__METHOD__ .":: invalid updateBitName (". $updateBitName .")");
 			}
 			$updatesArr = array(
 				$updateBitName	=> $newValue,
@@ -245,7 +246,7 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 			$this->updatesByKey[$this->create_sheet_id(self::sheetIdPrefix, 'total', $recordId)] = $this->calculate_save_mod($data);
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to handle update, DETAILS::: ". $e->getMessage());
 		}
 		
 		return($retval);

@@ -65,6 +65,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			'ability_id'		=> 'int',
 			'ability_name'		=> 'sql'
 		);
+		$this->logger->logCategory = "Character Ability";
 		$this->baseAbilityObj = new csbt_ability($this->dbObj);
 		$this->baseAbilityObj->get_ability_list();
 	}//end __construct()
@@ -92,11 +93,11 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 				}
 			}
 			else {
-				throw new exception(__METHOD__ .":: unable to retrieve records, no data retrieved");
+				$this->_exception_handler(__METHOD__ .":: unable to retrieve records, no data retrieved");
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: unable to retrieve records, DETAILS:::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: unable to retrieve records, DETAILS:::: ". $e->getMessage());
 		}
 		return($retval);
 	}//end get_character_abilities()
@@ -129,12 +130,12 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 				//TODO: should this store an entry into $this->updatesByKey?
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to create record::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to create record::: ". $e->getMessage());
 			}
 			
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid abilityId (". $abilityId .")");
+			$this->_exception_handler(__METHOD__ .":: invalid abilityId (". $abilityId .")");
 		}
 		
 		return($recId);
@@ -160,7 +161,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			
 		}
 		else {
-			throw new exception(__METHOD__ .":: missing internal data cache");
+			$this->_exception_handler(__METHOD__ .":: missing internal data cache");
 		}
 		
 		return($retval);
@@ -223,7 +224,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid strength score (". $strScore .")");
+			$this->_exception_handler(__METHOD__ .":: invalid strength score (". $strScore .")");
 		}
 		return($retval);
 	}//end get_max_load()
@@ -272,7 +273,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		else {
 			if(!is_array($this->dataCache) || !count($this->dataCache)) {
 				if($this->lastCall == __METHOD__) {
-					throw new exception(__METHOD__ .":: failed to create cache, stopping to avoid recursion");
+					$this->_exception_handler(__METHOD__ .":: failed to create cache, stopping to avoid recursion");
 				}
 				else {
 					$this->lastCall = __METHOD__;
@@ -286,7 +287,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 					$retval = $this->baseAbilityObj->get_ability_modifier($this->dataCache['abilities'][$abilityName]['score']);
 				}
 				else {
-					throw new exception(__METHOD__ .":: cannot find cached value for (". $abilityName .")");
+					$this->_exception_handler(__METHOD__ .":: cannot find cached value for (". $abilityName .")");
 				}
 			}
 		}
@@ -327,7 +328,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			$retval[$this->create_sheet_id('generated', 'push_pull_drag')] = (int)floor($maxLoad *5);
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid strength score (". $strengthScore .")");
+			$this->_exception_handler(__METHOD__ .":: invalid strength score (". $strengthScore .")");
 		}
 		return($retval);
 	}//end get_strength_stats()
@@ -346,7 +347,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		}
 		else {
 			if($this->lastCall == __METHOD__) {
-				throw new exception(__METHOD__ .":: failed to retrieve cached score");
+				$this->_exception_handler(__METHOD__ .":: failed to retrieve cached score");
 			}
 			else {
 				$this->get_character_abilities();
@@ -379,7 +380,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 					$abilityName = $this->baseAbilityObj->get_ability_name($abilityId);
 				}
 				catch(Exception $e) {
-					throw new exception(__METHOD__ .":: unable to locate ability_id for (". $updateBits[0] ."), DETAILS::: ". $e->getMessage());
+					$this->_exception_handler(__METHOD__ .":: unable to locate ability_id for (". $updateBits[0] ."), DETAILS::: ". $e->getMessage());
 				}
 				
 				//got the ID, keep going.
@@ -395,12 +396,12 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 								$keysToUpdate = array('score', 'modifier');
 							}
 							else {
-								throw new exception("invalid new value (". $newValue .")");
+								$this->_exception_handler("invalid new value (". $newValue .")");
 							}
 						}
 						else {
 							//don't add method name, as it will get caught inside this method anyway.
-							throw new exception("unknown field (". $updateBits[1] .")");
+							$this->_exception_handler("unknown field (". $updateBits[1] .")");
 						}
 						
 						//attempt the update.
@@ -439,19 +440,19 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 						}
 					}
 					catch(Exception $e) {
-						throw new exception(__METHOD__ .":: error while attempting update, DETAILS::: ". $e->getMessage());
+						$this->_exception_handler(__METHOD__ .":: error while attempting update, DETAILS::: ". $e->getMessage());
 					}
 				}
 				else {
-					throw new exception(__METHOD__ .":: FATAL: cannot update modifiers (". $updateBits[1] .") directly");
+					$this->_exception_handler(__METHOD__ .":: FATAL: cannot update modifiers (". $updateBits[1] .") directly");
 				}
 			}
 			else {
-				throw new exception(__METHOD__ .":: wrong number of bits in (". $updateBitName ."), expecting 2 but found (". count($updateBits) .")");
+				$this->_exception_handler(__METHOD__ .":: wrong number of bits in (". $updateBitName ."), expecting 2 but found (". count($updateBits) .")");
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .":: not enough arguments to continue::: ". $this->gfObj->debug_var_dump(func_get_args(),0));
+			$this->_exception_handler(__METHOD__ .":: not enough arguments to continue::: ". $this->gfObj->debug_var_dump(func_get_args(),0));
 		}
 		
 		return($retval);
@@ -479,7 +480,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 		}
 		else {
 			$this->gfObj->debug_print($this->baseAbilityObj->dataCache,1);
-			throw new exception(__METHOD__ .":: invalid name (". $name .")");
+			$this->_exception_handler(__METHOD__ .":: invalid name (". $name .")");
 		}
 		
 		return($retval);
@@ -497,7 +498,7 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			$retval = $this->baseAbilityObj->dataCache['byId'][$id];
 		}
 		else {
-			throw new exception(__METHOD__ .":: invalid id (". $id .")");
+			$this->_exception_handler(__METHOD__ .":: invalid id (". $id .")");
 		}
 		
 		return($retval);
