@@ -75,7 +75,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 			$this->characterObj = new csbt_character($this->dbObj, $this->characterId);
 		}
 		else {
-			$this->exception_handler(__METHOD__ .": invalid characterId (". $id .")");
+			throw new exception(__METHOD__ .": invalid characterId (". $id .")");
 		}
 	}//end set_character_id()
 	//-------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 	//-------------------------------------------------------------------------
 	protected function exception_handler($message) {
 		$logId = $this->logger->log_by_class($message, 'exception in code');
-		throw new exception($message ." -- Logged (id #". $logId .")");
+		$this->characterObj->_exception_handler($message ." -- Logged (id #". $logId .")");
 	}//end exception_handler()
 	//-------------------------------------------------------------------------
 	
@@ -97,7 +97,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 			$returnThis = $this->$var;
 		}
 		else {
-			throw new exception(__METHOD__ .": unknown var (". $var .")");
+			$this->characterObj->_exception_handler(__METHOD__ .": unknown var (". $var .")");
 		}
 		return($returnThis);
 	}//end __get()
@@ -137,7 +137,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 					$blockRowName = 'characterSaveRow';
 				}
 				if(!isset($page->templateRows[$blockRowName])) {
-					throw new exception(__METHOD__ .": failed to parse data for (". $name ."), missing block row '". $blockRowName ."'");;
+					$this->characterObj->_exception_handler(__METHOD__ .": failed to parse data for (". $name ."), missing block row '". $blockRowName ."'");;
 				}
 				
 				$parsedRows = '';
@@ -262,7 +262,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 				break;
 
 			default:
-				throw new exception(__METHOD__ .": invalid type (". $type .")");
+				$this->characterObj->_exception_handler(__METHOD__ .": invalid type (". $type .")");
 		}
 		//update changes list so it can get to the sheet.
 		$this->characterObj->process_updates_by_key();

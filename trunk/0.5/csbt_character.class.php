@@ -81,10 +81,10 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $characterIdOrName, $create=false, $playerUid=null) {
 		if(!is_object($dbObj) || get_class($dbObj) != 'cs_phpDB') {
-			throw new exception(__METHOD__ .":: invalid database object (". $dbObj .")");
+			$this->_exception_handler(__METHOD__ .":: invalid database object (". $dbObj .")");
 		}
-		$this->logger->logCategory = "Character";
 		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr);
+		$this->logger->logCategory = "Character";
 		
 		if($create===false && is_numeric($characterIdOrName) && $characterIdOrName >= 0) {
 			#$this->get_character_data();
@@ -98,8 +98,9 @@ class csbt_character extends csbt_battleTrackAbstract {
 		}
 		else {
 			cs_debug_backtrace(1);
-			throw new exception(__METHOD__ .": not enough information to create new character or initialize existing... create=(". $create ."), characterIdOrName=(". $characterIdOrName ."), playerUid=(". $playerUid .")");
+			$this->_exception_handler(__METHOD__ .": not enough information to create new character or initialize existing... create=(". $create ."), characterIdOrName=(". $characterIdOrName ."), playerUid=(". $playerUid .")");
 		}
+		$this->logger->logCategory = "Character";
 		
 	}//end __construct()
 	//-------------------------------------------------------------------------
@@ -191,7 +192,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$data = $this->tableHandlerObj->get_single_record(array(self::pkeyField=>$this->characterId));
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .":: failed to retrieve main record, DETAILS::: ". $e->getMessage());
+				$this->_exception_handler(__METHOD__ .":: failed to retrieve main record, DETAILS::: ". $e->getMessage());
 			}
 		}
 		else {
@@ -235,7 +236,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	protected function exception_handler($message) {
 		$logId = $this->logger->log_by_class($message, 'exception in code');
-		throw new exception($message ." -- Logged (id #". $logId .")");
+		$this->_exception_handler($message ." -- Logged (id #". $logId .")");
 	}//end exception_handler()
 	//-------------------------------------------------------------------------
 	
@@ -293,7 +294,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'skills_max_cc')] = floor($mainCharData['skills_max'] / 2);
 			}
 			else {
-				throw new exception("no main character data");
+				$this->_exception_handler("no main character data");
 			}
 			
 			$skillsData = $this->skillsObj->get_sheet_data();
@@ -306,7 +307,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$retval[$this->savesObj->_sheetIdPrefix] = $savesData;
 			}
 			else {
-				throw new exception(__METHOD__ .": no saves data");
+				$this->_exception_handler(__METHOD__ .": no saves data");
 			}
 			
 			
@@ -320,7 +321,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$retval = array_merge($retval, $charAbilities);
 			}
 			else {
-				throw new exception(__METHOD__ .": no abilities");
+				$this->_exception_handler(__METHOD__ .": no abilities");
 			}
 			
 			$weaponData = $this->weaponObj->get_sheet_data();
@@ -339,12 +340,12 @@ class csbt_character extends csbt_battleTrackAbstract {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .":: failed to retrieve sheet data, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .":: failed to retrieve sheet data, DETAILS::: ". $e->getMessage());
 		}
 		
 		if(!is_array($retval) || !count($retval)) {
 			$this->gfObj->debug_print($this->dbObj,1);
-			throw new exception(__METHOD__ .":: invalid data or no data returned (". $retval .")");
+			$this->_exception_handler(__METHOD__ .":: invalid data or no data returned (". $retval .")");
 		}
 		
 		return($retval);
@@ -368,7 +369,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if(isset($bits[1])) {
 			$recordId = $bits[1];
 		}
-		$this->do_log(__METHOD__ .": handling update, updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), newValue=(". $newValue .")", 'debug');
+		#$this->do_log(__METHOD__ .": handling update, updateType=(". $updateType ."), sheetIdBit=(". $sheetIdBit ."), newValue=(". $newValue .")", 'debug');
 		
 		switch($updateType) {
 			case 'main':
@@ -464,7 +465,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 				break;
 			
 			default:
-				throw new exception(__METHOD__ .":: invalid update type (". $updateType .") for sheetId (". $sheetId ."), no class to handle it");
+				$this->_exception_handler(__METHOD__ .":: invalid update type (". $updateType .") for sheetId (". $sheetId ."), no class to handle it");
 		}
 		$this->handle_automatic_updates($sheetIdBit, $newValue);
 		
@@ -543,7 +544,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			}
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .": failed to retrieve data for ac bonus, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .": failed to retrieve data for ac bonus, DETAILS::: ". $e->getMessage());
 		}
 		return($totalAc);
 	}//end get_total_ac_bonus()
@@ -589,7 +590,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$initBonus += $this->abilityObj->get_ability_modifier('dex');
 		}
 		catch(Exception $e) {
-			throw new exception(__METHOD__ .": failed to retrieve data for initiative, DETAILS::: ". $e->getMessage());
+			$this->_exception_handler(__METHOD__ .": failed to retrieve data for initiative, DETAILS::: ". $e->getMessage());
 		}
 		return($initBonus);
 	}//end get_initiative_bonus()
@@ -610,7 +611,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 					$atkBonus += $data[$colName];
 				}
 				else {
-					throw new exception(__METHOD__ .": cannot calculate attack bonus for '". $type ."' without (". $colName .")");
+					$this->_exception_handler(__METHOD__ .": cannot calculate attack bonus for '". $type ."' without (". $colName .")");
 				}
 			}
 			$abilityName = 'str';
@@ -620,7 +621,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			$atkBonus += $this->abilityObj->get_ability_modifier($abilityName);
 		}
 		else {
-			throw new exception(__METHOD__ .": invalid type (". $type .")");
+			$this->_exception_handler(__METHOD__ .": invalid type (". $type .")");
 		}
 		return($atkBonus);
 	}//end get_attack_bonus()
@@ -639,11 +640,11 @@ class csbt_character extends csbt_battleTrackAbstract {
 					}
 				}
 				else {
-					throw new exception(__METHOD__ .": attempted to access updatesByKey in (". get_class($this->$object) ."), but found non-array");
+					$this->_exception_handler(__METHOD__ .": attempted to access updatesByKey in (". get_class($this->$object) ."), but found non-array");
 				}
 			}
 			else {
-				throw new exception(__METHOD__ .": attempt to access member of non-object (". $this->$object .")");
+				$this->_exception_handler(__METHOD__ .": attempt to access member of non-object (". $this->$object .")");
 			}
 		}
 	}//end process_updates_by_key()

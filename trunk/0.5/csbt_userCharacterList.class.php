@@ -58,7 +58,7 @@ class csbt_userCharacterList extends csbt_tableHandler {
 			$characterList = $this->get_records(array('uid'=>$this->uid));
 		}
 		catch(exception $e) {
-			$this->exception_handler(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());
+			throw new exception(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());
 		}
 		return($characterList);
 	}//end get_character_list()
