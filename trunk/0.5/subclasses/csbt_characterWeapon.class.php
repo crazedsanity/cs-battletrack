@@ -61,13 +61,6 @@ class csbt_characterWeapon extends csbt_battleTrackAbstract	 {
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve weapon with record id (". $weaponId ."), DETAILS:::: ". $e->getMessage());
 		}
-		
-		if(isset($data[$weaponId])) {
-			$retval = $data[$weaponId];
-		}
-		else {
-			$this->_exception_handler(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $weaponId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
-		}
 		return($retval);
 	}//end get_weapon_by_id()
 	//-------------------------------------------------------------------------

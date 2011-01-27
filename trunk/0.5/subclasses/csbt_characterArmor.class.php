@@ -60,13 +60,6 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve armor with record id (". $armorId ."), DETAILS:::: ". $e->getMessage());
 		}
-		
-		if(isset($data[$armorId])) {
-			$retval = $data[$armorId];
-		}
-		else {
-			$this->_exception_handler(__METHOD__ .":: invalid data format returned, could not find sub-record for (". $armorId ."), DATA:::: ". $this->gfObj->debug_var_dump($data,0));
-		}
 		return($retval);
 	}//end get_armor_by_id()
 	//-------------------------------------------------------------------------
