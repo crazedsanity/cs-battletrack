@@ -55,46 +55,54 @@ function mapStorage() {
 		$("#"+ pId).html("&nbsp;");
 	}//end MakeSpaceEmpty()
 	
-	/**  */
-	this.CalculateAddAlpha = function(pAddToThis) {
-	}//end CalculateAddAlpha()
-}
-
-function _AlphaCalc() {
-	
-	var _AlphaArr = new Array();
-	
-	this.BuildArray = function() {
-		if(_AlphaArr.length != 26) {
-			_AlphaArr = new Array();
-			var tStr = "abcdefghijklmnopqrstuvwxyz";
-			var tBits = tStr.split("");
-			for(i=0;i<tBits.length;i++) {
-				var x = (i+1);
-				var ttChar= tBits[i];
-				_AlphaArr[ttChar] = x;
-				//alert("i=("+ i +"), x=("+ x +"), ttChar=("+ ttChar +")");
-			}
-			//alert("done... test 'a'=("+ _AlphaArr['a'] +")");
-		}
-	}//end BuildArray()
-	
-	this.AlphaToNum = function(pStr) {
-		this.BuildArray();
-		tRetval = 0;
-		var tBits = pStr.split("");
-		
-		for(var i=0; i<tBits.length;i++) {
-			var tIndex = tBits[i];
-			tRetval += _AlphaArr[tIndex];
+	/** Get the X coordinate of the given piece (by ID) */
+	this.GetCoordX = function(pId) {
+		var tRetval = null;
+		if(_pieces[pId] != undefined) {
+			var tBits = _locations[pId].split("_");
+			var tCoords = tBits[1].split("-");
 		}
 		return(tRetval);
-	}//end AlphaToNum()
+	}//end GetCoordX()
+	
+	/** Get the Y coordinate of the given piece (by ID) */
+	this.GetCoordY = function(pId) {
+		var tRetval = null;
+		if(_pieces[pId] != undefined) {
+			var tBits = _locations[pId].split("_");
+			var tCoords = tBits[1].split("-");
+			tRetval = tCoords[1];
+		}
+		return(tRetval);
+	}//end GetCoordY()
+	
+	/**  */
+	this.MakeIdFromCoordinates = function(pX, pY) {
+		var tId = "coord_"+ pX +"-"+ pY;
+		return(tId);
+	}//end MakeIdFromCoordinates()
+	
+	/** Move left 1 space... */
+	this.MoveLeft = function(pId) {
+		var tRetval = false;
+		if(_pieces[pId]) {
+			//add one to the X coordinate...
+			var tCoord = this.GetCoordX(pId);
+			alert("Checking coordinates ("+ tNewCoord +")");
+			var tNewCoord = this.MakeIdFromCoordinates(tCoord, this.GetCoordY(pId));
+			
+			//make sure there's a space.
+			if($("#"+ tNewCoord) != null) {
+				this.MovePiece(pId, tNewCoord);
+				tRetval = tCoord;
+			}
+		}
+		return(tRetval);
+	}//end MoveLeft()
 }
 
 //create an object
 _map = new mapStorage();
-obj = new _AlphaCalc();
 
 
 $(document).ready(function(){
