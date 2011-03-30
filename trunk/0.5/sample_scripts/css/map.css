@@ -1,0 +1,10 @@
+@charset "utf-8";
+
+table.ttorp tr td {
+	width: 20px;
+	height:20px;
+}
+
+.readyToMove {
+	background-color: yellow;
+}
