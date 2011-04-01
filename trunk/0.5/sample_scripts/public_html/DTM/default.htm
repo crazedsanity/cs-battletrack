@@ -1,0 +1,244 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<link type="text/css" href="style.css" media="screen" rel="stylesheet" />
+		<script language="javascript" type="text/javascript">var online = false;</script>
+		<script language="javascript" src="./inc/prototype.js" type="text/javascript"></script>
+		<script language="javascript" src="./inc/scriptaculous.js" type="text/javascript"></script>
+		<script language="javascript" src="Cookie.js" type="text/javascript"></script>
+		<script language="javascript" src="Objects.js" type="text/javascript"></script>
+		<script language="javascript" src="Lib.js" type="text/javascript"></script>
+		<script language="javascript" src="ExtensionsMaps.js" type="text/javascript"></script>
+		<script type="text/javascript" id="jsSettings">
+			var Version = { Major:1, Minor:2, Revision:0 };
+			/*
+				1.0.0 >> Initial Build
+				1.1.0 >> Added Zoom Capability
+				1.1.1 >> 2007.01.15 - Fixed bug with Zoom and Anchoring
+				         Added Zoom  buttons to Tiles Tab
+				         Added code to allow reuse of images
+				1.2.0 >> Tile Set 4 added		 
+			*/
+		</script>
+		<title>Dungeon Tiles Mapper</title>
+	</head>
+	<body>
+		<div class="Loading" id="divLoading"><br /><img alt="Active Image" src="./images/mozilla_blu.gif" /> Loading, Please Wait ...<br /><br /></div>
+		<div class="Grid" id="divGrid"></div>
+		<div class="ToolBox" id="divToolBox" style="display:none;">
+			<div class="Caption" id="divToolBoxCaption">&nbsp;ToolBox - Tiles</div>
+			
+			
+			
+			<div style="width:100%;padding:2px;">
+			
+					<table cellpadding="0" cellspacing="0"   align="right">
+					<tr>
+						<td>&nbsp;</td>
+						<td><input type="image" hspace="1" vspace="1" src="./images/picture.jpg" alt="Maps" title="Maps" onclick="showTab('divTB_Map');" /></td>
+						<td>&nbsp;&nbsp;</td>
+						<td><input type="image" hspace="1" vspace="1" src="./images/cog.jpg" alt="Settings" title="Settings" onclick="showTab('divTB_Settings');" /></td>
+						<td>&nbsp;&nbsp;</td>
+						<td><input type="image" hspace="1" vspace="1" src="./images/bricks.jpg" alt="Tiles" title="Tiles" onclick="showTab('divTB_Tiles');" /></td>
+						<td>&nbsp;&nbsp;</td>
+						<td><input type="image" hspace="1" vspace="1" src="./images/information.jpg" alt="About" title="About" onclick="showTab('divTB_About');" /></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>		
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div style="width:100%;padding:2px;">
+
+
+	<div id="divTB_About" style="display:none;min-height:225px;padding-left:2px;">
+					<table cellpadding="0" cellspacing="0" border="0">
+						<colgroup><col width="16" /><col /></colgroup>
+						<tr><td colspan="2"><b>Dungeon Tiles Mapper</b></td></tr>
+						<tr><td>&nbsp;</td><td id="tdVersion">Version</td></tr>
+						<tr><td>&nbsp;</td><td>Created by Randal Meyer</td></tr>
+						<tr><td>&nbsp;</td><td><i>Wizards version modified</i></td></tr>
+						<tr><td>&nbsp;</td><td><i>by Mark A Jindra</i></td></tr>
+						<tr><td colspan="2" style="font-size:6pt;">&nbsp;</td></tr>
+						<tr><td colspan="2"><b>Special Thanks</b></td></tr>
+						<tr><td>&nbsp;</td><td>Mark James at <a target="_blank" href="http://www.famfamfam.com">FamFamFam</a></td></tr>
+						<tr><td>&nbsp;</td><td> - For the wonderful icons</td></tr>
+						<tr><td>&nbsp;</td><td>Kevin Tatroe at <a target="_blank" href="http://www.hordelings.com">Hordelings</a></td></tr>
+						<tr><td>&nbsp;</td><td> - For the 'jai' subdomain</td></tr>
+						<tr><td colspan="2" style="font-size:6pt;">&nbsp;</td></tr>
+						<tr><td colspan="2"><b>Links</b></td></tr>
+						
+						<tr><td>&nbsp;</td><td><a target="_blank" href="http://www.wizards.com/default.asp?x=dnd/dnd/20061121t">Wizards Official Support Page</a></td></tr>						
+						
+						<tr><td>&nbsp;</td><td><a target="_blank" href="http://www.hordelings.com/frontend/articles/article.php?article_id=19">Jai's Tutorial / User Guide</a></td></tr>
+						<tr><td>&nbsp;</td><td><a target="_blank" href="http://www.hordelings.com/frontend/forums/postView.php?post_id=21105">Bug / Updates Discussion</a></td></tr>
+						<tr><td>&nbsp;</td><td><a target="_blank" href="http://jai.hordelings.com">Jai.Hordelings.com</a></td></tr>
+						<tr><td colspan="2" style="font-size:6pt;">&nbsp;</td></tr>
+					</table>
+				</div>
+
+			
+				<div id="divTB_Map" style="display:none;min-height:225px;padding-left:2px;">
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col /></colgroup>
+						<tr><td colspan="2"><b>Saved Maps</b></td></tr>
+						<tr><td>&nbsp;</td><td><select id="cmbMaps" style="width:140px;"><option value="0">Select Map ...</option></select></td></tr>
+					</table>
+					<b>Map Actions</b><br />
+					<div id="divTB_Map_Text">
+						<table cellpadding="0" cellspacing="0" border="0">
+							<colgroup><col width="16" /><col width="16" /><col /></colgroup>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/picture_go.jpg" title="Load Map" onclick="loadMap();" /></td><td>&nbsp;<a href="javascript:void(loadMap());">Load Selected</a></td></tr>
+						</table>
+						<div id="divSaveDelete">
+							<table cellspacing="0" cellpadding="0" border="0">
+								<colgroup><col width="16" /><col width="16" /><col /></colgroup>
+								<tr><td>&nbsp;</td><td><input type="image" src="./images/picture_save.jpg" title="Save Map" onclick="saveMap();" /></td><td>&nbsp;<a href="javascript:void(saveMap());">Save Current</a></td></tr>
+								<tr><td>&nbsp;</td><td><input type="image" src="./images/picture_delete.jpg" title="Delete Map" onclick="deleteMap();" /></td><td>&nbsp;<a href="javascript:void(deleteMap());">Delete Selected</a></td></tr>
+							</table>
+						</div>
+						<table cellspacing="0" cellpadding="0" border="0">
+							<colgroup><col width="16" /><col width="16" /><col /></colgroup>
+							<tr><td colspan="3" style="font-size:6pt;">&nbsp;</td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/picture_link.jpg" title="Export Map" onclick="exportMap();" /></td><td>&nbsp;<a href="javascript:void(exportMap());">Export Current</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/picture_add.jpg" title="Import Map" onclick="importMap();" /></td><td>&nbsp;<a href="javascript:void(importMap());">Import New</a></td></tr>
+							<tr><td colspan="3" style="font-size:6pt;">&nbsp;</td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/printer.jpg" title="Print View" onclick="printView();" /></td><td>&nbsp;<a href="javascript:void(printView());">Print View</a></td></tr>
+						</table>
+					</div>
+					<div id="divTB_Map_NoText" style="text-align:center;display:none;">
+						<input type="image" src="./images/picture_go.jpg" title="Load Map" onclick="loadMap();" />
+						<span id="spanSaveDelete">
+							<input type="image" src="./images/picture_save.jpg" title="Save Map" onclick="saveMap();" />
+							<input type="image" src="./images/picture_delete.jpg" title="Delete Map" onclick="deleteMap();" />
+						</span>
+						&nbsp; &nbsp;
+						<input type="image" src="./images/picture_link.jpg" title="Export Map" onclick="exportMap();" />
+						<input type="image" src="./images/picture_add.jpg" title="Import Map" onclick="importMap();" />
+						&nbsp; &nbsp;
+						<input type="image" src="./images/printer.jpg" title="Print View" onclick="printView();" />
+					</div>
+				</div>
+				<div id="divTB_Settings" style="display:none;min-height:225px;padding-left:2px;">
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col width="85" /><col /></colgroup>
+						<tr><td colspan="3"><b>Grid Options</b></td></tr>
+						<tr><td>&nbsp;</td><td>Width:&nbsp;</td><td><select id="cmbGridWidth" onchange="cmbGrid_OnChange();" onkeyup="cmbGrid_OnChange();"><option value="12">12</option><option value="24">24</option><option value="36" selected="selected">36</option><option value="48" >48</option><option value="60">60</option><option value="72">72</option></select></td></tr>
+						<tr><td>&nbsp;</td><td>Height:&nbsp;</td><td><select id="cmbGridHeight" onchange="cmbGrid_OnChange();" onkeyup="cmbGrid_OnChange();"><option value="12">12</option><option value="24">24</option><option value="36" >36</option><option value="48" selected="selected">48</option><option value="60">60</option><option value="72">72</option></select></td></tr>
+						<tr><td>&nbsp;</td><td>Zoom:&nbsp;</td><td><select id="cmbGridZoom" onchange="cmbGrid_OnChange();" onkeyup="cmbGrid_OnChange();"><option value="8">50%</option><option value="16">100%</option><option value="32">200%</option></select></td></tr>
+					</table>
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col width="32" /><col /></colgroup>
+						<tr><td colspan="3"><b>Set / Extension Counts</b></td></tr>
+						<tr><td>&nbsp;</td><td>Set:&nbsp;</td><td><select id="cmbSSets" onchange="cmbSSets_OnChange();" onkeyup="cmbSSets_OnChange();" style="width:100px;"></select></td></tr>
+						<tr><td>&nbsp;</td><td>Cnt:&nbsp;</td><td><select id="cmbSetCount" onchange="cmbSetCount_OnChange();" onkeyup="cmbSetCount_OnChange();"></select></td></tr>
+					</table>
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col width="85" /><col /></colgroup>
+						<tr><td colspan="3"><b>Icon Text</b></td></tr>
+						<tr><td>&nbsp;</td><td>Maps Tab:&nbsp;</td><td><input type="checkbox" style="font-size:8pt;" id="chkMapIconText" onclick="chkMapIconText_OnClick();" onkeyup="chkMapIconText_OnClick();" /></td></tr>
+						<tr><td>&nbsp;</td><td>Tiles Tab:&nbsp;</td><td><input type="checkbox" style="font-size:8pt;" id="chkTilesIconText" onclick="chkTilesIconText_OnClick();" onkeyup="chkTilesIconText_OnClick();" /></td></tr>
+					</table>
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col width="85" /><col /></colgroup>
+						<tr><td colspan="3"><b style="cursor:help;" title="The Anchor is the Bottom Tile of a Group">Anchor Delete Options</b></td></tr>
+						<tr><td>&nbsp;</td><td>Delete All:&nbsp;</td><td><input type="radio" id="optGroupDelete" name="optGroup" /></td></tr>
+						<tr><td>&nbsp;</td><td>Detach All:&nbsp;</td><td><input type="radio" id="optGroupDetach" name="optGroup" /></td></tr>
+					</table>
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col width="85" /><col /></colgroup>
+						<tr><td colspan="3"><b>Other Settings</b></td></tr>
+						<tr><td>&nbsp;</td><td>Free Form:&nbsp;</td><td><input type="checkbox" style="font-size:8pt;" id="chkFreeForm" onclick="chkFreeForm_OnClick();" onkeyup="chkFreeForm_OnClick();" /></td></tr>
+						<tr id="trRememberTab"><td>&nbsp;</td><td>Remember Tab:&nbsp;</td><td><input type="checkbox" style="font-size:8pt;" id="chkRememberTab" onclick="chkRememberTab_OnClick();" onkeyup="chkRememberTab_OnClick();" /></td></tr>
+					</table>
+				</div>
+				<div id="divTB_Tiles" style="min-height:225px;padding-left:2px;">
+					<table cellpadding="0" cellspacing="0" class="Settings">
+						<colgroup><col width="16" /><col /></colgroup>
+						<tr><td colspan="2"><b>Sets</b></td></tr>
+						<tr><td>&nbsp;</td><td><select id="cmbSets" onchange="cmbSets_OnChange();" onkeyup="cmbSets_OnChange();" style="width:140px;"></select></td></tr>
+					</table>
+					<table cellpadding="0" cellspacing="0" style="border:0px;table-layout:fixed;">
+						<colgroup><col width="16" /><col width="16" /><col /></colgroup>
+						<tr><td colspan="3"><b>Tiles</b></td></tr>
+						<tr><td>&nbsp;</td><td colspan="2"><select id="cmbTiles" onchange="cmbTiles_OnChange();" onkeyup="cmbTiles_OnChange();" style="width:140px;"></select></td></tr>
+						<tr id="trBText"><td>&nbsp;</td><td><b>B:&nbsp;</b></td><td><span id="spanSideB">&nbsp;</span></td></tr>
+						<tr><td>&nbsp;</td><td><b>#:&nbsp;</b></td><td><span id="spanUsed">&nbsp;</span></td></tr>
+					</table>
+					<center><img alt="Preview A" id="imgPreviewA" ondblclick="addTile();" vspace="5" />&nbsp;<img alt="Preview B" id="imgPreviewB" ondblclick="addTile(true);" vspace="5" /></center>
+					<b>Actions</b><br />
+					<div id="divTB_Tiles_NoText" style="text-align:center;">
+						<input type="image" src="./images/shape_move_back.jpg" title="Send to Back" onclick="sendToBack();" />
+						<input type="image" src="./images/shape_move_backwards.jpg" title="Lower Tile" onclick="lowerTile();" />
+						<input type="image" src="./images/shape_move_forwards.jpg" title="Raise Tile" onclick="raiseTile();" />
+						<input type="image" src="./images/shape_move_front.jpg" title="Bring to Front" onclick="bringToFront();" />
+						&nbsp; &nbsp;<input type="image" src="./images/shape_group.jpg" title="Attach" onclick="attach();" />
+						<input type="image" src="./images/shape_ungroup.jpg" title="Detach" onclick="detach();" />
+						<br /><input type="image" src="./images/arrow_rotate_anticlockwise.jpg" title="Rotate Counter Clockwise" onclick="turnCC();" />
+						<input type="image" src="./images/arrow_rotate_clockwise.jpg" title="Rotate Clockwise" onclick="turnC();" />
+						<input type="image" src="./images/delete.jpg" title="Delete Tile" onclick="del();" />
+						&nbsp; &nbsp;<input type="image" src="./images/magnifier_zoom_out.jpg" title="Zoom Out" onclick="zoomOut();" />
+						<input type="image" src="./images/magnifier.jpg" title="Zoom In" onclick="zoom();" />
+						<input type="image" src="./images/magnifier_zoom_in.jpg" title="Zoom In" onclick="zoomIn();" />
+					</div>
+					<div id="divTB_Tiles_Text" style="display:none;">
+						<table cellpadding="0" cellspacing="0" border="0">
+							<colgroup><col width="16" /><col width="16" /><col /></colgroup>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_move_back.jpg" title="Send to Back" onclick="sendToBack();" /></td><td>&nbsp;<a href="javascript:void(sendToBack());">Send to Back</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_move_backwards.jpg" title="Lower Tile" onclick="lowerTile();" /></td><td>&nbsp;<a href="javascript:void(lowerTile());">Lower Tile</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_move_forwards.jpg" title="Raise Tile" onclick="raiseTile();" /></td><td>&nbsp;<a href="javascript:void(raiseTile());">Raise Tile</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_move_front.jpg" title="Bring to Front" onclick="bringToFront();" /></td><td>&nbsp;<a href="javascript:void(bringToFront());">Bring to Front</a></td></tr>
+							<tr><td colspan="3" style="font-size:6pt;">&nbsp;</td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_group.jpg" title="Attach" onclick="attach();" /></td><td>&nbsp;<a href="javascript:void(attach());">Attach</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/shape_ungroup.jpg" title="Detach" onclick="detach();" /></td><td>&nbsp;<a href="javascript:void(detach());">Detach</a></td></tr>
+							<tr><td colspan="3" style="font-size:6pt;">&nbsp;</td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/arrow_rotate_anticlockwise.jpg" title="Rotate Counter Clockwise" onclick="turnCC();" /></td><td>&nbsp;<a href="javascript:void(turnCC());">Rotate CounterC</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/arrow_rotate_clockwise.jpg" title="Rotate Clockwise" onclick="turnC();" /></td><td>&nbsp;<a href="javascript:void(turnC());">Rotate Clockwise</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/delete.jpg" title="Delete Tile" onclick="del();" /></td><td>&nbsp;<a href="javascript:void(del());">Delete</a></td></tr>
+							<tr><td colspan="3" style="font-size:6pt;">&nbsp;</td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/magnifier_zoom_out.jpg" title="Zoom Out" onclick="zoomOut();" /></td><td>&nbsp;<a href="javascript:void(zoomOut());">Zoom Out</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/magnifier.jpg" title="Normal Zoom" onclick="zoom();" /></td><td>&nbsp;<a href="javascript:void(zoom());">Normal Zoom</a></td></tr>
+							<tr><td>&nbsp;</td><td><input type="image" src="./images/magnifier_zoom_in.jpg" title="Zoom In" onclick="zoomIn();" /></td><td>&nbsp;<a href="javascript:void(zoomIn());">Zoom In</a></td></tr>
+						</table>
+					</div>
+				</div>
+ 
+			</div>
+
+			<div class="Copyright" id="copyright">				<table cellpadding="2" cellspacing="2" width="100%">
+					<tr>
+						<td class="copyright">© 1995-2007 Wizards of the Coast, Inc., a subsidiary of Hasbro, Inc. All Rights Reserved.</td>
+					</tr>
+				</table></div>		
+
+		</div>
+		
+		
+		
+		
+		
+	</body>
+</html>
