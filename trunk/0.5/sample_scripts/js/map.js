@@ -44,14 +44,14 @@ function mapStorage() {
 		
 	
 		
-	/**  */
+	/** Puts the piece's HTML into the appropriate. */
 	this._DisplayPiece = function(pId) {
 		$("#"+ _locations[pId]).html(_pieces[pId]);
 	}//end _DisplayPiece()
 	
 	
 	
-	/**  */
+	/** Determines if the given coordinates have a piece there or not. */
 	this.IsSpaceOccupied = function(pCoords) {
 		var tRetval = false;
 		if(typeof this.GetPieceIdFromCoords(pCoords) == "number") {
@@ -62,7 +62,7 @@ function mapStorage() {
 	
 	
 	
-	/** Move a piece. */
+	/** Move the given piece ID to the given coordinates. */
 	this.MovePiece = function(pId, pNewLocation) {
 		var tRetval = false;
 		if(_pieces[pId] != undefined && this.IsValidCoord(pNewLocation) && !this.IsSpaceOccupied(pNewLocation)) {
@@ -121,7 +121,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Create the ID from the X/Y values ("1","2" == "coord_1-2") */
 	this.MakeIdFromCoordinates = function(pX, pY) {
 		var tId = "coord_"+ pX +"-"+ pY;
 		return(tId);
@@ -144,7 +144,7 @@ function mapStorage() {
 	this.MoveDown = function(pId) {
 		var tRetval = false;
 		if(_pieces[pId]) {
-			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))+1), this.GetCoordY(pId));
+			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))+1));
 			tRetval = this.MovePiece(pId, tNewCoord);
 		}
 		return(tRetval);
@@ -156,7 +156,7 @@ function mapStorage() {
 	this.MoveUp = function(pId) {
 		var tRetval = false;
 		if(_pieces[pId]) {
-			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))-1), this.GetCoordY(pId));
+			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))-1));
 			tRetval = this.MovePiece(pId, tNewCoord);
 		}
 		return(tRetval);
@@ -168,7 +168,7 @@ function mapStorage() {
 	this.MoveLeft = function(pId) {
 		var tRetval = false;
 		if(_pieces[pId]) {
-			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))-1));
+			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))-1), this.GetCoordY(pId));
 			tRetval = this.MovePiece(pId, tNewCoord);
 		}
 		return(tRetval);
@@ -180,7 +180,7 @@ function mapStorage() {
 	this.MoveRight = function(pId) {
 		var tRetval = false;
 		if(_pieces[pId]) {
-			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))+1));
+			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))+1), this.GetCoordY(pId));
 			tRetval = this.MovePiece(pId, tNewCoord);
 		}
 		return(tRetval);
@@ -188,7 +188,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Mark the piece stored at the given coordinates as being selected. */
 	this.SelectPiece = function(pCoords) {
 		var tRetval = false;
 		var tId = this.GetPieceIdFromCoords(pCoords);
@@ -203,7 +203,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Removes the class that indicates a coordinate is selected from EVERYTHING. */
 	this.UnselectPiece = function(pId) {
 		$("table.ttorp tr td.readyToMove").removeClass("readyToMove");
 		if(pId != undefined) {
@@ -213,7 +213,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Returns the ID (number) of a piece from the coordinates. */
 	this.GetPieceIdFromCoords = function(pCoords) {
 		var tRetval = false;
 		for(var i=0; i<_locations.length;i++) {
@@ -226,7 +226,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Determines if the coordinates contain a piece or not. */
 	this.IsSpaceEmpty = function(pCoords) {
 		var tRetval = false;
 		var tPId = this.GetPieceIdFromCoords(pCoords);
@@ -238,7 +238,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Displays list of the pieces. */
 	this.ShowAllPieces = function() {
 		if(_pieces.length > 0) {
 			var tStr = "";
@@ -254,7 +254,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** Either selects the given piece or moves the already selected piece to the new coordinates (or nothing). */
 	this.SelectOrMovePiece = function(pCoords) {
 		var tRetval = false;
 		if(_locations.length > 0 && this.IsValidCoord(pCoords)) {
@@ -282,7 +282,7 @@ function mapStorage() {
 	
 	
 	
-	/**  */
+	/** If a piece is selected, this will move a piece up, down, left, or right if the corresponding arrow key is pressed. */
 	this.HandleMovement = function (pKeyNum) {
 		var tPieceMoved = true;
 		if(_selectedPiece != undefined) {
@@ -313,13 +313,10 @@ _map = new mapStorage();
 
 
 function createDialog(pIdOfDialog) {
-	alert("yo!");
 	$("#"+ pIdOfDialog).dialog({
 		buttons: {
 			"Ok": 		function() { 
 				if($("#newPieceName")) {
-					
-					//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 					_map.AddPiece();
 				}
 				$(this).dialog("close"); 
@@ -339,8 +336,8 @@ $(document).ready(function(){
 		_map.MakeSpaceEmpty(tMyId);
 	});
 	// Add a piece so people w/o FireBug can try it out.
-	_map.AddPiece("X", "coord_1-1");
-	_map.AddPiece("Y", "coord_3-1");
+	_map.AddPiece("<img src='/images/icons/16-tool-a.png'>", "coord_1-1");
+	_map.AddPiece("<img src='/images/icons/16-em-plus.png' align='center'>", "coord_3-1");
 	$("table.ttorp tr td").click(function(){
 		var tId = $(this).attr("id");
 		return(_map.SelectOrMovePiece(tId));
@@ -353,6 +350,12 @@ $(document).ready(function(){
 			tFinalString += tBits[i] + "<br />\n";
 		}
 		$(this).html(tFinalString);
+	});
+	$("#input_loadMap").click(function(){
+		$("table.ttorp").attr("background", $("#input_mapUrl").val());
+	});
+	$("#resetMap").click(function(){
+		$("table.ttorp").attr("background", "");
 	});
 	$(document).keyup(function(event){
 		_map.HandleMovement(event.which);
