@@ -34,18 +34,18 @@ Objects.Tile.prototype = {
 		this.Width = Options.Width;
 
 		this.ImageA = [new Image(this.Width, this.Height), new Image(this.Height, this.Width), new Image(this.Width, this.Height), new Image(this.Height, this.Width)];
-		this.ImageA[0].src = "./Tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".0." + Options.Extension;
-		this.ImageA[1].src = "./Tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".90." + Options.Extension;
-		this.ImageA[2].src = "./Tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".180." + Options.Extension;
-		this.ImageA[3].src = "./Tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".270." + Options.Extension;
+		this.ImageA[0].src = "./tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".0." + Options.Extension;
+		this.ImageA[1].src = "./tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".90." + Options.Extension;
+		this.ImageA[2].src = "./tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".180." + Options.Extension;
+		this.ImageA[3].src = "./tiles/" + this.Tag + (Options.NameB? ".a" : "") + ".270." + Options.Extension;
 		this.NameA = Options.NameA;
 		
 		if (Options.NameB) {
 			this.ImageB = [new Image(this.Width, this.Height), new Image(this.Height, this.Width), new Image(this.Width, this.Height), new Image(this.Height, this.Width)];
-			this.ImageB[0].src = "./Tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.0." + Options.Extension;
-			this.ImageB[1].src = "./Tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.90." + Options.Extension;
-			this.ImageB[2].src = "./Tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.180." + Options.Extension;
-			this.ImageB[3].src = "./Tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.270." + Options.Extension;
+			this.ImageB[0].src = "./tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.0." + Options.Extension;
+			this.ImageB[1].src = "./tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.90." + Options.Extension;
+			this.ImageB[2].src = "./tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.180." + Options.Extension;
+			this.ImageB[3].src = "./tiles/" + (this.TagB? this.TagB : this.Tag) + ".b.270." + Options.Extension;
 			this.NameB = Options.NameB;
 		}		
 	},

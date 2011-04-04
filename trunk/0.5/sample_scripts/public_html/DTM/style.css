@@ -30,7 +30,7 @@ DIV.ToolBox {
 	font-family: Arial, Helvetica, sans-serif; 	
 }
 DIV.ToolBox DIV.Caption {
-	background-image:url('./images/Header.jpg');
+	background-image:url('./images/header.jpg');
 	width:100%;
 	background-color:ActiveCaption;
 	color:CaptionText;

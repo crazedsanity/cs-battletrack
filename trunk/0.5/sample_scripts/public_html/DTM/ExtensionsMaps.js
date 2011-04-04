@@ -12,7 +12,15 @@ var aExtensions = ["DT1", "DT2", "DT3", "DT4"];
 //Includes Extensions
 if (online && -1 < document.URL.indexOf("?")) aExtensions = document.URL.split("?")[1].split(",");
 for (var i = 0; i < aExtensions.length; i++) {
-	document.write('<script type="text/javascript" src="./Tiles/' + aExtensions[i] + '/Manifest.js"></script>');
+	/*
+	var tStuff = "./tiles/" + aExtensions[i];
+	document.write('<script type="text/javascript" src="./tiles/' + aExtensions[i] + '/Manifest.js"></script>');
+	alert(tStuff);
+	*/
+	var fileref=document.createElement('script')
+	fileref.setAttribute("type","text/javascript")
+	fileref.setAttribute("src", './tiles/' + aExtensions[i] + '/Manifest.js')
+	document.getElementsByTagName("head")[0].appendChild(fileref);
 }
 //DO NOT CHANGE THE PREVIOUS SECTION OF CODE
 
