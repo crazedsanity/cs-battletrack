@@ -1,60 +1,123 @@
+function tokenStorage(pId, pName, pLocation) {
+	//TODO: should this store the number of moves available?
+	var _id = undefined;
+	var _name = undefined;
+	var _location = undefined;
+	var _movement = Array();
+	
+	/** Like properties... */ {
+		this.getId = function() {
+			return(_id);
+		}//end getId()
+		this.setId = function(pId) {
+			_id=pId;
+			return(_id);
+		}//end setId()
+		
+		this.getName = function() {
+			return(_name);
+		}//end getName()
+		this.setName = function(pName) {
+			_name = pName;
+			return(_name);
+		}//end setName()
+		
+		this.getLocation = function() {
+			return(_location);
+		}//end getLocation()
+		this.setLocation = function(pLocation) {
+			if(pLocation != undefined) {
+				_location = pLocation;
+				_movement[0] = _location;
+			}
+			return(_location);
+		}//end setLocation()
+	}//end "properties"
+	
+	
+	/** this part is like a constructor (after "properties" so they exist before they're called) ... */{
+		this.setId(pId);
+		this.setName(pName);
+		this.setLocation(pLocation);
+	}//end "constructor"
+	
+	
+	/**  */
+	this.move = function(pLocation) {
+		var tRetval = undefined;
+		var tMoveNum = _movement.length;
+		if(tMoveNum != 0) {
+			var tCheckMove = (tMoveNum -1);
+			if(_movement[tCheckMove] != pLocation) {
+				_movement[tMoveNum] = pLocation;
+				tRetval = tMoveNum;
+			}
+		}
+		return(tRetval);
+	}//end move()
+}//end tokenStorage{}
+
+
 function mapStorage() {
-	var _selectedPiece = undefined;
-	var _pieces = new Array();
+	var _selectedToken = undefined;
+	var _tokens = new Array();
 	var _locations = new Array();
 	
 	// Identifiers...
-	var _lastPieceId = null;
+	var _lastTokenId = null;
 	
 	
 	
-	/** Add a piece by name, get an ID. */
-	this.AddPiece = function(pName, pLocation) {
+	
+	/** Add a token by name, get an ID. */
+	this.AddToken = function(pName, pLocation) {
 		var tNewId = undefined;
-		if(_lastPieceId == null) {
-			_lastPieceId = 1;
+		if(_lastTokenId == null) {
+			_lastTokenId = 1;
 		}
 		else {
-			_lastPieceId++;
+			_lastTokenId++;
 		}
-		tNewId = _lastPieceId;
-		_pieces[tNewId] = pName;
-		_locations[tNewId] = pLocation;
-		this._DisplayPiece(tNewId);
+		tNewId = _lastTokenId;
+		_tokens[tNewId] = pName;
+		if(pLocation != undefined) {
+			_locations[tNewId] = pLocation;
+			this._DisplayToken(tNewId);
+			$("#"+ pLocation).html(pName);
+		}
 		
-		//add the piece to the map.
-		$("#"+ pLocation).html(pName);
-		this.ShowAllPieces();
+		//add the token to the map.
+		this.ShowAllTokens();
 		return(tNewId);
-	}//end AddPiece()
+	}//end AddToken()
 	
 	
 	
-	/** Retrieve a piece's name based on an ID. */
-	this.GetPieceById = function(pId) {
-		return(_pieces[pId]);
-	}//end GetPieceById()
+	/** Retrieve a token's name based on an ID. */
+	this.GetTokenById = function(pId) {
+		return(_tokens[pId]);
+	}//end GetTokenById()
 	
 	
 	
-	/** Get the current location of a particular piece (based on ID) */
-	this.GetPieceLocation = function(pId) {
+	/** Get the current location of a particular token (based on ID) */
+	this.GetTokenLocation = function(pId) {
 		return(_locations[pId]);
-	}//end GetPieceLocation()
+	}//end GetTokenLocation()
 		
 	
 		
-	/** Puts the piece's HTML into the appropriate. */
-	this._DisplayPiece = function(pId) {
-		$("#"+ _locations[pId]).html(_pieces[pId]);
-	}//end _DisplayPiece()
+	/** Puts the token's HTML into the appropriate. */
+	this._DisplayToken = function(pId) {
+		$("#"+ _locations[pId]).html(_tokens[pId]);
+	}//end _DisplayToken()
 	
 	
 	
-	/** Determines if the given coordinates have a piece there or not. */
+	/** Determines if the given coordinates have a token there or not. */
 	this.IsSpaceOccupied = function(pCoords) {
 		var tRetval = false;
-		if(typeof this.GetPieceIdFromCoords(pCoords) == "number") {
+		if(typeof this.GetTokenIdFromCoords(pCoords) == "number") {
 			tRetval = true;
 		}
 		return(tRetval);
@@ -62,29 +125,29 @@ function mapStorage() {
 	
 	
 	
-	/** Move the given piece ID to the given coordinates. */
-	this.MovePiece = function(pId, pNewLocation) {
+	/** Move the given token ID to the given coordinates. */
+	this.MoveToken = function(pId, pNewLocation) {
 		var tRetval = false;
-		if(_pieces[pId] != undefined && this.IsValidCoord(pNewLocation) && !this.IsSpaceOccupied(pNewLocation)) {
+		if(_tokens[pId] != undefined && this.IsValidCoord(pNewLocation) && !this.IsSpaceOccupied(pNewLocation)) {
 			//move from the old location.
 			this.MakeSpaceEmpty(_locations[pId]);
 			
 			// update to a new location.
 			_locations[pId] = pNewLocation;
 			
-			//o$("#"+ _locations[pId]).html(_pieces[pId]);
-			this._DisplayPiece(pId);
+			//o$("#"+ _locations[pId]).html(_tokens[pId]);
+			this._DisplayToken(pId);
 			
-			// Keep the piece selected...
-			if(_selectedPiece == pId) {
-				this.SelectPiece(_locations[pId]);
+			// Keep the token selected...
+			if(_selectedToken == pId) {
+				this.SelectToken(_locations[pId]);
 			}
 			
 			tRetval = true;
 		}
-		this.ShowAllPieces();
+		this.ShowAllTokens();
 		return(tRetval);
-	}//end MovePiece()
+	}//end MoveToken()
 	
 	
 	
@@ -95,7 +158,7 @@ function mapStorage() {
 	
 	
 	
-	/** Get the X coordinate of the given piece (by ID) */
+	/** Get the X coordinate of the given token (by ID) */
 	this.GetCoordX = function(pId) {
 		var tRetval = undefined;
 		if(_locations[pId] != undefined) {
@@ -108,7 +171,7 @@ function mapStorage() {
 	
 	
 	
-	/** Get the Y coordinate of the given piece (by ID) */
+	/** Get the Y coordinate of the given token (by ID) */
 	this.GetCoordY = function(pId) {
 		var tRetval = undefined;
 		if(_locations[pId] != undefined) {
@@ -143,9 +206,9 @@ function mapStorage() {
 	/** Move down 1 space... */
 	this.MoveDown = function(pId) {
 		var tRetval = false;
-		if(_pieces[pId]) {
+		if(_tokens[pId]) {
 			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))+1));
-			tRetval = this.MovePiece(pId, tNewCoord);
+			tRetval = this.MoveToken(pId, tNewCoord);
 		}
 		return(tRetval);
 	}//end MoveLeft()
@@ -155,9 +218,9 @@ function mapStorage() {
 	/** Move up 1 space... */
 	this.MoveUp = function(pId) {
 		var tRetval = false;
-		if(_pieces[pId]) {
+		if(_tokens[pId]) {
 			var tNewCoord = this.MakeIdFromCoordinates(this.GetCoordX(pId), (parseInt(this.GetCoordY(pId))-1));
-			tRetval = this.MovePiece(pId, tNewCoord);
+			tRetval = this.MoveToken(pId, tNewCoord);
 		}
 		return(tRetval);
 	}//end MoveLeft()
@@ -167,9 +230,9 @@ function mapStorage() {
 	/** Move Left 1 space... */
 	this.MoveLeft = function(pId) {
 		var tRetval = false;
-		if(_pieces[pId]) {
+		if(_tokens[pId]) {
 			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))-1), this.GetCoordY(pId));
-			tRetval = this.MovePiece(pId, tNewCoord);
+			tRetval = this.MoveToken(pId, tNewCoord);
 		}
 		return(tRetval);
 	}//end MoveLeft()
@@ -179,42 +242,42 @@ function mapStorage() {
 	/** Move Right 1 space... */
 	this.MoveRight = function(pId) {
 		var tRetval = false;
-		if(_pieces[pId]) {
+		if(_tokens[pId]) {
 			var tNewCoord = this.MakeIdFromCoordinates((parseInt(this.GetCoordX(pId))+1), this.GetCoordY(pId));
-			tRetval = this.MovePiece(pId, tNewCoord);
+			tRetval = this.MoveToken(pId, tNewCoord);
 		}
 		return(tRetval);
 	}//end MoveLeft()
 	
 	
 	
-	/** Mark the piece stored at the given coordinates as being selected. */
-	this.SelectPiece = function(pCoords) {
+	/** Mark the token stored at the given coordinates as being selected. */
+	this.SelectToken = function(pCoords) {
 		var tRetval = false;
-		var tId = this.GetPieceIdFromCoords(pCoords);
-		this.UnselectPiece();
+		var tId = this.GetTokenIdFromCoords(pCoords);
+		this.UnselectToken();
 		if(tId !== false) {
-			_selectedPiece = tId;
-			//alert("SelectPiece("+ pCoords +"), tId=("+ tId +"), piece coords=("+ _locations[tId] +")");
+			_selectedToken = tId;
+			//alert("SelectToken("+ pCoords +"), tId=("+ tId +"), token coords=("+ _locations[tId] +")");
 			$("#"+ _locations[tId]).addClass("readyToMove");
 		}
 		return(tRetval);
-	}//end SelectPiece()
+	}//end SelectToken()
 	
 	
 	
 	/** Removes the class that indicates a coordinate is selected from EVERYTHING. */
-	this.UnselectPiece = function(pId) {
+	this.UnselectToken = function(pId) {
 		$("table.ttorp tr td.readyToMove").removeClass("readyToMove");
 		if(pId != undefined) {
-			_selectedPiece = undefined;
+			_selectedToken = undefined;
 		}
-	}//end UnselectPiece()
+	}//end UnselectToken()
 	
 	
 	
-	/** Returns the ID (number) of a piece from the coordinates. */
-	this.GetPieceIdFromCoords = function(pCoords) {
+	/** Returns the ID (number) of a token from the coordinates. */
+	this.GetTokenIdFromCoords = function(pCoords) {
 		var tRetval = false;
 		for(var i=0; i<_locations.length;i++) {
 			if(_locations[i] == pCoords) {
@@ -222,14 +285,14 @@ function mapStorage() {
 			}
 		}
 		return(tRetval);
-	}//end GetPieceIdFromCoords
+	}//end GetTokenIdFromCoords
 	
 	
 	
-	/** Determines if the coordinates contain a piece or not. */
+	/** Determines if the coordinates contain a token or not. */
 	this.IsSpaceEmpty = function(pCoords) {
 		var tRetval = false;
-		var tPId = this.GetPieceIdFromCoords(pCoords);
+		var tPId = this.GetTokenIdFromCoords(pCoords);
 		if(tPId === false) {
 			tRetval = true;
 		}
@@ -238,90 +301,93 @@ function mapStorage() {
 	
 	
 	
-	/** Displays list of the pieces. */
-	this.ShowAllPieces = function() {
-		if(_pieces.length > 0) {
+	/** Displays list of the tokens. */
+	this.ShowAllTokens = function() {
+		if(_tokens.length > 0) {
 			var tStr = "";
-			for(var i=1; i<_pieces.length; i++) {
+			for(var i=1; i<_tokens.length; i++) {
 				if(i>0) {
 					tStr += "<br />";
 				}
-				tStr += _pieces[i] +" ("+ i +"): "+ _locations[i] +" -- X="+ this.GetCoordX(i) +", y="+ this.GetCoordY(i);
+				tStr += _tokens[i] +" ("+ i +"): "+ _locations[i] +" -- X="+ this.GetCoordX(i) +", y="+ this.GetCoordY(i);
 			}
-			$("#allPieces").html(tStr);
+			$("#allTokens").html(tStr);
 		}
-	}//end ShowAllPieces()
+	}//end ShowAllTokens()
 	
 	
 	
-	/** Either selects the given piece or moves the already selected piece to the new coordinates (or nothing). */
-	this.SelectOrMovePiece = function(pCoords) {
+	/** Either selects the given token or moves the already selected token to the new coordinates (or nothing). */
+	this.SelectOrMoveToken = function(pCoords) {
 		var tRetval = false;
 		if(_locations.length > 0 && this.IsValidCoord(pCoords)) {
 			//alert("got valid coords ("+ pCoords +")");
-			if(_selectedPiece !== undefined && pCoords == this.GetPieceLocation(_selectedPiece)) {
-				this.UnselectPiece(_selectedPiece);
+			if(_selectedToken !== undefined && pCoords == this.GetTokenLocation(_selectedToken)) {
+				this.UnselectToken(_selectedToken);
 			}
 			else if(this.IsSpaceEmpty(pCoords) == true) {
-				//it's an empty space; move selected piece here (if there's one selected)
-				if(_selectedPiece != undefined) {
-					tRetval = this.MovePiece(_selectedPiece, pCoords);
+				//it's an empty space; move selected token here (if there's one selected)
+				if(_selectedToken != undefined) {
+					tRetval = this.MoveToken(_selectedToken, pCoords);
 				}
 				else {
-					//alert("no piece selected; can't move anything");
+					//alert("no token selected; can't move anything");
 				}
 			}
 			else {
-				//get the piece ID from the coordinates...
-				var tPieceId = this.GetPieceIdFromCoords(pCoords);
-				this.SelectPiece(pCoords);
+				//get the token ID from the coordinates...
+				var tTokenId = this.GetTokenIdFromCoords(pCoords);
+				this.SelectToken(pCoords);
 			}
 		}
 		return(tRetval);
-	}//end SelectOrMovePiece()
+	}//end SelectOrMoveToken()
 	
 	
 	
-	/** If a piece is selected, this will move a piece up, down, left, or right if the corresponding arrow key is pressed. */
+	/** If a token is selected, this will move a token up, down, left, or right if the corresponding arrow key is pressed. */
 	this.HandleMovement = function (pKeyNum) {
-		var tPieceMoved = true;
-		if(_selectedPiece != undefined) {
+		var tTokenMoved = true;
+		if(_selectedToken != undefined) {
 			switch(pKeyNum) {
 				case 37:
-					this.MoveLeft(_selectedPiece);
+					this.MoveLeft(_selectedToken);
 					break;
 				case 38:
-					this.MoveUp(_selectedPiece);
+					this.MoveUp(_selectedToken);
 					break;
 				case 39:
-					this.MoveRight(_selectedPiece);
+					this.MoveRight(_selectedToken);
 					break;
 				case 40:
-					this.MoveDown(_selectedPiece);
+					this.MoveDown(_selectedToken);
 					break;
 				default:
-					tPieceMoved = false;
+					tTokenMoved = false;
 					break;
 			}
 		}
-		return(tPieceMoved);
+		return(tTokenMoved);
 	}//end HandleMovement
-}
+}//end mapStorage{}
 
-//create an object
+
+//create required objects...
 _map = new mapStorage();
 
 
 function createDialog(pIdOfDialog) {
 	$("#"+ pIdOfDialog).dialog({
 		buttons: {
-			"Ok": 		function() { 
-				if($("#newPieceName")) {
-					_map.AddPiece();
-				}
-				$(this).dialog("close"); 
-			},
-			"Cancel":	function() { $(this).dialog("close"); }
+			"Ok": 		
+				function() { 
+					if($("#newTokenName")) {
+						_map.AddToken($("#newTokenName").text());
+					}
+					$(this).dialog("close"); 
+				},
+			"Cancel":	
+				function() { $(this).dialog("close"); }
 		},
 		modal: true,
 		effect: 'slide'
@@ -335,12 +401,15 @@ $(document).ready(function(){
 		var tMyId = $(this).attr("id");
 		_map.MakeSpaceEmpty(tMyId);
 	});
-	// Add a piece so people w/o FireBug can try it out.
-	_map.AddPiece("<img src='/images/icons/16-tool-a.png'>", "coord_1-1");
-	_map.AddPiece("<img src='/images/icons/16-em-plus.png' align='center'>", "coord_3-1");
+	
+	// Add a token so people w/o FireBug can try it out.
+	_map.AddToken("<img src='/images/icons/16-tool-a.png'>", "coord_1-1");
+	_map.AddToken("<img src='/images/icons/16-em-plus.png' align='center'>", "coord_2-1");
+	
+	
 	$("table.ttorp tr td").click(function(){
 		var tId = $(this).attr("id");
-		return(_map.SelectOrMovePiece(tId));
+		return(_map.SelectOrMoveToken(tId));
 	});
 	$(".vertical-text").each(function(){
 		var tStr = $(".vertical-text").text();
