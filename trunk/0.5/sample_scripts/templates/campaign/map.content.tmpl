@@ -15,14 +15,13 @@
 </div -->
 
 
-<!-- p>NOTE::: Coordinates are "coord_(x)-(y)", where "(x)" is the x-axis or column #, and "(y)" is the row.</p -->
-{ttorpTable}
+	<div id="debug">N/A</div>
 	<div class="map tokens" id="allTokens"></div>
 	<div>
 		<input type="button" id="input_addToken" value="Add Token" OnClick="javascript:createDialog('newToken')">
 	</div>
 	<input type="button" id="input_loadMap" value="Load map:">
-		<input type="text" id="input_mapUrl" value="/images/dnd/testmap-1__8x8.jpg" size="40">
+		<input type="text" id="input_mapUrl" value="/images/ttorp/04_HeroesHorror_300_ppi_a29yq.jpg" size="40">
 		(<a href="#reset" id="resetMap" class="badLink">reset</a>)
 	<div class="dialog hidden" id="newToken" title="Create New Token" style="width:500">
 		<table>
@@ -33,3 +32,5 @@
 		</table>
 	</div>
 
+<!-- p>NOTE::: Coordinates are "coord_(x)-(y)", where "(x)" is the x-axis or column #, and "(y)" is the row.</p -->
+{ttorpTable}

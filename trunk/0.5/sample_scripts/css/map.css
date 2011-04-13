@@ -1,9 +1,16 @@
 @charset "utf-8";
+/*
+ * ID: $Id$
+ */
 
 table.ttorp tr td {
 	width:  48px;
 	height: 48px;
 	margin: 1px;
+}
+
+td.highlight {
+	background-color: lightCoral;
 }
 
 .readyToMove {

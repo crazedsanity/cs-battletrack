@@ -53,25 +53,42 @@ class csbt_mapBuilder extends cs_webapplibsAbstract {
 		 * TODO: consider adding ability to create a "border" row & column, to cope 
 		 *		with parts of the map not being attached to a grid...
 		 */
-		$output = "<table class=\"ttorp\">";
-		#$output = "<div class=\"table ttorp\">";
+		$output = "<table class=\"ttorp\">\n";
+		
+		#//build the border row.
+		#$output .= "<tr class=\"border\">\n";
+		#for($i=0;$i<=$this->width;$i++) {
+		#	$output .= "\t<td class=\"borderRow borderCell\" id=\"border_". $i ."-0\"></td>\n";
+		#}
+		#$output .= "</tr>\n";
+		
 		for($h=0;$h<$this->height;$h++) {
 			$rowNum = ($h+1);
-			$thisRow = "<tr class=\"row_". $rowNum ."\">\n";
-			#$thisRow = "<div class=\"tr row_". $rowNum ."\">\n";
+			$rowClasses = "row_". $rowNum;
+			$addColClasses = "";
+			if($h==0) {
+				$rowClasses .= " borderRow";
+				$addColClasses = " borderCol";
+			}
+			$thisRow = "<tr class=\"". $rowClasses ."\">\n";
 			$output .= $thisRow;
+			
+			#//add a border cell.
+			#$output .= "\t<td class=\"borderCol borderCell\" id=\"border_0-". ($h+1) ."\"></td>\n";
 			
 			for($w=0;$w<$this->width;$w++) {
 				$coord = ($w+1) ."-". ($h+1);
-				$thisCol = "\t<td class=\"row_". ($h+1) ." col_". ($w+1) ."\" id=\"coord_". $coord ."\">&nbsp;</td>\n";
-				#$thisCol = "\t<div class=\"td row_". ($h+1) ." col_". ($w+1) ."\" id=\"coord_". $coord ."\">". $coord ."</td>\n";
+				$colClasses = "tile col_". ($w+1) ." row_". ($h+1);
+				if($w==0) {
+					$colClasses .= " borderRow";
+				}
+				$colClasses .= $addColClasses;
+				$thisCol = "\t<td class=\"". $colClasses ."\" id=\"coord_". $coord ."\">&nbsp;</td>\n";
 				$output .= $thisCol;
 			}
 			$output .= "</tr>\n";
-			#$output .= "</div>\n";
 		}
 		$output .= "</table>";
-		#$output .= "</div>";
 		return($output);
 	}//end build_grid()
 	//-------------------------------------------------------------------------

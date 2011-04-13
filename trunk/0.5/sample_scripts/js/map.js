@@ -396,10 +396,14 @@ function createDialog(pIdOfDialog) {
 }//end createDialog()
 
 
+
 $(document).ready(function(){
-	$("table.ttorp tr td").each(function(){
+	$("table.ttorp tr td.tile").each(function(){
 		var tMyId = $(this).attr("id");
 		_map.MakeSpaceEmpty(tMyId);
+	});
+	$("table.ttorp tr td.borderCell").each(function(){
+		$(this).html("");
 	});
 	
 	// Add a token so people w/o FireBug can try it out.
