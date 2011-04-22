@@ -171,3 +171,28 @@ CREATE TABLE csbt_character_save_table (
 );
 
 
+CREATE TABLE csbt_map_table (
+	map_id serial NOT NULL PRIMARY KEY,
+	campaign_id integer REFERENCES csbt_campaign_table(campaign_id),
+	map_name text,
+	map_image_url text,
+	creator_uid integer NOT NULL REFERENCES cs_authentication_table(uid),
+	width integer NOT NULL DEFAULT 10,
+	height integer NOT NULL DEFAULT 10,
+	offset_left integer NOT NULL DEFAULT 20,
+	offset_top integer NOT NULL DEFAULT 20,
+	cell_size integer NOT NULL DEFAULT 32,
+	toolbox_offset_left integer NOT NULL default 200,
+	toolbox_offset_top integer NOT NULL DEFAULT 50,
+	grid_shown boolean NOT NULL DEFAULT false
+);
+
+
+CREATE TABLE csbt_map_token_table (
+	map_token_id serial NOT NULL PRIMARY KEY,
+	map_id integer NOT NULL REFERENCES csbt_map_table(map_id),
+	token_name text NOT NULL DEFAULT 'not set...',
+	token_img text,
+	location text,
+	movement text
+);
