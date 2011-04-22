@@ -1,3 +1,4 @@
+//=============================================================================
 function tokenStorage(pId, pName, pLocation) {
 	//TODO: should this store the number of moves available?
 	var _id = undefined;
@@ -21,6 +22,15 @@ function tokenStorage(pId, pName, pLocation) {
 			_name = pName;
 			return(_name);
 		}//end setName()
+		
+		this.getHtml = function(pIsToken) {
+			var tId = "token_"+ _id;
+			if(pIsToken !== true) {
+				tId = "tokenLegend_"+ _id;
+			}
+			var tHtml = "<img src='/images/icons/"+ _name +"' id='"+ tId +"'>";
+			return(tHtml);
+		}//end setHtml()
 		
 		this.getLocation = function() {
 			return(_location);
@@ -55,10 +65,19 @@ function tokenStorage(pId, pName, pLocation) {
 		}
 		return(tRetval);
 	}//end move()
+	
+	/**  */
+	this.getMovement = function() {
+		return(_movement);
+	}//end getMovement()
 }//end tokenStorage{}
+//=============================================================================
 
 
+
+//=============================================================================
 function mapStorage() {
+	//TODO: account for tile positions that have an off-by-one problem (i.e. position must increase 1xgrid[x/]coord)
 	var _selectedToken = undefined;
 	var _tokens = new Array();
 	var _locations = new Array();
@@ -79,15 +98,14 @@ function mapStorage() {
 			_lastTokenId++;
 		}
 		tNewId = _lastTokenId;
-		_tokens[tNewId] = pName;
+		_tokens[tNewId] = new tokenStorage(tNewId, pName, pLocation);
 		if(pLocation != undefined) {
 			_locations[tNewId] = pLocation;
 			this._DisplayToken(tNewId);
-			$("#"+ pLocation).html(pName);
 		}
 		
 		//add the token to the map.
-		this.ShowAllTokens();
+		this.ShowTokenLegend();
 		return(tNewId);
 	}//end AddToken()
 	
@@ -107,9 +125,11 @@ function mapStorage() {
 		
 	
 		
-	/** Puts the token's HTML into the appropriate. */
+	/** Puts the token's HTML into the appropriate coordinates. */
 	this._DisplayToken = function(pId) {
-		$("#"+ _locations[pId]).html(_tokens[pId]);
+		var tHtml = this.GetTokenById(pId).getHtml(true);
+		$("#"+ _locations[pId] +" div.inner").html(tHtml);
+		return(tHtml);
 	}//end _DisplayToken()
 	
 	
@@ -129,13 +149,14 @@ function mapStorage() {
 	this.MoveToken = function(pId, pNewLocation) {
 		var tRetval = false;
 		if(_tokens[pId] != undefined && this.IsValidCoord(pNewLocation) && !this.IsSpaceOccupied(pNewLocation)) {
-			//move from the old location.
+			//remove from the old location.
 			this.MakeSpaceEmpty(_locations[pId]);
 			
 			// update to a new location.
 			_locations[pId] = pNewLocation;
 			
-			//o$("#"+ _locations[pId]).html(_tokens[pId]);
+			_tokens[pId].move(pNewLocation);
+			
 			this._DisplayToken(pId);
 			
 			// Keep the token selected...
@@ -145,7 +166,7 @@ function mapStorage() {
 			
 			tRetval = true;
 		}
-		this.ShowAllTokens();
+		this.ShowTokenLegend();
 		return(tRetval);
 	}//end MoveToken()
 	
@@ -153,7 +174,7 @@ function mapStorage() {
 	
 	/** Make the space (pId == ID of cell on page) empty */
 	this.MakeSpaceEmpty = function(pId) {
-		$("#"+ pId).html("&nbsp;");
+		$("#"+ pId +" div.inner").html("&nbsp;");
 	}//end MakeSpaceEmpty()
 	
 	
@@ -268,7 +289,7 @@ function mapStorage() {
 	
 	/** Removes the class that indicates a coordinate is selected from EVERYTHING. */
 	this.UnselectToken = function(pId) {
-		$("table.ttorp tr td.readyToMove").removeClass("readyToMove");
+		$("#map div.readyToMove").removeClass("readyToMove");
 		if(pId != undefined) {
 			_selectedToken = undefined;
 		}
@@ -302,18 +323,23 @@ function mapStorage() {
 	
 	
 	/** Displays list of the tokens. */
-	this.ShowAllTokens = function() {
+	this.ShowTokenLegend = function() {
 		if(_tokens.length > 0) {
 			var tStr = "";
 			for(var i=1; i<_tokens.length; i++) {
 				if(i>0) {
 					tStr += "<br />";
 				}
-				tStr += _tokens[i] +" ("+ i +"): "+ _locations[i] +" -- X="+ this.GetCoordX(i) +", y="+ this.GetCoordY(i);
+				var tHtml = _tokens[i].getHtml(false);
+				var tLocationString = "(Not placed yet...)";
+				if(_locations[i]) {
+					tLocationString = _locations[i] +" -- X="+ this.GetCoordX(i) +", y="+ this.GetCoordY(i);
+				}
+				tStr += tHtml +" ("+ i +"): "+ tLocationString;
 			}
 			$("#allTokens").html(tStr);
 		}
-	}//end ShowAllTokens()
+	}//end ShowTokenLegend()
 	
 	
 	
@@ -348,19 +374,20 @@ function mapStorage() {
 	/** If a token is selected, this will move a token up, down, left, or right if the corresponding arrow key is pressed. */
 	this.HandleMovement = function (pKeyNum) {
 		var tTokenMoved = true;
+		var tMoveResult = undefined;
 		if(_selectedToken != undefined) {
 			switch(pKeyNum) {
 				case 37:
-					this.MoveLeft(_selectedToken);
+					tMoveResult = this.MoveLeft(_selectedToken);
 					break;
 				case 38:
-					this.MoveUp(_selectedToken);
+					tMoveResult = this.MoveUp(_selectedToken);
 					break;
 				case 39:
-					this.MoveRight(_selectedToken);
+					tMoveResult = this.MoveRight(_selectedToken);
 					break;
 				case 40:
-					this.MoveDown(_selectedToken);
+					tMoveResult = this.MoveDown(_selectedToken);
 					break;
 				default:
 					tTokenMoved = false;
@@ -369,20 +396,46 @@ function mapStorage() {
 		}
 		return(tTokenMoved);
 	}//end HandleMovement
+	
+	
+	
+	/**  */
+	this.getTokenMovements = function(pId) {
+		return(_tokens[pId].getMovement());
+	}//end getTokenMovements()
+	
+	
+	
+	/** POST changes to the server */
+	this.sendChanges = function(pChanges) {
+		//nction ajax_doPost(formName, postData, msgTitle, msgBody, isAsync) {
+		ajax_doPost('/ajax/ttorp/map', pChanges);
+	}//end sendChanges()
+	
+	
+	
+	/** Callback for handling the response. */
+	this.sendChanges_response = function(pXmlResponse) {
+	}//end sendChanges_response()
+
 }//end mapStorage{}
+//=============================================================================
 
 
 //create required objects...
-_map = new mapStorage();
+var mapObj = new mapStorage();
+
+
 
 
 function createDialog(pIdOfDialog) {
 	$("#"+ pIdOfDialog).dialog({
 		buttons: {
-			"Ok": 		
+			"Add": 		
 				function() { 
-					if($("#newTokenName")) {
-						_map.AddToken($("#newTokenName").text());
+					if($("#newTokenName").val().length) {
+						mapObj.AddToken($("#newTokenName").val());
+						$("#newTokenName").val("");
 					}
 					$(this).dialog("close"); 
 				},
@@ -390,49 +443,95 @@ function createDialog(pIdOfDialog) {
 				function() { $(this).dialog("close"); }
 		},
 		modal: true,
+		open: 
+			//TODO: make this do the same thing as "Add"...
+			//TODO: keep this from submitting mutliple times (manifests after submitting at least once).
+			function(){
+			/*$(this).keyup(
+				function(e) {
+					if (e.keyCode == 13) {
+						$(this).dialog("close");
+					}
+				}
+			)*/
+			},
 		effect: 'slide'
 	});
 	return(true);
 }//end createDialog()
 
+function handleDialogAdd(obj) {
+}
+
+
+function btnClick_sendChanges() {
+	var tChanges = Array();
+	// get a list of tokens and associate their id's to their list of movements...
+	
+	// check for background map settings, grid changes (placement, size, progressive padding, etc)
+	
+	// send all data to the server.
+	mapObj.sendChanges(tChanges);
+}//end btnClick_sendChanges()
 
 
 $(document).ready(function(){
-	$("table.ttorp tr td.tile").each(function(){
-		var tMyId = $(this).attr("id");
-		_map.MakeSpaceEmpty(tMyId);
-	});
-	$("table.ttorp tr td.borderCell").each(function(){
-		$(this).html("");
-	});
-	
 	// Add a token so people w/o FireBug can try it out.
-	_map.AddToken("<img src='/images/icons/16-tool-a.png'>", "coord_1-1");
-	_map.AddToken("<img src='/images/icons/16-em-plus.png' align='center'>", "coord_2-1");
+	mapObj.AddToken("16-tool-a.png", "coord_1-1");
+	mapObj.AddToken("16-em-plus.png", "coord_2-1");
 	
 	
-	$("table.ttorp tr td").click(function(){
+	$("#map div.tile").click(function(){
 		var tId = $(this).attr("id");
-		return(_map.SelectOrMoveToken(tId));
-	});
-	$(".vertical-text").each(function(){
-		var tStr = $(".vertical-text").text();
-		var tBits = tStr.split("");
-		var tFinalString = "";
-		for(var i=0; i<tBits.length; i++) {
-			tFinalString += tBits[i] + "<br />\n";
-		}
-		$(this).html(tFinalString);
+		return(mapObj.SelectOrMoveToken(tId));
 	});
 	$("#input_loadMap").click(function(){
-		$("table.ttorp").attr("background", $("#input_mapUrl").val());
+		$("#map").css("background-image", "url("+ $("#input_mapUrl").val() +")");
 	});
 	$("#resetMap").click(function(){
-		$("table.ttorp").attr("background", "");
+		$("#map").css("background-image", "");
 	});
 	$(document).keyup(function(event){
-		_map.HandleMovement(event.which);
+		mapObj.HandleMovement(event.which);
+	});
+	$(".draggable").draggable();
+	$(".resizable").resizable();
+	$("#showGrid").click(function(){
+		$("div.tile div.inner").addClass("gridShown");
+		$(this).toggle();
+		$("#hideGrid").toggle();
+	});
+	$("#hideGrid").click(function(){
+		$("div.tile div.inner").removeClass("gridShown");
+		$(this).toggle();
+		$("#showGrid").toggle();
 	});
 });
 
+var _responseXML = undefined;
+
+function ajax_getRequest(type, isAsync, url) {
+	if(isAsync != false && isAsync != true) {
+		isAsync = true;
+	}
+	
+	myUrl='/ajax/';
+	if(url != undefined) {
+		myUrl = url;
+	}
+	
+	$.ajax ({
+		url			: myUrl + type,
+		cache		: false,
+		async		: isAsync,
+		dataType	: 'text/xml',
+		timeout		: (30 * 1000),
+		success: function (returnXml) {
+			_responseXML = returnXml;
+		},
+		error: function (returnXml) {
+			alert("Call to " + type + " failed::: " + returnXml);
+		}
+	});
+}
 

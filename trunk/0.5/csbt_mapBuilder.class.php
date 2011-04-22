@@ -14,6 +14,7 @@ class csbt_mapBuilder extends cs_webapplibsAbstract {
 	
 	private $height = 0;
 	private $width = 0;
+	private $_size = null;
 	
 	//-------------------------------------------------------------------------
 	public function __construct($sizeSpec) {
@@ -48,48 +49,43 @@ class csbt_mapBuilder extends cs_webapplibsAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function build_grid() {
-		/*
-		 * TODO: consider adding ability to create a "border" row & column, to cope 
-		 *		with parts of the map not being attached to a grid...
-		 */
-		$output = "<table class=\"ttorp\">\n";
-		
-		#//build the border row.
-		#$output .= "<tr class=\"border\">\n";
-		#for($i=0;$i<=$this->width;$i++) {
-		#	$output .= "\t<td class=\"borderRow borderCell\" id=\"border_". $i ."-0\"></td>\n";
-		#}
-		#$output .= "</tr>\n";
-		
-		for($h=0;$h<$this->height;$h++) {
-			$rowNum = ($h+1);
-			$rowClasses = "row_". $rowNum;
-			$addColClasses = "";
-			if($h==0) {
-				$rowClasses .= " borderRow";
-				$addColClasses = " borderCol";
-			}
-			$thisRow = "<tr class=\"". $rowClasses ."\">\n";
-			$output .= $thisRow;
-			
-			#//add a border cell.
-			#$output .= "\t<td class=\"borderCol borderCell\" id=\"border_0-". ($h+1) ."\"></td>\n";
-			
-			for($w=0;$w<$this->width;$w++) {
-				$coord = ($w+1) ."-". ($h+1);
-				$colClasses = "tile col_". ($w+1) ." row_". ($h+1);
-				if($w==0) {
-					$colClasses .= " borderRow";
-				}
-				$colClasses .= $addColClasses;
-				$thisCol = "\t<td class=\"". $colClasses ."\" id=\"coord_". $coord ."\">&nbsp;</td>\n";
-				$output .= $thisCol;
-			}
-			$output .= "</tr>\n";
+	public function build_grid($sqSize=32) {
+		if(!is_numeric($sqSize) || $sqSize < 5) {
+			$sqSize = 32;
 		}
-		$output .= "</table>";
+		//<div id="x0y0" class="gridSquareHidden" style="position: absolute; left: 0px; top: 0px; width: 50px; height: 50px;">
+		$output="";
+		$top = 0;
+		for($x = 0; $x < $this->width; $x++) {
+			$offsetY = ($sqSize * $x);
+			
+			$left = 0;
+			
+			for($y = 0; $y < $this->height; $y++) {
+				$offsetX = ($sqSize * $y);
+				$innerSize = ($sqSize -1);
+				$output .= "\t". '<div id="coord_'. $y .'-'. $x .'" class="tile col_'. $y .'" '.
+					'style="position: absolute; left: '. $offsetX .'px; top: '. $offsetY .'px; '.
+					'width: '. $sqSize .'px; height: '. $sqSize .'px;">'.
+					'<div class="inner" style="height: '. $innerSize .'px; width: '. $innerSize .'px;"></div></div>'. "\n";
+			}
+			#$output .= "</div>\n";
+			$top += $sqSize;
+		}
+		$this->_size = array(
+			'x'	=> ($sqSize * $this->width),
+			'y'	=> ($sqSize * $this->height)
+		);
+		
 		return($output);
 	}//end build_grid()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_size($xOrY) {
+		return($this->_size[$xOrY]);
+	}//end get_size()
 	//-------------------------------------------------------------------------
 }

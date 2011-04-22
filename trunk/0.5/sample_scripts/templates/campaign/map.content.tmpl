@@ -1,36 +1,48 @@
 
-<h3>Test map</h3>
-
-<!-- div class="table">
-	<div class="tr">
-		<div class="th">Header 1</div>
-		<div class="th">Header 2</div>
-		<div class="th">Header 3</div>
-	</div>
-	<div class="tr">
-		<div class="td">cell in column 1</div>
-		<div class="td">cell in column 2</div>
-		<div class="td">cell in column 3</div>
-	</div>
-</div -->
 
 
-	<div id="debug">N/A</div>
+<div id="toolbox" class="floatingBox draggable" style="z-index: 99">
+<h1>Test map</h1>
 	<div class="map tokens" id="allTokens"></div>
 	<div>
 		<input type="button" id="input_addToken" value="Add Token" OnClick="javascript:createDialog('newToken')">
 	</div>
 	<input type="button" id="input_loadMap" value="Load map:">
-		<input type="text" id="input_mapUrl" value="/images/ttorp/04_HeroesHorror_300_ppi_a29yq.jpg" size="40">
-		(<a href="#reset" id="resetMap" class="badLink">reset</a>)
-	<div class="dialog hidden" id="newToken" title="Create New Token" style="width:500">
-		<table>
-			<tr>
-				<th>Token Name</th>
-				<td><input id="newTokenName" type="text" /></td>
-			</tr>
-		</table>
+	<input type="text" id="input_mapUrl" value="/images/ttorp/04_HeroesHorror_300_ppi_a29yq.jpg" size="40">
+	<div>
+		<a href="#reset" id="resetMap" class="badLink">reset map</a>
+		| <a href="">reload page</a>
+		| <a href="#" id="showGrid">show grid</a><a href="#hideGrid" id="hideGrid" class="hidden">hide grid</a>
 	</div>
+	<div>
+		<div class="caption">TODO LIST:</div>
+		<div class="note todo">
+			<ul>
+				<li>Placing new tokens automatically</li>
+				<li>Icon selection (instead of typing an image)</li>
+				<li>Better Icons...</li>
+				<li>AJAX-style loading icons</li>
+				<li>Initial loading screen (so users know they need to wait for stuff)</li>
+				<li>Map resizing</li>
+				<li>Drag map around (defines where upper-left grid square starts--not all maps are entirely grid-based)</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="dialog hidden" id="newToken" title="Create New Token" style="width:500">
+	<table>
+		<tr>
+			<th>Token Name</th>
+			<td><input id="newTokenName" type="text" /></td>
+		</tr>
+		<tr>
+			<td colspan=2 class="note">Token placement doesn't work yet, so it will only appear in the legend.</td>
+		</tr>
+	</table>
+</div>
 
 <!-- p>NOTE::: Coordinates are "coord_(x)-(y)", where "(x)" is the x-axis or column #, and "(y)" is the row.</p -->
+<div id="map" style="position:absolute; left:20; top:20; width:{mapSizeX}; height:{mapSizeY};">
+<!-- style="background-image:url(/images/ttorp/04_HeroesHorror_300_ppi_a29yq.jpg)" -->
 {ttorpTable}
+</div>

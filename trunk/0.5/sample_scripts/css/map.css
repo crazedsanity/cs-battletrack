@@ -3,10 +3,29 @@
  * ID: $Id$
  */
 
-table.ttorp tr td {
-	width:  48px;
-	height: 48px;
-	margin: 1px;
+div.tile {
+	width:   32px;
+	height:  32px;
+	margin:  0px;
+	padding: 0px;
+	border:  0px;
+	overflow: visible;
+	display:  inline-block;
+}
+
+div.tile img {
+	margin-top: none;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+div.tile span {
+	height: 100%;
+	width: 100%;
+}
+
+div.gridShown {
+	border: solid #000 1px;
 }
 
 td.highlight {
@@ -42,4 +61,19 @@ div.th {
 div.td {
 	display:table-cell;
 	border:solid #000 1px;
+}
+
+div.floatingBox {
+	background-color: LightGrey;
+	border: solid #000 3px;
+	padding: 6px;
+}
+.note {
+	border: solid #666 1px;
+	text-decoration: italic;
+	padding: 3px;
+	text-align: center;
+}
+.todo {
+	text-align: left;
 }
