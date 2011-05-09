@@ -10,7 +10,8 @@
 --
 CREATE TABLE csbt_campaign_table (
 	campaign_id serial NOT NULL PRIMARY KEY,
-	campaign_name varchar(128) NOT NULL UNIQUE,	
+	campaign_name varchar(128) NOT NULL,	
+	description text,
 	owner_uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	create_date timestamp NOT NULL DEFAULT NOW(),
 	is_active bool NOT NULL DEFAULT true
@@ -174,7 +175,7 @@ CREATE TABLE csbt_character_save_table (
 CREATE TABLE csbt_map_table (
 	map_id serial NOT NULL PRIMARY KEY,
 	campaign_id integer REFERENCES csbt_campaign_table(campaign_id),
-	map_name text,
+	map_name text NOT NULL DEFAULT 'map',
 	map_image_url text,
 	creator_uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	width integer NOT NULL DEFAULT 10,

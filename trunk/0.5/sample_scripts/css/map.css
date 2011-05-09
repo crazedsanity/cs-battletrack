@@ -68,12 +68,3 @@ div.floatingBox {
 	border: solid #000 3px;
 	padding: 6px;
 }
-.note {
-	border: solid #666 1px;
-	text-decoration: italic;
-	padding: 3px;
-	text-align: center;
-}
-.todo {
-	text-align: left;
-}

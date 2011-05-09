@@ -190,6 +190,19 @@ class csbt_character extends csbt_battleTrackAbstract {
 		if(is_numeric($this->characterId)) {
 			try {
 				$data = $this->tableHandlerObj->get_single_record(array(self::pkeyField=>$this->characterId));
+				
+				if(isset($data['campaign_id']) && is_numeric($data['campaign_id'])) {
+					//retrieve campaign information.
+					//cs_phpDB $dbObj, $uid, $campaignId=null
+					$cObj = new csbt_campaign($this->dbObj, $data['uid'], $data['campaign_id']);
+					$cData = $cObj->get_campaign($data['campaign_id']);
+					$data['campaign_name'] = $cData['campaign_name'];
+					$data['campaign_description'] = $cData['description'];
+				}
+				else {
+					$data['campaign_name'] = "N/A";
+					$data['campaign_description'] = "Not associated to a campaign...";
+				}
 			}
 			catch(Exception $e) {
 				$this->_exception_handler(__METHOD__ .":: failed to retrieve main record, DETAILS::: ". $e->getMessage());
@@ -292,6 +305,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'melee_total')] = $this->get_attack_bonus('melee');
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'ranged_total')] = $this->get_attack_bonus('ranged');
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'skills_max_cc')] = floor($mainCharData['skills_max'] / 2);
+				$retval[$this->create_sheet_id('generated', 'campaign_name')] = $mainCharData['campaign_name'];
+				$retval[$this->create_sheet_id('generated', 'campaign_description')] = $mainCharData['campaign_description'];
 			}
 			else {
 				$this->_exception_handler("no main character data");

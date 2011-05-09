@@ -9,7 +9,8 @@ $charList = $userChar->get_character_list();
 
 $page->rip_all_block_rows();
 
-$rowName = 'characterList';
+$rowName = 'characterList_unassigned';
+$rowName_assigned = 'characterList_assigned';
 if(isset($page->templateRows[$rowName])) {
 	if(is_array($charList)) {
 		$parsedRows = "";

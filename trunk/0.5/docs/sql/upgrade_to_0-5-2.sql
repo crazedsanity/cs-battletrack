@@ -9,7 +9,7 @@
 CREATE TABLE csbt_map_table (
 	map_id serial NOT NULL PRIMARY KEY,
 	campaign_id integer REFERENCES csbt_campaign_table(campaign_id),
-	map_name text,
+	map_name text NOT NULL DEFAULT 'map',
 	map_image_url text,
 	creator_uid integer NOT NULL REFERENCES cs_authentication_table(uid),
 	width integer NOT NULL DEFAULT 10,
@@ -31,3 +31,6 @@ CREATE TABLE csbt_map_token_table (
 	location text,
 	movement text
 );
+
+
+ALTER TABLE csbt_campaign_table ADD COLUMN description text;

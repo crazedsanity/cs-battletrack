@@ -12,19 +12,49 @@
 
 class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
-	protected $campaignId;
-	
+	protected $campaignId=null;
+	protected $uid=null;
+	protected $tableHandler;
 	
 	//-------------------------------------------------------------------------
 	/**
 	 * Basic creation of the campaign object.
 	 */
-	public function __construct($campaignId=null) {
+	public function __construct(cs_phpDB $dbObj, $uid, $campaignId=null) {
+		$cleanStringArr = array(
+			'campaign_name'		=> "text",
+			'description'		=> "text",
+			'owner_uid'			=> "int",
+			'is_active'			=> "bool"
+		);
+		parent::__construct($dbObj, 'csbt_campaign_table', 'csbt_campaign_table_campaign_id_seq', 'campaign_id', $cleanStringArr);
 		if(!is_null($campaignId)) {
 			$this->get_campaign($campaignId);
 		}
-		parent::__construct();
+		if(!is_null($uid) && is_numeric($uid)) {
+			$this->uid = $uid;
+		}
+		else {
+			throw new exception(__METHOD__ .": uid required (". $uid .")");
+		}
+		
 	}//end __construct()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_sheet_data(){
+		return(false);
+	}//end get_sheet_data()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_character_defaults() {
+		return(false);
+	}//end get_character_defaults()
 	//-------------------------------------------------------------------------
 	
 	
@@ -46,22 +76,31 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_campaign($campaignId) {
-		$sql = "SELECT * FROM csbt_campaign_table WHERE campaign_id=". $campaignId;
+	public function handle_update($fieldName, $recId=null, $newValue) {
+		$retval = false;
 		try {
-			$data = $this->dbObj->run_query($sql);
-			$numRows = $this->dbObj->numRows();
-			$dbError = $this->dbObj->errorMsg();
-				
-			if($numRows != 1 || strlen($dbError) !== 0) {
-				//now set some internal items.
-				$this->campaignId = $data['campaign_id'];
-				$this->_sanity();
+			$res = $this->tableHandlerObj->update_record($this->campaignId, array($fieldName=>$newValue));
+			if($res) {
+				$retval = true;
 			}
-			else {
-				throw new exception(__METHOD__ .": invalid number of records (". $numRows() .") or" 
-						." database error (". $dbError .")");
-			}
+		}
+		catch(Exception $ex) {
+			$retval = false;
+		}
+
+		return($retval);
+	}//end handle_update()
+	//-------------------------------------------------------------------------
+	
+	
+	
+	//-------------------------------------------------------------------------
+	public function get_campaign($campaignId) {
+		try {
+			$this->campaignId = $campaignId;
+			$data = $this->tableHandlerObj->get_record_by_id($campaignId);
+			
+			$this->_sanity();
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to retrieve campaign (". $campaignId ."), DETAILS::: ". $e->getMessage());
@@ -73,19 +112,22 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function create_campaign($name, $ownerUid, array $players=null) {
-		if(strlen($name) && is_numeric($ownerId)) {
-			$sql = "INSERT INTO csbt_campaign_table (campaign_name, owner_uid) VALUES "
-				."(". $this->gfObj->cleanString($name, 'name', true) .", ". $ownerUid .")";
+	public function create_campaign($name, $description=null) {
+		if(strlen($name) && is_numeric($this->uid)) {
+			$insertData = array(
+				'campaign_name'	=> $name,
+				'owner_uid'		=> $this->uid,
+				'description'	=> $description
+			);
 			try {
-				$this->campaignId = $this->dbObj->run_insert($sql, 'csbt_campaign_table_campaign_id_seq');
+				$this->campaignId = $this->tableHandlerObj->create_record($insertData);
 			}
 			catch(Exception $ex) {
 				throw new exception(__METHOD__ .": failed to create campaign, SQL error::: ". $ex->getMessage());
 			}
 		}
 		else {
-			throw new exception(__METHOD__ .": failed to create campaign, missing name (". $name .") or ownerUid (". $ownerUid .")");
+			throw new exception(__METHOD__ .": failed to create campaign, missing name (". $name .") or ownerUid (". $this->uid .")");
 		}
 		$this->_sanity();
 		return($this->campaignId);
@@ -95,27 +137,17 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function update_campaign($campaignName, $ownerUid=null, $isActive=null) {
+	public function update_campaign($campaignName, $isActive=null) {
 		$this->_sanity();
 		
-		$cleanString = array(
-			'campaign_name'		=> 'sql',
-			'owner_uid'			=> 'int',
-			'is_active'			=> 'bool'
-		);
 		$sqlArr = array(
 			'campaign_name'		=> $campaignName
 		);
-		if(!is_null($ownerUid) && is_numeric($ownerUid) && $ownerUid > 0) {
-			$sqlArr['owner_uid'] = $ownerUid;
-		}
 		if(!is_null($isActive) && is_bool($isActive)) {
 			$sqlArr['is_active'] = $isActive;
 		}
-		$sql = "UPDATE csbt_campaign_table SET ". $this->gfObj->string_from_array($sqlArr, 'update', null, $cleanString, true)
-			."' WHERE campaign_id=". $this->campaignId;
 		try {
-			$retval = $this->dbObj->run_update($sql,true);
+			$retval = $this->tableHandlerObj->update_record($this->campaignId, $sqlArr, null, " AND owner_uid=". $this->uid);
 		}
 		catch(Exception $e) {
 			throw new exception(__METHOD__ .":: failed to update campaign record, DETAILS::: ". $e->getMessage());
@@ -128,10 +160,14 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function set_is_active($newSetting=true) {
-		$retval = false;
-		$newSetting = $this->gfObj->interpret_bool($newSetting, array('FALSE', 'TRUE'));
-		
-		$sql = "UPDATE csbt_campaign_table SET is_active=". $newSetting;
+		try {
+			$newSetting = $this->gfObj->interpret_bool($newSetting, array('FALSE', 'TRUE'));
+			$this->tableHandlerObj->update_record($this->campaignId, array('is_active'=>$newSetting), " AND owner_uid=". $this->uid);
+			$retval = true;
+		}
+		catch(Exception $e) {
+			$retval = false;
+		}
 		
 		return($retval);
 	}
@@ -140,11 +176,14 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	
 	//-------------------------------------------------------------------------
-	public function add_players(array $characterSheets) {
-		if(count($characterSheets)) {
+	public function add_players(array $characterIds) {
+		$retval = 0;
+		if(count($characterIds)) {
 			try{
-				foreach($characterSheets as $i=>$sheetObj) {
-					$this->add_player($sheetObj);
+				foreach($characterIds as $id) {
+					$charSheetObj = new csbt_character($this->dbObj, $id);
+					$charSheetObj->update_main_character_data(array('campaign_id'=>$this->campaignId));
+					$retval++;
 				}
 			}
 			catch(Exception $ex) {
@@ -155,55 +194,64 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 			throw new exception(__METHOD__ .": no data in list");
 		}
 		
+		return($retval);
 	}//end add_players()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function add_player(characterSheet $sheetObj) {
-		$sql = "UPDATE csbt_character_sheet_table WHERE character_id=". $sheetObj->characterId;
-		try {
-			$numUpdated = $this->dbObj->run_update($sql);
-		}
-		catch(Exception $ex) {
-			throw new exception(__METHOD__ .": failed to add character::: ". $ex->getMessage());
-		}
-		return($numUpdated);
-	}//end add_player
+	public function add_player($id) {
+		return($this->add_players(array($id)));
+	}//end add_player()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_player_data() {
+	public function get_player_data($campaignId=null) {
+		if(is_null($campaignId)) {
+			$campaignId = $this->campaignId;
+		}
+		$charListObj = new csbt_campaignCharacterList($this->dbObj, $campaignId);
+		return($charListObj->get_character_list());
 	}//end get_player_data()
 	//-------------------------------------------------------------------------
 	
 	
 	
 	//-------------------------------------------------------------------------
-	private function _do_update(array $updates) {
-		
-		$cleanStringArr = array(
-			'campaign_name'	=> 'sql',
-			'is_active'		=> 'bool'
-		);
-		
-		$sql = 'UPDATE csbt_campaign_table SET '
-			. $this->gfObj->string_from_array($updates, 'update', null, $allowedFieldsArr, false)
-			. ' WHERE campaign_id='. $this->campaignId;
-		
-		try{
-			$numAffected = $this->dbObj->run_update($sql, false);
+	public function get_campaigns() {
+		$retval = array();
+		if(!is_null($this->uid)) {
+			try {
+				//function get_records(array $filter=null, $orderBy=null, $limit=null, $offset=null)
+				$retval = $this->tableHandlerObj->get_records(array('owner_uid'=>$this->uid));
+				
+				if(is_array($retval) && count($retval)) {
+					foreach($retval as $id=>$info) {
+						$playerList = $this->get_player_data($id);
+						if(is_array($playerList)) {
+							$retval[$id]['playerList'] = $playerList;
+						}
+						else {
+							$retval[$id]['playerList'] = array();
+						}
+					}
+				}
+			}
+			catch(Exception $e) {
+				throw new exception(__METHOD__ .": error... ". $e->getMessage());
+			}
 		}
-		catch(Exception $ex) {
-			throw new exception(__METHOD__ .": failed to run SQL::: ". $ex->getMessage());
+		else {
+			throw new exception(__METHOD__ .": uid must be set (". $this->uid .")");
 		}
-		
-		return($numAffected);
-	}//end _do_update()
+		return($retval);
+	}//end get_campaigns()
 	//-------------------------------------------------------------------------
+	
+	
 }
 
 ?>
