@@ -1,0 +1,42 @@
+/* SVN INFO
+ * 
+ * $Id$
+ */
+
+ .header {
+ 	text-align: center;
+	font-size: 2em;
+ }
+ .headerLink {
+	padding-left: 5em;
+ 	display: inline;
+ }
+.note {
+	border: solid #666 1px;
+	text-decoration: italic;
+	padding: 3px;
+	text-align: center;
+}
+.todo {
+	text-align: left;
+}
+.campaignList {
+	border:solid #000 1px; 
+	width: auto;
+	margin: 3px; 
+	padding:3px;
+}
+.campaignBox {
+	display: inline-block;
+	/* The width is to hopefully wrap the boxes most efficiently for the majority of displays. */
+	width: 380px;
+	border: dashed #000 1px;
+	vertical-align: top;
+}
+
+.campaignBox .note {
+	border: none;
+}
+.dialog {
+	width: 500px;
+}
