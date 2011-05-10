@@ -25,9 +25,19 @@ function addPlayerDialog(pIdOfCampaign) {
 	});
 	_activeDialog = "addPlayer";
 	$("#addPlayer_campaignName").text($("#campaignId_"+ pIdOfCampaign).text());
+	$("#addPlayerCampaignId").val(pIdOfCampaign);
 	$(".closeForm").click(function() {
 		$("#addPlayer").dialog("close");
 		_activeDialog = undefined;
+	});
+	$("#playerId").autocomplete({
+		source: "/ajax/member/ttorp/campaign/charSearch",
+		minLength: 2,
+		select: function(event,ui) {
+			//alert("event: ("+ event +")");
+			$("#addPlayerSubmit").removeAttr("disabled");
+			$("#addPlayer form").submit();
+		}
 	});
 }//end addPlayerDialog()
 
@@ -44,9 +54,4 @@ function updatePlayerName(pJson) {
 	}
 }//end updatePlayerName()
 
-$(document).ready(function() {
-	$("#playerId").autocomplete(function() {
-		source: 
-	});
-});
 

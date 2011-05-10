@@ -55,7 +55,7 @@ class csbt_campaignCharacterList extends csbt_tableHandler {
 	public function get_character_list() {
 		
 		try {
-			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId));
+			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
 		}
 		catch(exception $e) {
 			throw new exception(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());

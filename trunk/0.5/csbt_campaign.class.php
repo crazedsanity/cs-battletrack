@@ -202,7 +202,14 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	
 	//-------------------------------------------------------------------------
 	public function add_player($id) {
-		return($this->add_players(array($id)));
+		try {
+			$char = new csbt_character($this->dbObj, $id);
+			$retval = $char->update_main_character_data(array('campaign_id' => $this->campaignId));
+		}
+		catch(Exception $e) {
+			throw new exception(__METHOD__ .": failed to update character::: ". $e->getMessage());
+		}
+		return($retval);
 	}//end add_player()
 	//-------------------------------------------------------------------------
 	

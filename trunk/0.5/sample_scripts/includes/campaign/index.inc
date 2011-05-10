@@ -4,14 +4,35 @@
 $campaign = new csbt_campaign($page->db, $_SESSION['uid'], null);
 if($_POST) {
 	$urlAppend = "invalid";
-	if($_POST['action'] == 'newCampaign') {
-		try {
-			$res = $campaign->create_campaign($_POST['name'], $_POST['description']);
-		}
-		catch(Exception $ex) {
-			$res = $ex->getMessage();
-		}
-		$urlAppend = "newId=". $res;
+	switch($_POST['action']) {
+		case 'newCampaign':
+			try {
+				$res = $campaign->create_campaign($_POST['name'], $_POST['description']);
+			}
+			catch(Exception $ex) {
+				$res = $ex->getMessage();
+			}
+			$urlAppend = "newId=". $res;
+			break;
+
+		case 'addPlayer':
+			try {
+				$campaign->get_campaign($_POST['campaignId']);
+				$res = $campaign->add_player($_POST['playerId']);
+				$urlAppend = $res;
+			}
+			catch(Exception $e) {
+				$res = $e->getMessage();
+				$urlAppend = "failed...";
+				$page->set_message_wrapper(array(
+					'title'		=> "Error",
+					'message'	=> "Failed to add character, DETAILS::: ". $e->getMessage(),
+					'type'		=> "error"
+				));
+			}
+			break;
+		default:
+			$urlAppend .= ";action=". $_POST['action'];
 	}
 	$page->gfObj->conditional_header("#Posted;". $urlAppend);
 	exit;

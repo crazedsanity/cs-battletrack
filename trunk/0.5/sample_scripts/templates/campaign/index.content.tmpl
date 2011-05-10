@@ -43,14 +43,11 @@
 		<form method="POST">
 			<div id="addPlayer_campaignName" class="header"></div>
 			<div id="addPlayer">Player ID</div>
-			<div><input id="playerId" type="text" autocomplete="off" /></div>
+			<div><input id="playerId" name="playerId" type="text" autocomplete="off" /></div>
 			<div id="addPlayer_name" class="note">Type an ID and the character's name will appear here</div>
 			<input type="hidden" name="action" value="addPlayer">
-			<input type="submit" value="Add"><a href="#closeForm" class="closeForm">Cancel</a>
+			<input type="hidden" name="campaignId" id="addPlayerCampaignId" value="invalid">
+			<input id="addPlayerSubmit" type="submit" value="Add" disabled="disabled"><a href="#closeForm" class="closeForm">Cancel</a>
 		</form>
 	</div>
-</div>
-
-LOG:
-<div id="log">
 </div>

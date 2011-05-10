@@ -52,16 +52,17 @@ if(count($sectionArr) >= 5) {
 				);
 				$res = $searchObj->search($searchCrit);
 				if(is_array($res) && count($res)) {
-					$xmlStatus = count($res);
-					unset($xmlData['errorCode']);
-					$returnData = array();
+					$xmlData = array();
 					foreach($res as $id=>$cData) {
-						$returnData[] = array(
-							'character_id'	=> $id,
-							'display'		=> $cData['character_name']. " [". $cData['character_level'] ."]"
+						$xmlData[] = array(
+							'id'		=> $id,
+							'value'		=> $id,
+							'label'		=> $cData['character_name']. " [". $cData['character_level'] ."]"
 						);
 					}
 				}
+				print(json_encode($xmlData));
+				exit;
 			}
 			catch(Exception $e) {
 				$xmlData['errorCode'] = "Fatal error: ". $e->getMessage();
@@ -78,5 +79,6 @@ if(count($sectionArr) >= 5) {
 	}
 	$xmlData['status'] = $xmlStatus;
 }
+
 
 
