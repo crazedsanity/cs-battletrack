@@ -28,8 +28,8 @@
 }
 .campaignBox {
 	display: inline-block;
-	/* The width is to hopefully wrap the boxes most efficiently for the majority of displays. */
-	width: 380px;
+	width: 49%;
+	overflow:auto;
 	border: dashed #000 1px;
 	vertical-align: top;
 }
