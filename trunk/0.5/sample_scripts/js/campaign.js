@@ -33,9 +33,10 @@ function addPlayerDialog(pIdOfCampaign) {
 	$("#playerId").autocomplete({
 		source: "/ajax/member/ttorp/campaign/charSearch",
 		minLength: 2,
-		select: function(event,ui) {
+		select: function( event, ui ) {
 			//alert("event: ("+ event +")");
 			$("#addPlayerSubmit").removeAttr("disabled");
+			$("#playerId").val(ui.item.id);
 			$("#addPlayer form").submit();
 		}
 	});
