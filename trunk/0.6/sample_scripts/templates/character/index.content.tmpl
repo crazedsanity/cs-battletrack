@@ -1,0 +1,14 @@
+<div>
+	<div><a href="character/sheet.php?id=">Create a new character</a></div>
+	<!-- BEGIN campaignListing --><div id="campaigns">
+		<!-- BEGIN characterList_campaignHeader --><div id="campaign_{campaign_id}" class="campaignHeader">{campaign_name}</div>
+		<!-- END characterList_campaignHeader -->
+		<ul>
+			{characterList_assigned}
+		</ul>
+	</div><!-- END campaignListing -->
+	<ul>
+		<!-- BEGIN characterList_unassigned --><li><a href="character/sheet?id={id}">{name}</a></li>
+		<!-- END characterList_unassigned -->
+	</ul>
+</div>
