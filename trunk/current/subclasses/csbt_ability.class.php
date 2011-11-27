@@ -32,7 +32,7 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 		);
 		
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $this->fields);
-		$this->logger->logCategory = "Ability";
+		//$this->logger->logCategory = "Ability";
 		$this->get_ability_list();
 	}//end __construct()
 	//-------------------------------------------------------------------------

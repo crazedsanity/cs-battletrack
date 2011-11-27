@@ -13,6 +13,9 @@ if(is_numeric($charId)) {
 	$data = $char->get_sheet_data();
 #$page->gfObj->debug_print($data,1);
 	
+	if(!isset($contentTemplate)) {
+		$contentTemplate = null;
+	}
 	$char->build_sheet($page, $contentTemplate);
 	$page->add_template_var('html_title', $char->get_character_name() ." - TTORP [CrazedSanity.com]");
 }
