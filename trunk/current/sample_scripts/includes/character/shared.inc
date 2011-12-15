@@ -4,8 +4,6 @@
  */
 
 
-define('CRYPT_SALT', 'csbt');
-
 $charId = null;
 
 if(isset($_GET['id']) && is_numeric($_GET['id'])) {

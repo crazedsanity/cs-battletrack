@@ -46,6 +46,7 @@ else {
 	#$page->gfObj->debug_print(array_keys($x),1);
 	$rowName = 'noCampaignRow';
 	$finalRow = $page->templateRows[$rowName];
+	$idObfuscator = new cs_idObfuscator();
 	if(is_array($campaignList) && count($campaignList)) {
 		$rowName = 'campaignRow';
 		$finalRow = "";
@@ -60,6 +61,7 @@ else {
 					$playerRow = $page->templateRows['campaignRow_playerRow'];
 					$pRow = "";
 					foreach($playerList as $pId=>$pInfo) {
+						$pInfo['character_id'] = $idObfuscator->encode($pInfo['character_id']);
 						$pRow .= $page->mini_parser($playerRow, $pInfo);
 					}
 				}
