@@ -4,11 +4,11 @@
  * 
  *  SVN INFORMATION::::
  * --------------------------
- * $HeadURL$
- * $Id$
- * $LastChangedDate$
- * $LastChangedRevision$
- * $LastChangedBy$
+ * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/abstract/csbt_battleTrack.abstract.class.php $
+ * $Id: csbt_battleTrack.abstract.class.php 123 2010-11-11 02:09:32Z crazedsanity $
+ * $LastChangedDate: 2010-11-10 20:09:32 -0600 (Wed, 10 Nov 2010) $
+ * $LastChangedRevision: 123 $
+ * $LastChangedBy: crazedsanity $
  */
 
 

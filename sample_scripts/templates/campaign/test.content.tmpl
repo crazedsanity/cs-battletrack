@@ -1,0 +1,91 @@
+<meta charset="utf-8">
+	
+	<style>
+		.ui-autocomplete-loading { background: white url('/images/ajax-loader.gif') right center no-repeat; }
+		.hidden {display: none;}
+	</style>
+	<script>
+	var playerIdList = new Array();
+	var playerIds = new Array();
+	$(function() {
+		function log( message ) {
+			$( "<div/>" ).text( message ).prependTo( "#log" );
+			$( "#log" ).attr( "scrollTop", 0 );
+		}
+
+		function selectPlayer(pId, pLabel)  {
+			if(playerIdList[pId] == undefined) {
+				playerIdList[pId] = pLabel;
+				var tIndex = 0;
+				if(playerIds.length > 0) {
+					tIndex = playerIds.length;
+				}
+				playerIds[tIndex] = pId;
+				var rowToCopy = $(".addedPlayerTemplate");
+				var copy = rowToCopy.clone(true);
+				copy.removeClass("hidden");
+				copy.removeClass("addedPlayerTemplate");
+				copy.text(pLabel);
+				copy.attr("id", "addedPlayer_"+ pId);
+				$("#playerList").append(copy);
+			}
+			else {
+				console.log("Already added "+ pId +" ("+ pLabel +")");
+			}
+			var tMyText = "";
+			for(i=0; i < playerIds.length; i++) {
+				if(i==0) {
+					tMyText = playerIds[i];
+				}
+				else {
+					tMyText = tMyText +","+ playerIds[i];
+				}
+			}
+			$("#submitPlayerIds").val(tMyText);
+		}
+		
+
+		$( "#searchInput" ).autocomplete({
+			source: "/ajax/member/ttorp/campaign/charSearch",
+			minLength: 2,
+			focus: function( event, ui ) {
+				console.log("focused, set value as ("+ ui.item.label +")");
+			},
+			change: function( event, ui ) {
+				console.log("changed");
+				$("#searchInput").val("");
+			},
+			blur: function( event, ui ) {
+				$( "#searchInput" ).val(ui.item.label);
+			},
+			select: function( event, ui ) {
+				console.log("Selected");
+				$( "#searchInput" ).val(ui.item.label);
+				selectPlayer(ui.item.id, ui.item.label);
+			},
+			close: function( event, ui ) {
+				$("#searchInput").val("");
+			}
+		});
+	});
+	</script>
+
+
+
+<div class="demo">
+
+	<div class="ui-widget">
+		<label for="searchInput">Character Search: </label>
+		<input id="searchInput" />
+	</div>
+	
+	<div id="playerList">
+		<div class="addedPlayer hidden addedPlayerTemplate">invalid</div>
+	</div>
+	<div>
+		<label for="submitPlayerIds">List of ID's: </label>
+		<input id="submitPlayerIds" value="">
+	</div>
+
+</div><!-- End demo -->
+

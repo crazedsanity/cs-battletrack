@@ -3,11 +3,11 @@
 /*
  *  SVN INFORMATION::::
  * --------------------------
- * $HeadURL$
- * $Id$
- * $LastChangedDate$
- * $LastChangedRevision$
- * $LastChangedBy$
+ * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_campaign.class.php $
+ * $Id: csbt_campaign.class.php 150 2011-05-10 22:45:16Z crazedsanity $
+ * $LastChangedDate: 2011-05-10 17:45:16 -0500 (Tue, 10 May 2011) $
+ * $LastChangedRevision: 150 $
+ * $LastChangedBy: crazedsanity $
  */
 
 class csbt_campaign extends csbt_battleTrackAbstract	 {

@@ -1,5 +1,5 @@
 /*
-$Id$
+$Id: campaign.js 151 2011-05-11 00:55:19Z crazedsanity $
 */
 
 var _activeDialog = undefined;

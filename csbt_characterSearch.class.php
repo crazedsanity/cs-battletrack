@@ -4,11 +4,11 @@
  * 
  * SVN INFORMATION::::
  * --------------------------
- * $HeadURL$
- * $Id$
- * $LastChangedDate$
- * $LastChangedRevision$
- * $LastChangedBy$
+ * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_characterSearch.class.php $
+ * $Id: csbt_characterSearch.class.php 148 2011-05-09 23:18:02Z crazedsanity $
+ * $LastChangedDate: 2011-05-09 18:18:02 -0500 (Mon, 09 May 2011) $
+ * $LastChangedRevision: 148 $
+ * $LastChangedBy: crazedsanity $
  */
 
 class csbt_characterSearch extends csbt_character {
