@@ -1,14 +1,6 @@
 <?php
 /*
  * Created on Jul 13, 2009
- * 
- * SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_character.class.php $
- * $Id: csbt_character.class.php 148 2011-05-09 23:18:02Z crazedsanity $
- * $LastChangedDate: 2011-05-09 18:18:02 -0500 (Mon, 09 May 2011) $
- * $LastChangedRevision: 148 $
- * $LastChangedBy: crazedsanity $
  */
 
 //TODO: consider optionally adding the logging system.
@@ -316,6 +308,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 			}
 			
 			$savesData = $this->savesObj->get_sheet_data();
+$this->gfObj->debug_print($savesData,1);
 			if(is_array($savesData) && count($savesData)) {
 				$retval[$this->savesObj->_sheetIdPrefix] = $savesData;
 			}

@@ -32,7 +32,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $characterIdOrName=null, $playerUid=null) {
 		$this->dbObj = $dbObj;
-		$this->logger->logCategory = "Character Sheet";
+		$this->logger = new cs_webdblogger($this->dbObj, "Character Sheet");
 		
 		$this->playerUid = $playerUid;
 		

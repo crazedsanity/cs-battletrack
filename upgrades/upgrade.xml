@@ -32,12 +32,5 @@
 		</v1.2.0-ALPHA6>
 	</examples>
 	<initialversion>0.1.0-BETA1</initialversion>
-	<matching>
-		<v0.1.0-BETA1>
-			<target_version>0.5.0</target_version>
-			<script_name>upgradeTo0.5.0.php</script_name>
-			<class_name>upgradeTo_0_5_0</class_name>
-			<call_method>run_upgrade</call_method>
-		</v0.1.0-BETA1>
-	</matching>
+	<matching />
 </upgrade>

@@ -3,7 +3,6 @@
  * Created on Jul 18, 2009
  */
 
-
 $page->rip_all_block_rows('content');
 $page->clear_content('header');
 $page->clear_content('menu');
@@ -11,7 +10,6 @@ $page->clear_content('menu');
 if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
-#$page->gfObj->debug_print($data,1);
 	
 	if(!isset($contentTemplate)) {
 		$contentTemplate = null;
@@ -22,7 +20,12 @@ if(strlen($charId)) {
 else {
 	$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
 	$charId = $char->characterId;
-	$page->conditional_header("?id=". $charId);
+	
+	
+	$obfuscator = new cs_IdObfuscator();
+	$newId = $obfuscator->encode($charId);
+	
+	$page->conditional_header("?id=". $newId);
 }
 
 ?>

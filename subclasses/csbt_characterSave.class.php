@@ -135,7 +135,8 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 		$sql .= " ORDER BY save_name";
 		
 		try {
-			$retval = $this->dbObj->run_query($sql, $params);
+			$this->dbObj->run_query($sql, $params);
+			$retval = $this->dbObj->farray_fieldnames($this->pkeyField);
 			
 			//TODO: get ability modifier (ability_mod) and total (save_total)
 		}

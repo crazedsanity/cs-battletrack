@@ -162,7 +162,8 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 		$sql .= ' ORDER BY skill_name';
 		
 		try {
-			$retval = $this->dbObj->run_query($sql, $params);
+			$this->dbObj->run_query($sql, $params);
+			$retval = $this->dbObj->farray_fieldnames($this->pkeyField);
 		}
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
