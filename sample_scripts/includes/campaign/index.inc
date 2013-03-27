@@ -1,6 +1,5 @@
 <?php
 
-#$page->gfObj->debug_print($_POST,1);
 $campaign = new csbt_campaign($page->db, $_SESSION['uid'], null);
 if($_POST) {
 	$urlAppend = "invalid";
@@ -39,11 +38,9 @@ if($_POST) {
 }
 else {
 	$campaignList = $campaign->get_campaigns();
-	#$page->gfObj->debug_print($campaignList,1);
 
 
 	$x = $page->rip_all_block_rows();
-	#$page->gfObj->debug_print(array_keys($x),1);
 	$rowName = 'noCampaignRow';
 	$finalRow = $page->templateRows[$rowName];
 	$idObfuscator = new cs_idObfuscator();

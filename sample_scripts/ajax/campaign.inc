@@ -1,7 +1,5 @@
 <?php
 
-#$page->gfObj->debug_print($sectionArr,1);
-
 define('JSON_ENCODE', 1);
 
 $xmlData['errorCode'] = "Invalid action";

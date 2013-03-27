@@ -469,7 +469,6 @@ class csbt_characterAbility extends csbt_battleTrackAbstract {
 			$retval = $this->baseAbilityObj->dataCache['byName'][$name];
 		}
 		else {
-			$this->gfObj->debug_print($this->baseAbilityObj->dataCache,1);
 			$this->_exception_handler(__METHOD__ .":: invalid name (". $name .")");
 		}
 		

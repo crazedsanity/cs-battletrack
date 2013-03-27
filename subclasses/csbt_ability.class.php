@@ -40,8 +40,6 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			}
 			
 			if(count($this->dataCache['byId']) !== count($this->dataCache['byName'])) {
-				$this->gfObj->debug_print($data,1);
-				$this->gfObj->debug_print($this->dataCache,1);
 				$this->_exception_handler(__METHOD__ .":: FATAL ERROR: couldn't get lists to line-up, so the kittens ate their mittens... ");
 			}
 		}
@@ -82,7 +80,6 @@ class csbt_ability extends cs_singleTableHandlerAbstract	 {
 			$retval = $this->dataCache['byName'][$name];
 		}
 		else {
-			$this->gfObj->debug_print($this->dataCache,1);
 			$this->_exception_handler(__METHOD__ .":: invalid name (". $name .")");
 		}
 		

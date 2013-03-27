@@ -308,7 +308,6 @@ class csbt_character extends csbt_battleTrackAbstract {
 			}
 			
 			$savesData = $this->savesObj->get_sheet_data();
-$this->gfObj->debug_print($savesData,1);
 			if(is_array($savesData) && count($savesData)) {
 				$retval[$this->savesObj->_sheetIdPrefix] = $savesData;
 			}
@@ -350,7 +349,6 @@ $this->gfObj->debug_print($savesData,1);
 		}
 		
 		if(!is_array($retval) || !count($retval)) {
-			$this->gfObj->debug_print($this->dbObj,1);
 			$this->_exception_handler(__METHOD__ .":: invalid data or no data returned (". $retval .")");
 		}
 		
