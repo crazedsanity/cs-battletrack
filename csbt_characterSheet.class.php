@@ -1,15 +1,5 @@
 <?php
-/*
- * Created on Jul 13, 2009
- * 
- * SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_characterSheet.class.php $
- * $Id: csbt_characterSheet.class.php 122 2010-11-11 01:54:37Z crazedsanity $
- * $LastChangedDate: 2010-11-10 19:54:37 -0600 (Wed, 10 Nov 2010) $
- * $LastChangedRevision: 122 $
- * $LastChangedBy: crazedsanity $
- */
+
 
 //TODO: consider optionally adding the logging system.
 

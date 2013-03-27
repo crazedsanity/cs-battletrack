@@ -8,7 +8,7 @@ $page->rip_all_block_rows('content');
 $page->clear_content('header');
 $page->clear_content('menu');
 
-if(is_numeric($charId)) {
+if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
 #$page->gfObj->debug_print($data,1);

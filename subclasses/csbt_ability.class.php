@@ -1,15 +1,5 @@
 <?php 
 
-/*
- *  SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/subclasses/csbt_ability.class.php $
- * $Id: csbt_ability.class.php 160 2011-11-27 22:52:10Z crazedsanity $
- * $LastChangedDate: 2011-11-27 16:52:10 -0600 (Sun, 27 Nov 2011) $
- * $LastChangedRevision: 160 $
- * $LastChangedBy: crazedsanity $
- */
-
 class csbt_ability extends cs_singleTableHandlerAbstract	 {
 	
 	protected $characterId;

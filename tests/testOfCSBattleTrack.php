@@ -9,6 +9,8 @@
  * $LastChangedDate: 2010-06-23 08:45:57 -0500 (Wed, 23 Jun 2010) $
  * $LastChangedBy: crazedsanity $
  * $LastChangedRevision: 175 $
+ * 
+ * TODO: fix to use the test database code...
  */
 
 class testOfCSBattleTrack extends UnitTestCase {

@@ -1,15 +1,5 @@
 <?php
 
-/*
- *  SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_mapBuilder.class.php $
- * $Id: csbt_mapBuilder.class.php 145 2011-04-22 00:04:49Z crazedsanity $
- * $LastChangedDate: 2011-04-21 19:04:49 -0500 (Thu, 21 Apr 2011) $
- * $LastChangedRevision: 145 $
- * $LastChangedBy: crazedsanity $
- */
-
 class csbt_mapBuilder extends cs_webapplibsAbstract {
 	
 	private $height = 0;

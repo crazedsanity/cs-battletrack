@@ -1,15 +1,5 @@
 <?php 
 
-/*
- *  SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/subclasses/csbt_skill.class.php $
- * $Id: csbt_skill.class.php 123 2010-11-11 02:09:32Z crazedsanity $
- * $LastChangedDate: 2010-11-10 20:09:32 -0600 (Wed, 10 Nov 2010) $
- * $LastChangedRevision: 123 $
- * $LastChangedBy: crazedsanity $
- */
-
 class csbt_skill extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
@@ -157,15 +147,22 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	public function get_character_skills($byAbilityName=null) {
 		
 		$sql = 'SELECT t.*, t2.ability_name FROM '. self::tableName .' AS t INNER JOIN '. self::joinTable .' AS t2 '
-			. ' USING ('. self::joinTableField .') WHERE character_id='. $this->characterId;
+			. ' USING ('. self::joinTableField .') WHERE character_id=:id AND 
+				(t.ability_id=:aId OR :aId IS NULL)';
 		
+		$abilityId = null;
 		if(!is_null($byAbilityName) && !is_numeric($byAbilityName) && strlen($byAbilityName)) {
-			$sql .= " AND t.ability_id=". $this->abilityObj->get_ability_id($byAbilityName);
+			$abilityId =  $this->abilityObj->get_ability_id($byAbilityName);
 		}
+		$params = array(
+			'id'	=> $this->characterId,
+			'aId'	=> $abilityId
+		);
+		
 		$sql .= ' ORDER BY skill_name';
 		
 		try {
-			$retval = $this->dbObj->run_query($sql, 'character_skill_id');
+			$retval = $this->dbObj->run_query($sql, $params);
 		}
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
@@ -282,7 +279,7 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	public function load_character_defaults() {
 		$autoSkills = $this->get_character_defaults();
 		foreach($autoSkills as $i=>$data) {
-			$res = $this->create_skill($data[0], $data[1]);
+			$this->create_skill($data[0], $data[1]);
 		}
 	}//end load_character_defaults()
 	//-------------------------------------------------------------------------

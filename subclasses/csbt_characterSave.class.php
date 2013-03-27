@@ -1,15 +1,5 @@
 <?php 
 
-/*
- *  SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/subclasses/csbt_characterSave.class.php $
- * $Id: csbt_characterSave.class.php 123 2010-11-11 02:09:32Z crazedsanity $
- * $LastChangedDate: 2010-11-10 20:09:32 -0600 (Wed, 10 Nov 2010) $
- * $LastChangedRevision: 123 $
- * $LastChangedBy: crazedsanity $
- */
-
 class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
@@ -135,17 +125,17 @@ class csbt_characterSave extends csbt_battleTrackAbstract	 {
 	public function get_character_saves($byAbilityId=null) {
 		
 		$sql = "SELECT s.*, a.ability_name FROM ". self::tableName ." AS s INNER JOIN "
-			. "csbt_ability_table AS a USING (ability_id) WHERE s.character_id="
-			. $this->characterId ;
-		
-		if(is_numeric($byAbilityId)) {
-			$sql .= " AND s.ability_id=". $byAbilityId;
-		}
+			. "csbt_ability_table AS a USING (ability_id) WHERE 
+				s.character_id=:id AND (s.ability_id=:aId OR :aId IS NULL)";
+		$params = array(
+			'id'	=> $this->characterId,
+			'aId'	=> $byAbilityId
+		);
 		
 		$sql .= " ORDER BY save_name";
 		
 		try {
-			$retval = $this->dbObj->run_query($sql, 'character_save_id');
+			$retval = $this->dbObj->run_query($sql, $params);
 			
 			//TODO: get ability modifier (ability_mod) and total (save_total)
 		}

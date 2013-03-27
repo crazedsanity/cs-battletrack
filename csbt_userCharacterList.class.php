@@ -1,14 +1,6 @@
 <?php
 /*
  * Created on Jul 30, 2009
- * 
- * SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/csbt_userCharacterList.class.php $
- * $Id: csbt_userCharacterList.class.php 122 2010-11-11 01:54:37Z crazedsanity $
- * $LastChangedDate: 2010-11-10 19:54:37 -0600 (Wed, 10 Nov 2010) $
- * $LastChangedRevision: 122 $
- * $LastChangedBy: crazedsanity $
  */
 
 

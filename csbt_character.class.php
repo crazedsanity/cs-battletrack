@@ -147,13 +147,11 @@ class csbt_character extends csbt_battleTrackAbstract {
 	//-------------------------------------------------------------------------
 	public function create_character($characterName, $uid) {
 		if(strlen($characterName) && is_numeric($uid) && $uid > 0) {
-			$sql = "INSERT INTO csbt_character_table ". 
-				$this->gfObj->string_from_array(array(
-					'character_name'	=> $characterName,
-					'uid'				=> $uid
-				), 'insert');
+			$sql = "INSERT INTO csbt_character_table (character_name, uid) VALUES 
+				(:character_name, :uid)";
+			$params = array('character_name'=>$characterName, 'uid'=>$uid);
 			try {
-				$newId = $this->dbObj->run_insert($sql, 'csbt_character_table_character_id_seq');
+				$newId = $this->dbObj->run_insert($sql, $params, 'csbt_character_table_character_id_seq');
 				
 				#$this->logger->log_by_class("New character (id=". $newId ."),: '". $characterName ."'", 'created character');
 				$this->set_character_id($newId);

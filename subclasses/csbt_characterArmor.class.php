@@ -1,15 +1,5 @@
 <?php 
 
-/*
- *  SVN INFORMATION::::
- * --------------------------
- * $HeadURL: https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/current/subclasses/csbt_characterArmor.class.php $
- * $Id: csbt_characterArmor.class.php 125 2011-01-27 14:47:03Z crazedsanity $
- * $LastChangedDate: 2011-01-27 08:47:03 -0600 (Thu, 27 Jan 2011) $
- * $LastChangedRevision: 125 $
- * $LastChangedBy: crazedsanity $
- */
-
 class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	
 	protected $characterId;
