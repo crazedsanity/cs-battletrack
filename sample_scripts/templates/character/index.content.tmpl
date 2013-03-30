@@ -1,14 +1,23 @@
+<link rel="stylesheet" href="/css/ttorp/shared.css" type="text/css">
 <div>
 	<div><a href="character/sheet.php">Create a new character</a></div>
-	<!-- BEGIN campaignListing --><div id="campaigns">
-		<!-- BEGIN characterList_campaignHeader --><div id="campaign_{campaign_id}" class="campaignHeader">{campaign_name}</div>
-		<!-- END characterList_campaignHeader -->
-		<ul>
-			{characterList_assigned}
-		</ul>
-	</div><!-- END campaignListing -->
-	<ul>
-		<!-- BEGIN characterList_unassigned --><li><a href="character/sheet?id={id}">{name}</a></li>
-		<!-- END characterList_unassigned -->
-	</ul>
+
+	<table border="0" id="campaigns" class="campaign list">
+	<!-- BEGIN campaignListing -->
+		<tr>
+			<th colspan="3" class="campaignList header">{campaign_name}</th>
+		</tr>
+		<tr>
+			<th class="indent">&nbsp;</th>
+			<th>Character Name</th>
+			<th>Level</th>
+		</tr>
+		<!-- BEGIN characterList --><tr>
+			<td>&nbsp;</td>
+			<td style="border:2px,2px,2px;"><a href="character/sheet?id={id}">{character_name}</a></td>
+			<td>{character_level}</td>
+		</tr>
+		<!-- END characterList -->
+	<!-- END campaignListing -->
+	</table>
 </div>

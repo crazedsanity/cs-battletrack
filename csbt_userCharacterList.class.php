@@ -47,7 +47,15 @@ class csbt_userCharacterList extends csbt_tableHandler {
 	public function get_character_list() {
 		
 		try {
-			$characterList = $this->get_records(array('uid'=>$this->uid));
+			//$characterList = $this->get_records(array('uid'=>$this->uid));
+			
+			$sql = 'SELECT t.*, t2.campaign_name FROM '. self::tableName 
+					.' AS t LEFT OUTER JOIN '. csbt_campaign::tableName .' AS t2
+					USING (campaign_id) WHERE (uid=:uid OR :uid IS NULL)';
+			$params = array('uid' => $this->uid);
+			$this->dbObj->run_query($sql, $params);
+			
+			$characterList = $this->dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(exception $e) {
 			throw new exception(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());

@@ -34,6 +34,29 @@
 	vertical-align: top;
 }
 
+table.campaign.list tr td:first-child, table.campaign.list tr th:first-child {
+	border-left:solid #000 1px;
+}
+table.campaign.list tr td:last-child, table.campaign.list tr th:last-child {
+	border-right: solid #000 1px;
+}
+table.campaign.list tr:nth-child(odd) {
+	background-color: ddd;
+}
+table.campaign.list tr:nth-child(even) {
+	background-color: #eee;
+}
+table.campaign.list tr td {
+	padding:3px;
+	margin:0px;
+}
+table.campaign.list {
+	border-spacing: 0px 0px;
+}
+table.campaign.list tr:last-child td {
+	border-bottom: solid #000 1px;
+}
+
 .campaignBox .note {
 	border: none;
 }

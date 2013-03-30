@@ -6,6 +6,9 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 	protected $uid=null;
 	protected $tableHandler;
 	
+	const tableName = 'csbt_campaign_table';
+	const seqName =  'csbt_campaign_table_campaign_id_seq';
+	const pkeyField = 'campaign_id';
 	//-------------------------------------------------------------------------
 	/**
 	 * Basic creation of the campaign object.
@@ -17,7 +20,7 @@ class csbt_campaign extends csbt_battleTrackAbstract	 {
 			'owner_uid'			=> "int",
 			'is_active'			=> "bool"
 		);
-		parent::__construct($dbObj, 'csbt_campaign_table', 'csbt_campaign_table_campaign_id_seq', 'campaign_id', $cleanStringArr);
+		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField, $cleanStringArr);
 		if(!is_null($campaignId)) {
 			$this->get_campaign($campaignId);
 		}

@@ -5,28 +5,60 @@
 
 
 
-$charList = $userChar->get_character_list();
+$charData = $userChar->get_character_list();
 
 $page->rip_all_block_rows();
-
-$rowName = 'characterList_unassigned';
-$rowName_assigned = 'characterList_assigned';
+$outerTemplate = 'campaignListing';
+$rowName = 'characterList';
 $idObfuscator = new cs_idObfuscator();
 if(isset($page->templateRows[$rowName])) {
-	if(is_array($charList)) {
-		$parsedRows = "";
-		foreach($charList as $id=>$info) {
-			$name = $info['character_name'];
-			if(!strlen($name)) {
-				$name = "<font color=\"red\">[Not Applicable]</font>";
+	if(is_array($charData)) {
+		
+		// put into an array based on campaign.
+		//TODO: put unassigned characters at top or bottom of the list
+		$byCampaign = array();
+		$unassigned = array();
+		foreach($charData as $id=>$info) {
+			if(strlen($info['campaign_name'])) {
+				$byCampaign[$info['campaign_name']][$id] = $info;
 			}
-			$repArr = array(
-				'id'	=> $idObfuscator->encode($id),
-				'name'	=> $name
-			);
-			$parsedRows .= $page->gfObj->mini_parser($page->templateRows[$rowName], $repArr, '{', '}');
+			else {
+				$unassigned[$id] = $info;
+			}
 		}
-		$page->add_template_var($rowName, $parsedRows);
+		if(count($unassigned)) {
+			$byCampaign['*NOT ASSIGNED'] = $unassigned;
+		}
+		
+		$campaignRow = "";
+		foreach($byCampaign as $campaignName => $charList) {
+			if(!strlen($campaignName)){
+				$campaignName = '<i>Unassigned Characters</i>';
+			}
+			
+			$parsedRows = "";
+			foreach($charList as $id=>$info) {
+				$name = $info['character_name'];
+				if(!strlen($name)) {
+					$name = "<font color=\"red\">[Not Applicable]</font>";
+				}
+				$repArr2 = $info;
+				$repArr2['id']	= $idObfuscator->encode($id);
+				$parsedRows .= $page->gfObj->mini_parser($page->templateRows[$rowName], $repArr2, '{', '}');
+			}
+			
+			
+			$repArr = array(
+				'campaign_name'	=> $campaignName,
+				$rowName		=> $parsedRows
+			);
+			$campaignRow .= $page->gfObj->mini_parser($page->templateRows[$outerTemplate], $repArr, '{', '}');
+			
+		}
+		
+		#$page->add_template_var($rowName, $parsedRows);
+		
+		$page->add_template_var($outerTemplate, $campaignRow);
 	}
 }
 else {
