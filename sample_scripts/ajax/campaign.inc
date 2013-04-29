@@ -2,12 +2,14 @@
 
 define('JSON_ENCODE', 1);
 
-$xmlData['errorCode'] = "Invalid action";
+$xmlData['errorCode'] = "Invalid action... sectionArr count=(". count($sectionArr) .")";
 $xmlStatus = 0;
 
 //get the request & value.
 if(count($sectionArr) >= 5) {
 	$action = $sectionArr[4];
+	
+	$xmlData['errorCode'] .= " - action=(". $action .")";
 	
 	$returnData = null;
 	
@@ -45,22 +47,28 @@ if(count($sectionArr) >= 5) {
 			$searchObj = new csbt_characterSearch($page->db);
 			try {
 				$searchCrit = array(
-					'character_name'	=> $_GET['term'],
-					'__FILTER__'			=> 'campaign_id IS NULL'
+					'character_name'	=> $_GET['term']
 				);
 				$res = $searchObj->search($searchCrit);
 				if(is_array($res) && count($res)) {
 					$xmlData = array();
 					foreach($res as $id=>$cData) {
-						$xmlData[] = array(
+						$returnData[] = array(
 							'id'		=> $id,
 							'value'		=> $id,
 							'label'		=> $cData['character_name']. " [". $cData['character_level'] ."]"
 						);
 					}
+					print(json_encode($returnData));
+					exit;
+					
 				}
-				print(json_encode($xmlData));
-				exit;
+				else {
+					$gf = new cs_globalFunctions;
+					$xmlData['errorCode'] .= " --- no result... ". strip_tags($gf->debug_var_dump($res));
+				}
+				#print(json_encode($xmlData));
+				#exit;
 			}
 			catch(Exception $e) {
 				$xmlData['errorCode'] = "Fatal error: ". $e->getMessage();

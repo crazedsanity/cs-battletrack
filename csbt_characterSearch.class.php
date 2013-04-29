@@ -9,7 +9,8 @@ class csbt_characterSearch extends csbt_character {
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $uid=null) {
 		$this->dbObj = $dbObj;
-		$this->logger->logCategory = "Character Search";
+		
+		#$this->logger->logCategory = "Character Search";
 		
 		$this->uid = $uid;
 		
@@ -23,39 +24,43 @@ class csbt_characterSearch extends csbt_character {
 	//-------------------------------------------------------------------------
 	public function search(array $criteria) {
 		if(is_array($criteria) && count($criteria)) {
+			$retval = array();
+			
+			$sql = "SELECT c.*, ca.campaign_name FROM ". csbt_character::tableName ." AS c
+				LEFT OUTER JOIN ". csbt_campaign::tableName ." AS ca 
+				USING (campaign_id)
+				WHERE 
+				(LOWER(c.character_name) LIKE :character_name OR :character_name IS NULL)
+				AND 
+				(LOWER(ca.campaign_name) LIKE :campaign_name OR :campaign_name IS NULL)	
+			AND
+				(c.campaign_id IS NULL)
+				ORDER BY c.character_name, ca.campaign_name";
+			//Note that the campaign_id IS NULL part is arbitrary...
+			
+			if(!isset($criteria['character_name'])) {
+				$criteria['character_name'] = null;
+			}
+			else {
+				$criteria['character_name'] .= '%';
+			}
+			if(!isset($criteria['campaign_name'])) {
+				$criteria['campaign_name'] = null;
+			}
+			else {
+				$criteria['campaign_name'] .= '%';
+			}
+//			if(!isset($criteria['campaign']))
 			try {
-				$tableHandler = new cs_dbTableHandler($this->dbObj, csbt_character::tableName, csbt_character::seqName, csbt_character::pkeyField, $this->cleanStringArr);
-				//TODO: sanitize this a bit better...
-				$filterSql = "";
-				$orderBy = "";
-				foreach($criteria as $field=>$val) {
-					$addToOrder = true;
-					if(strlen($val)) {
-						switch($field) {
-							case '__FILTER__':
-								$extraFilter = $val;
-								$addToOrder = false;
-								break;
-							default:
-								$filterSql = $this->gfObj->create_list($filterSql, "lower(". $field .") LIKE '". strtolower($val) ."%'", " OR ");
-								break;
-						}
-						if($addToOrder) {
-							$orderBy = $this->gfObj->create_list($orderBy, $field, ", ");
-						}
-					}
-					else {
-						throw new exception(__METHOD__ .": invalid search criteria for '". $field ."' (". $val .")");
-					}
-				}
-				if($extraFilter) {
-					$filterSql = '('. $filterSql .') AND '. $extraFilter;
-				}
+				$numRows = $this->dbObj->run_query($sql, $criteria);
 
-				$retval = $tableHandler->get_records_using_custom_filter($filterSql, $orderBy);
+				if($numRows > 0) {
+					$retval = $this->dbObj->farray_fieldnames(csbt_character::pkeyField);
+				}
 			}
 			catch(Exception $e) {
-				throw new exception(__METHOD__ .": search failed::: ". $e->getMessage());
+				cs_debug_backtrace(1);
+				throw new exception(__METHOD__ .": error while running search::: ". $e->getMessage());
 			}
 		}
 		else {
