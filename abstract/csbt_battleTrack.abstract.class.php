@@ -97,7 +97,7 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 	
 	
 	//-------------------------------------------------------------------------
-	public function load_schema() {
+	public function load_schema($type=null, cs_phpDB $dbType=null) {
 		try {
 			$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		}
