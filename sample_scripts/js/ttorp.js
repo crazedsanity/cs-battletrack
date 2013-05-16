@@ -121,6 +121,8 @@ function callback_showUpdatedInput(xmlObj) {
 	//TODO: limit the call below to avoid removing the "updatedInput" status from places where it was just added...
 	//$("input,select").removeClass("updatedInput");
 	var forceNameChange=null;
+	var i = 0;
+	var x = 0;
 	if($(xmlObj).find('id_was').text()) {
 		forceNameChange = $(xmlObj).find('id_was').text();
 	}
@@ -207,7 +209,13 @@ function processChange(object) {
 var xParent = "";
 
 function showNewRecordDialog(pDialogId) {
-	$("#"+ pDialogId).dialog({modal:true});
+	$("#"+ pDialogId).dialog({
+		modal:	true,
+		close:	function(event,ui) {
+			$(this).dialog('destroy');
+			//$(this).remove();
+		}
+	});
 	$("div.ui-dialog button.submit").click(function() {
 		console.log("button clicked!");
 		xDebug = this;
@@ -215,8 +223,11 @@ function showNewRecordDialog(pDialogId) {
 	});
 }
 
+var testButtonObj = null;
+var xSectionToReload = null;
 function submitNewRecordDialog(pButtonObj) {
 	
+	testButtonObj = pButtonObj;
 	// First, make sure we've got everything we need.
 	var myData = $(pButtonObj).parents("div.form").children("input,textarea,checkbox,select").serialize();
 	
@@ -228,7 +239,7 @@ function submitNewRecordDialog(pButtonObj) {
 	
 	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
 		console.log("testing... ID=("+ $(pButtonObj).attr("id") +")");
-		//$("#"+ pDialogId).children("input,select,text,checkbox")
+		xSectionToReload = sectionToReload;
 		
 		//change the URL we're using the proper AJAX one.
 		var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet$/, "_updates");
@@ -240,7 +251,9 @@ function submitNewRecordDialog(pButtonObj) {
 		
 		if(myData.length > 0) {
 			// First, make it all readonly...
-			//pButtonObj.parents("div.form").children("input,textarea,select,checkbox").attr("readonly", "readonly");
+			//$(pButtonObj).parents("div.form").children("input,textarea,select,checkbox").attr("readonly", "readonly");
+			$("#"+ sectionToReload).find("input").attr("readonly", "readonly");
+			
 			
 			// Now send the update.
 			$.ajax({
@@ -249,8 +262,11 @@ function submitNewRecordDialog(pButtonObj) {
 				data: myData,
 				success: function(tData) {
 					//alert("GOT DATA BACK::: "+ tData);
-					$("div.ui-dialog-content").dialog('close');
 					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload);
+					$("#dialog__"+ sectionToReload).dialog('close').dialog('destroy');
+					
+					/// Without the next line, each additional attempt to add will cause it to submit multiple times... so the third will submit three, fourth will submit four, etc.
+					$("#dialog__"+ sectionToReload +" button.submit").unbind('click');
 				}
 			});
 		}
@@ -269,14 +285,10 @@ function handlePendingChanges() {
 }
 
 function doHighlighting(object, mouseEvent) {
-	//var myMouseEvent = mouseEvent;
-	var i = 0;
-	if(mouseEvent != 'over' && mouseEvent != 'out') {
-		myMouseEvent = 'out';
-	}
 	if($(object).attr("class") != undefined) {
 		var bits = $(object).attr("class").split(' ');
 		var littleBits = undefined;
+		var i = 0;
 		for(i=0; i<bits.length; i++) {
 			if(bits[i].match(/^hl--/)) {
 				littleBits = bits[i].split('--', 2);

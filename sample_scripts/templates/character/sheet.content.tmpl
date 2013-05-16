@@ -501,10 +501,10 @@ Powered by {CSBT_project_name}, v{CSBT_version}
                 </tbody></table>
                 </div>
                 
-
+				<div id="load__gear">
                 <table id="gear" cellspacing="0">
                   <tbody><tr class="title">
-                    <td colspan="3">Gear</td>
+                    <td colspan="3">Gear [<a href="javascript:void(showNewRecordDialog('dialog__gear'));">Add</a>]</td>
                   </tr>
                   <tr class="header">
                     <td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
@@ -526,6 +526,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
                   </td></tr>
 		
                 </tbody></table>
+                </div>
 
               </td>
             </tr>
@@ -549,7 +550,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
   </form>
 
 <div class="dialog">
-	<div id="dialog__specialAbility" class="form" action="return false;">
+	<div id="dialog__specialAbility" class="form">
 		New Special Ability/Feat: 
 		<input name="specialAbility__special_ability_name__new" type="text" class="freestyle" />
 		<input name="nameField" value="specialAbility__special_ability_name__new" class="hidden" />
@@ -557,5 +558,14 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 		<input name="tableName" value="specialAbility" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
 		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return false;">Create New Feat/Special Ability</button>
+	</div>
+	<div id="dialog__gear" class="form">
+		New Gear: 
+		<input name="gear__gear_name__new" type="text" class="freestyle" />
+		<input name="nameField" value="gear__gear_name__new" class="hidden" />
+		<input name="character_id" value="{main__character_id}" class="hidden" />
+		<input name="tableName" value="gear" class="hidden" />
+		<input name="type" value="newRecord" class="hidden" />
+		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return false;">Create New Gear</button>
 	</div>
 </div>
