@@ -109,39 +109,12 @@ function ajax_processChange(divId) {
 		'character_id'	: $("#form_character_id").val(),
 		'name'			: divId,
 		'value'			: myVal
-	}
+	};
 	
 	ajax_doPost("member/ttorp/character_updates", postArray);
 }
 function ajax_processNewRecord(tableName) {
-	var postArray = {
-		'type'			: "newRecord",
-		'tableName'		: tableName,
-		'character_id'	: $("#form_character_id").val()
-	}
-	var numItems = 0;
-	var numWithVals = 0;
-	//$("#" + tableName +" input.newRecord, #"+ tableName +" text.newRecord, #"+ tableName +" select.newRecord").each(function(tIndex,tObject) {
-	$("#"+ tableName +" tr.newRecord input, #"+ tableName +" tr.newRecord text, #"+ tableName +" tr.newRecord select").each(function(tIndex,tObject) {
-		numItems++;
-		if($(tObject).val().length > 0) {
-			var myVal = $(tObject).val();
-			if($(tObject).attr("type") == "checkbox") {
-				myVal = $(tObject).attr("checked");
-			}
-			postArray[$(tObject).attr("id")] = myVal;
-			numWithVals++;
-			if($(tObject).hasClass('nameField')) {
-				postArray['nameField'] = $(tObject).attr('id');
-			}
-		}
-	});
-	if(numItems > 0) {
-		ajax_doPost("member/ttorp/character_updates", postArray);
-	}
-	else {
-		alert("No items to process in ("+ tableName +")");
-	}
+	alert("ERROR\n\nAttempted to process a new record the OLD way");
 }
 
 function callback_showUpdatedInput(xmlObj) {
@@ -177,22 +150,7 @@ function callback_showUpdatedInput(xmlObj) {
 	}
 }
 function callback_processNewRecord(xmlObj) {
-	//All we really need is the new ID...
-	if($(xmlObj).find('newRecordId').val() != null && $(xmlObj).find('tableName') != null) {
-		var newId = $(xmlObj).find('newRecordId').text();
-		var tableName = $(xmlObj).find('tableName').text();
-		cloneRow(tableName, newId);
-		
-		//Re-enable the "nameField" in the new record...
-		$("#"+ tableName +" .newRecord .nameField").attr("readonly",false).each(function() {
-			clearDirtyInput(this);
-		});
-		callback_showUpdatedInput(xmlObj);
-	}
-	else {
-		//TODO: handle this more elegantly, like by putting it in a "growl" box or something.
-		alert("unable to finalize new record, could not find newRecordId...");
-	}
+	alert("ERROR\n\nAttempted to process new record the OLD way.  Ick.");
 }
 /*======================================
        XX AJAX STUFF...
@@ -204,7 +162,7 @@ function processChange(object) {
 			//let 'em know they did a stupid.
 			//alert("ERROR: input ("+ $(object).attr('id') +") requires numeric input... ("+ isNaN($(object).val()) +")");
 			//alert("STUPID! That input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
-			$.growlUI("WRONG DATA TYPE", "That input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
+			alert("WRONG DATA TYPE\n\nThat input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
 			
 			//reset the data.
 			$(object).val($(object).data('last_value'));
@@ -245,6 +203,63 @@ function processChange(object) {
 		}
 	}
 }
+
+var xParent = "";
+
+function showNewRecordDialog(pDialogId) {
+	$("#"+ pDialogId).dialog({modal:true});
+	$("div.ui-dialog button.submit").click(function() {
+		console.log("button clicked!");
+		xDebug = this;
+		submitNewRecordDialog(this);
+	});
+}
+
+function submitNewRecordDialog(pButtonObj) {
+	
+	// First, make sure we've got everything we need.
+	var myData = $(pButtonObj).parents("div.form").children("input,textarea,checkbox,select").serialize();
+	
+	console.log("DATA LENGTH: "+ myData.length);
+	
+	var sectionToReload = $(pButtonObj).parents("div.form").children("input[name='tableName']").val();
+	var divToReloadInto = 'load__' + sectionToReload;
+	console.log("Section we'll be reloading=(" + sectionToReload +"), which will be loaded into (" + divToReloadInto +")");
+	
+	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
+		console.log("testing... ID=("+ $(pButtonObj).attr("id") +")");
+		//$("#"+ pDialogId).children("input,select,text,checkbox")
+		
+		//change the URL we're using the proper AJAX one.
+		var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet$/, "_updates");
+		var fetchUrl = window.location.href;
+		
+		//$.post(submitUrl, $(this).parents("div.form").children("input,textarea,checkbox,select").serialize);
+		
+		console.log("MY DATA::: " + myData);
+		
+		if(myData.length > 0) {
+			// First, make it all readonly...
+			//pButtonObj.parents("div.form").children("input,textarea,select,checkbox").attr("readonly", "readonly");
+			
+			// Now send the update.
+			$.ajax({
+				type: "POST",
+				url: submitUrl,
+				data: myData,
+				success: function(tData) {
+					//alert("GOT DATA BACK::: "+ tData);
+					$("div.ui-dialog-content").dialog('close');
+					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload);
+				}
+			});
+		}
+		else {
+			alert("ERROR:\n\nNo data submitted... ");
+		}
+	} 
+}
+
 function handlePendingChanges() {
 	//this will submit changes for all pending (dirty) inputs (that are NOT new records).
 	//NOTE::: this is intended as a "fail-safe", and probably only for testing...
@@ -254,7 +269,8 @@ function handlePendingChanges() {
 }
 
 function doHighlighting(object, mouseEvent) {
-	var myMouseEvent = mouseEvent;
+	//var myMouseEvent = mouseEvent;
+	var i = 0;
 	if(mouseEvent != 'over' && mouseEvent != 'out') {
 		myMouseEvent = 'out';
 	}
@@ -279,44 +295,7 @@ function highlightField(id) {
 }
 
 function cloneRow(tableName, newId) {
-	//create a clone of an existing row...
-	var newRow = $("#"+ tableName +" tr.newRecord");
-	var copiedNewRow = $("#"+ tableName +" tr.newRecord").clone(true);
-	
-	//now change ID's of inputs for that existing record...
-	newRow.find("input,select").each(function() {
-		//update the ID properly.
-		var currentId = $(this).attr("id");
-		var updatedId = currentId.replace(/__new$/, "__"+ newId);
-		$(this).attr("id", updatedId);
-		
-		//if there is a "title" on the input with an ID, fix it.
-		if($(this).attr("title") && $(this).attr("title").match(/ID #new/)) {
-			var myTitle = $(this).attr("title").replace(/ID #new/, "ID #"+ newId);
-			$(this).attr("title", myTitle);
-		}
-		
-		//show that it has been updated...
-		markUpdatedInput(this);
-	});
-	
-	//minor changes for title tags...
-	newRow.find("td").each(function() {
-		if($(this).attr("title").match(/ID #new/)) {
-			var myTitle = $(this).attr("title").replace(/ID #new/, "ID #"+ newId);
-			$(this).attr("title", myTitle);
-		}
-	});
-	
-	//remove the "newRecord" class from everything BEFORE appending the copied record.
-	$("#"+ tableName +" .newRecord").removeClass("newRecord").removeClass("footer");
-	
-	//append it to the bottom of the table.
-	$("#"+ tableName).append(copiedNewRow);
-	
-	//TODO: move the "footer" row to the bottom...
-	$("#"+ tableName).append($("#"+ tableName +" tr.footer"));
-	$("#"+ tableName +" tr.newRecord").find("input[type='text']").attr("value", "");
+	alert("WARNING!!!!\n\nOld code was called!!!");
 }
 
 
@@ -327,8 +306,12 @@ $(document).ready(function() {
 	});
 	
 	$("input,textarea").not(".derived").keyup(function() {
-		if ($(this).val() != $(this).data('last_value')) {
-			markDirtyInput(this);
+		if($(this).attr("id")) {
+			if ($(this).val() != $(this).data('last_value')) {
+				console.log("Marking dirty input, ID=("+ $(this).attr("id") +")");
+				//alert($(this));
+				markDirtyInput(this);
+			}
 		}
 	});
 	$("input,textarea").not(".derived").bind('paste', function() {
@@ -355,6 +338,20 @@ $(document).ready(function() {
 	$("input[class*='hl--']").mouseout(function(){
 		doHighlighting(this);
 	});
+	
+//	$("div.ui-dialog button.submit").click(function() {
+//		console.log("button clicked!");
+//		xDebug = this;
+//		submitNewRecordDialog(this);
+//	});
+	
+//	// keep form from subitting when pressing <enter>
+//	$("div.dialog form").keydown(function(event) {
+//		if(event.keyCode == 13) {
+//			event.preventDefault();
+//			return false;
+//		}
+//	});
 	
 	//Disable non-name inputs for new record rows...
 	$("#characterWeapon tr.newRecord input").not(".nameField").attr("readonly",true);

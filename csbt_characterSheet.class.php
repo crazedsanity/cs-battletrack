@@ -151,40 +151,12 @@ class csbt_characterSheet extends csbt_tableHandler {
 					}
 				}
 				if($rowsParsed > 0) {
-					if(preg_match('/slot$/i', $blockRowName)) {
-						//ends in "[sS]lot", add another row.
-						$subArray = array();
-						$subArray[$name .'_id'] = 'new';
-						$subArray['addClassName'] = 'newRecord';
-						
-						if($name == 'skills') {
-							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, 'new');
-						}
-						$parsedRows .= $page->gfObj->mini_parser($myBlockRow, $subArray, '{', '}');
-						$rowsParsed++;
-					}
-					
 					//$parsedRows .= '{'. $blockRowName .'__newRecordRow}';
 					$page->add_template_var($blockRowName, $parsedRows);
 				}
 			}
 			else {
 				$page->add_template_var($name, $val);
-			}
-		}
-		foreach($parsedSlots as $name=>$numRecords) {
-			if($numRecords== 0) {
-				//get the "id" based on the name of the block row.
-				$idPrefix = preg_replace('/slot$/i','', $name);
-				
-				$subArray = array(
-					$idPrefix .'_id'	=> "new",
-					'addClassName'		=> "newRecord"
-				);
-				if($name == 'skills') {
-					$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, 'new');
-				}
-				$page->add_template_var($name, $page->gfObj->mini_parser($page->templateRows[$name], $subArray, '{', '}'));
 			}
 		}
 		
