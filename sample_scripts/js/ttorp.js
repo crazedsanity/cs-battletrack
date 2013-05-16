@@ -113,9 +113,6 @@ function ajax_processChange(divId) {
 	
 	ajax_doPost("member/ttorp/character_updates", postArray);
 }
-function ajax_processNewRecord(tableName) {
-	alert("ERROR\n\nAttempted to process a new record the OLD way");
-}
 
 function callback_showUpdatedInput(xmlObj) {
 	//TODO: limit the call below to avoid removing the "updatedInput" status from places where it was just added...
@@ -162,8 +159,6 @@ function processChange(object) {
 	if(isDirtyInput(object)) {
 		if(isNaN($(object).val()) && !$(object).hasClass('freestyle') && $(object).attr("type") != 'checkbox') {
 			//let 'em know they did a stupid.
-			//alert("ERROR: input ("+ $(object).attr('id') +") requires numeric input... ("+ isNaN($(object).val()) +")");
-			//alert("STUPID! That input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
 			alert("WRONG DATA TYPE\n\nThat input is numeric only; your value ("+ $(object).val() +") isn't really numeric, is it?");
 			
 			//reset the data.
@@ -206,52 +201,34 @@ function processChange(object) {
 	}
 }
 
-var xParent = "";
-
 function showNewRecordDialog(pDialogId) {
 	$("#"+ pDialogId).dialog({
 		modal:	true,
 		close:	function(event,ui) {
 			$(this).dialog('destroy');
-			//$(this).remove();
 		}
 	});
 	$("div.ui-dialog button.submit").click(function() {
-		console.log("button clicked!");
-		xDebug = this;
 		submitNewRecordDialog(this);
 	});
 }
 
-var testButtonObj = null;
-var xSectionToReload = null;
 function submitNewRecordDialog(pButtonObj) {
 	
-	testButtonObj = pButtonObj;
 	// First, make sure we've got everything we need.
 	var myData = $(pButtonObj).parents("div.form").children("input,textarea,checkbox,select").serialize();
 	
-	console.log("DATA LENGTH: "+ myData.length);
-	
 	var sectionToReload = $(pButtonObj).parents("div.form").children("input[name='tableName']").val();
 	var divToReloadInto = 'load__' + sectionToReload;
-	console.log("Section we'll be reloading=(" + sectionToReload +"), which will be loaded into (" + divToReloadInto +")");
 	
 	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
-		console.log("testing... ID=("+ $(pButtonObj).attr("id") +")");
-		xSectionToReload = sectionToReload;
 		
 		//change the URL we're using the proper AJAX one.
 		var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet$/, "_updates");
 		var fetchUrl = window.location.href;
 		
-		//$.post(submitUrl, $(this).parents("div.form").children("input,textarea,checkbox,select").serialize);
-		
-		console.log("MY DATA::: " + myData);
-		
 		if(myData.length > 0) {
-			// First, make it all readonly...
-			//$(pButtonObj).parents("div.form").children("input,textarea,select,checkbox").attr("readonly", "readonly");
+			// Make all the items readonly, so users can't try updating while the section reloads
 			$("#"+ sectionToReload).find("input").attr("readonly", "readonly");
 			
 			
@@ -267,6 +244,9 @@ function submitNewRecordDialog(pButtonObj) {
 					
 					/// Without the next line, each additional attempt to add will cause it to submit multiple times... so the third will submit three, fourth will submit four, etc.
 					$("#dialog__"+ sectionToReload +" button.submit").unbind('click');
+					
+					// NOTE::: the response actually needs to list these items... currently, it does not.
+					callback_showUpdatedInput(tData);
 				}
 			});
 		}
@@ -306,10 +286,6 @@ function highlightField(id) {
 	}
 }
 
-function cloneRow(tableName, newId) {
-	alert("WARNING!!!!\n\nOld code was called!!!");
-}
-
 
 $(document).ready(function() {
 	$("input,select,textarea").each(function(i) {
@@ -320,8 +296,6 @@ $(document).ready(function() {
 	$("input,textarea").not(".derived").keyup(function() {
 		if($(this).attr("id")) {
 			if ($(this).val() != $(this).data('last_value')) {
-				console.log("Marking dirty input, ID=("+ $(this).attr("id") +")");
-				//alert($(this));
 				markDirtyInput(this);
 			}
 		}
@@ -350,20 +324,6 @@ $(document).ready(function() {
 	$("input[class*='hl--']").mouseout(function(){
 		doHighlighting(this);
 	});
-	
-//	$("div.ui-dialog button.submit").click(function() {
-//		console.log("button clicked!");
-//		xDebug = this;
-//		submitNewRecordDialog(this);
-//	});
-	
-//	// keep form from subitting when pressing <enter>
-//	$("div.dialog form").keydown(function(event) {
-//		if(event.keyCode == 13) {
-//			event.preventDefault();
-//			return false;
-//		}
-//	});
 	
 	//Disable non-name inputs for new record rows...
 	$("#characterWeapon tr.newRecord input").not(".nameField").attr("readonly",true);
