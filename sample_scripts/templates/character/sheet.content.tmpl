@@ -528,14 +528,14 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 				<!-- END gearSlot -->
                   <tr class="footer">
                     <td>Total Weight:</td>
-                    <td class="total"><span id="totalweight" title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
+                    <td class="total"><span id="gear__total_weight__generated" title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
                     <td>
                   </td></tr>
 		
                 </tbody></table>
                 </div>
                 
-                <button class="newRecord" onClick="showNewRecordDialog('dialog__gear')'">Add Gear</button>
+                <button class="newRecord" onClick="showNewRecordDialog('dialog__gear')">Add Gear</button>
 
               </td>
             </tr>
@@ -558,7 +558,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
     </tbody></table>
   </form>
 
-<div class="dialog">
+<div class="dialog" class="hidden" style="display:none;">
 	<div id="dialog__specialAbility" class="form">
 		New Special Ability/Feat: 
 		<input name="specialAbility__special_ability_name__new" type="text" class="freestyle" />

@@ -1,12 +1,18 @@
-/*
-$Id: ttorp.js 127 2011-03-30 02:07:24Z crazedsanity $
-*/
+
+var globalUpdateDelay = 2000;
+
 /*======================================
        ++ INPUT MARKING...
   ====================================*/
 function markDirtyInput(object) {
 	clearUpdatedInput(object);
 	$(object).addClass('dirtyInput');
+	
+	// now set a timer so the change gets logged.
+	if($(object).data("timeout")) {
+		clearTimeout($(object).data("timeout"));
+	}
+	$(object).data('timeout', setTimeout(function() {processChange(object)}, globalUpdateDelay));
 }
 function clearDirtyInput(object) {
 	if($(object).hasClass('dirtyInput')) {
@@ -29,13 +35,27 @@ function markUpdatedInput(object, newVal, forceChange) {
 	if(forceChange == undefined || forceChange == null) {
 		forceChange=false;
 	}
+	
+	var originalVal = $(object).val();
+	var updateTextInstead = false;
+	if($(object).is("span") || $(object).is("div")) {
+		originalVal = $(object).text();
+		updateTextInstead = true;
+	}
+	
 	clearDirtyInput(object);
-	if($(object).val() != newVal || forceChange) {
-		$(object).val(newVal);
+	if(originalVal != newVal || forceChange) {
+		if(updateTextInstead == true) {
+			$(object).text(newVal);
+		}
+		else {
+			$(object).val(newVal);
+		}
 		$(object).data("last_value", newVal);
 		$(object).addClass("updatedInput");
 		
 		if($(object).attr('id')) {
+			
 			var myId = $(object).attr('id');
 			
 			/* Special: update any input that has a class name that matches the given id: this 
@@ -242,7 +262,11 @@ function submitNewRecordDialog(pButtonObj) {
 				url: submitUrl,
 				data: myData,
 				success: function(tData) {
-					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload);
+					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload, function() {
+						//alert("Content loaded, time to do stuff");
+						bindInputMarking(divToReloadInto);
+					});
+					
 					$("#dialog__"+ sectionToReload).dialog('close').dialog('destroy');
 					
 					/// Without the next line, each additional attempt to add will cause it to submit multiple times... so the third will submit three, fourth will submit four, etc.
@@ -274,7 +298,6 @@ function doHighlighting(object, mouseEvent) {
 	if($(object).attr("class") != undefined) {
 		var bits = $(object).attr("class").split(' ');
 		var littleBits = undefined;
-		var i = 0;
 		for(i=0; i<bits.length; i++) {
 			if(bits[i].match(/^hl--/)) {
 				littleBits = bits[i].split('--', 2);
@@ -292,36 +315,44 @@ function highlightField(id) {
 	}
 }
 
-
-$(document).ready(function() {
-	$("input,select,textarea").each(function(i) {
+function bindInputMarking(pId) {
+	
+	// if we've got an ID, add a prefix when selecting so it only applies to a subset; otherwise, apply it to everything.
+	var tPrefix = "";
+	if(pId != undefined && pId != null && pId.length > 1) {
+		tPrefix = "#"+ pId + " ";
+	}
+	
+	
+	$(tPrefix + "input,select,textarea").each(function(i) {
 		  $(this).data('last_value', $(this).val());
 		  $(this).data('old_bgcolor', $(this).css("background-color"));
 	});
 	
-	$("input,textarea").not(".derived").keyup(function() {
+	$(tPrefix + "input,textarea").not(".derived").keyup(function() {
 		if($(this).attr("id")) {
 			if ($(this).val() != $(this).data('last_value')) {
 				markDirtyInput(this);
 			}
 		}
 	});
-	$("input,textarea").not(".derived").bind('paste', function() {
+	$(tPrefix + "input,textarea").not(".derived").bind('paste', function() {
 		markDirtyInput(this);
 	});
-	$("input,textarea").not(".derived").blur(function() {
-		if(isDirtyInput(this)) {
-			processChange(this);
-		}
-	});
-	$("input[type=checkbox]").not(".newRecord").click(function() {
+	$(tPrefix + "input[type=checkbox]").not(".newRecord").click(function() {
 		markDirtyInput(this);
 		processChange(this);
 	});
-	$("select").not(".newRecord").change(function() {
+	$(tPrefix + "select").not(".newRecord").change(function() {
 		markDirtyInput(this);
 		processChange(this);
 	});
+}
+
+
+$(document).ready(function() {
+	
+	bindInputMarking(undefined);
 	
 	//Highlighting associated fields (i.e. highlight the main "base attack bonus" for melee/ranged so they know what to modify).
 	$("input[class*='hl--']").mouseover(function(){

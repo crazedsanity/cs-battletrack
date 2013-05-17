@@ -442,16 +442,41 @@ class csbt_character extends csbt_battleTrackAbstract {
 			case 'characterArmor':
 			case 'armor':
 				$retval = $this->armorObj->handle_update($sheetIdBit, $recordId, $newValue);
+				
+				// pull new data & return it so changes can be marked appropriately.
+				$newData = $this->armorObj->get_sheet_data();
+				if(is_array($newData[$recordId])) {
+					foreach($newData[$recordId] as $k=>$v) {
+						$this->changesByKey[$k .'__'. $recordId] = $v;
+					}
+				}
 				break;
 			
 			case 'characterWeapon':
 			case 'weapon':
 				$retval = $this->weaponObj->handle_update($sheetIdBit, $recordId, $newValue);
+				
+				// Pull data for marking changes
+				$newData = $this->weaponObj->get_sheet_data();
+				if(is_array($newData[$recordId])) {
+					foreach($newData[$recordId] as $k=>$v) {
+						$this->changesByKey[$k .'__'. $recordId] = $v;
+					}
+				}
 				break;
 			
 			case 'characterGear':
 			case 'gear':
 				$retval = $this->gearObj->handle_update($sheetIdBit, $recordId, $newValue);
+				//$this->gfObj->debug_print($this->gearObj->get_sheet_data(),1);
+				
+				$newData = $this->gearObj->get_sheet_data();
+				foreach($newData as $k=>$v) {
+					if(!is_array($v)) {
+						$this->changesByKey[$k] = $v;
+					}
+				}
+				#$this->changesByKey['gear__total_weight__generated'] = $newData['gear__total_weight__generated'];
 				break;
 			
 			case 'skills':
