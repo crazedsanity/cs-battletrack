@@ -11,7 +11,7 @@ body {
 Powered by {CSBT_project_name}, v{CSBT_version}
 
 <br style="clear: both;">
-    <form action="javascript:void()" method="post" id="charactersheet">
+    <form action="javascript:void(0);" method="post" id="charactersheet">
 	<input type="hidden" name="character_id" id="form_character_id" value="{main__character_id}" />
 <table id="maintable" border="1">
       <tbody><tr>
@@ -360,16 +360,9 @@ Powered by {CSBT_project_name}, v{CSBT_version}
           <!--
             table.weapon are weapon slots.
           -->
-          <div style="display:inline" class="weaponSlot" id="weaponSlot_{characterWeapon_id}">
+          <div style="display:inline" class="weaponSlot" id="load__characterWeapon">
           <table class="weapon" id="characterWeapon" cellspacing="0">
 		  <tbody>
-           <tr class="slot header {addClassName}">
-              <td class="type wide" title="Weapon ID #{characterWeapon_id}">Weapon</td>
-              <td class="wide">Total Attack Bonus</td>
-              <td class="medium">Damage</td>
-              <td class="small">Critical</td>
-              <td class="small">Range</td>
-            </tr>
           <!-- BEGIN characterWeaponSlot -->
            <tr class="slot header {addClassName}">
               <td class="type wide" title="Weapon ID #{characterWeapon_id}">Weapon</td>
@@ -402,15 +395,11 @@ Powered by {CSBT_project_name}, v{CSBT_version}
           <!-- END characterWeaponSlot -->
           </tbody></table></div>
           
+          <button class="createRecord" onClick="showNewRecordDialog('dialog__characterWeapon');">Add A Weapon</button>
+          
+          <div id="load__characterArmor">
           <table id="characterArmor" class="armor" cellspacing="0">
 		  <tbody>
-            <tr class="slot header {addClassName}">
-              <td class="type wide" title="Armor ID #{characterArmor_id}">Armor/Protective Item</td>
-              <td class="small">Type</td>
-              <td class="small">AC Bonus</td>
-              <td class="small">Check Pen</td>
-              <td class="small">Max Dex</td>
-            </tr>
           <!-- BEGIN characterArmorSlot -->
             <tr class="slot header {addClassName}">
               <td class="type wide" title="Armor ID #{characterArmor_id}">Armor/Protective Item</td>
@@ -440,6 +429,9 @@ Powered by {CSBT_project_name}, v{CSBT_version}
             </tr>
           <!-- END characterArmorSlot -->
           </tbody></table>
+          </div>
+          
+          <button class="createRecord" onClick="showNewRecordDialog('dialog__characterArmor');">Add Some Armor</button>
 
 
           <table id="skillsandgear">
@@ -581,5 +573,21 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 		<input name="tableName" value="gear" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
 		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return false;">Create New Gear</button>
+	</div>
+	<div id="dialog__characterWeapon" class="form">
+			<input class="left nameField freestyle" title="Weapon's name" name="characterWeapon__weapon_name__new" value="">
+			<input name="character_id" value="{main__character_id}" class="hidden" />
+			<input name="nameField" value="characterWeapon__weapon_name__new" class="hidden" />
+			<input name="tableName" value="characterWeapon" class="hidden" />
+			<input name="type" value="newRecord" class="hidden" />
+			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return false;">Create New Weapon</button>
+	</div>
+	<div id="dialog__characterArmor" class="form">
+			<input class="left nameField freestyle" title="Armor's name" name="characterArmor__armor_name__new" value="">
+			<input name="character_id" value="{main__character_id}" class="hidden" />
+			<input name="nameField" value="characterArmor__armor_name__new" class="hidden" />
+			<input name="tableName" value="characterArmor" class="hidden" />
+			<input name="type" value="newRecord" class="hidden" />
+			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return false;">Create New Armor</button>
 	</div>
 </div>

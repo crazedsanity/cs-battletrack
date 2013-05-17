@@ -213,13 +213,20 @@ function showNewRecordDialog(pDialogId) {
 	});
 }
 
+var xButton = null;
+
 function submitNewRecordDialog(pButtonObj) {
+	xButton = pButtonObj;
 	
 	// First, make sure we've got everything we need.
-	var myData = $(pButtonObj).parents("div.form").children("input,textarea,checkbox,select").serialize();
+	var myData = $(pButtonObj).parents("div.form").find("input,textarea,checkbox,select").serialize();
 	
 	var sectionToReload = $(pButtonObj).parents("div.form").children("input[name='tableName']").val();
 	var divToReloadInto = 'load__' + sectionToReload;
+	
+	console.log("sectionToReload=("+ sectionToReload +"), divToReloadInto=("+ divToReloadInto +")");
+	console.log("SERIALIZED DATA::: "+ myData);
+	
 	
 	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
 		
@@ -239,6 +246,8 @@ function submitNewRecordDialog(pButtonObj) {
 				data: myData,
 				success: function(tData) {
 					//alert("GOT DATA BACK::: "+ tData);
+					
+					console.log("Fetching new data.... fetchUrl=("+ fetchUrl +") into section=("+ divToReloadInto +")");
 					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload);
 					$("#dialog__"+ sectionToReload).dialog('close').dialog('destroy');
 					
@@ -253,7 +262,10 @@ function submitNewRecordDialog(pButtonObj) {
 		else {
 			alert("ERROR:\n\nNo data submitted... ");
 		}
-	} 
+	}
+	else {
+		alert("ERROR:\n\nThere there is a section missing ("+ sectionToReload +") or ("+ divToReloadInto +")");
+	}
 }
 
 function handlePendingChanges() {

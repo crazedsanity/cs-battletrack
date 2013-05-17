@@ -32,6 +32,10 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 				foreach($_POST as $k=>$v) {
 					if(preg_match('/__new$/', $k)) {
 						$newKey = preg_replace('/__new$/', '', $k);
+						
+						//NOTE::: this potentially fixes an issue with POSTing via AJAX.
+						$newKey = preg_replace('/^characterWeapon__/', '', $newKey);
+						
 						$v = preg_replace('/"/', "''", $v);
 						$extraData[$newKey] = $v;
 					}
