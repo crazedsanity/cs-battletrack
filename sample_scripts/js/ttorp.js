@@ -224,9 +224,6 @@ function submitNewRecordDialog(pButtonObj) {
 	var sectionToReload = $(pButtonObj).parents("div.form").children("input[name='tableName']").val();
 	var divToReloadInto = 'load__' + sectionToReload;
 	
-	console.log("sectionToReload=("+ sectionToReload +"), divToReloadInto=("+ divToReloadInto +")");
-	console.log("SERIALIZED DATA::: "+ myData);
-	
 	
 	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
 		
@@ -245,9 +242,6 @@ function submitNewRecordDialog(pButtonObj) {
 				url: submitUrl,
 				data: myData,
 				success: function(tData) {
-					//alert("GOT DATA BACK::: "+ tData);
-					
-					console.log("Fetching new data.... fetchUrl=("+ fetchUrl +") into section=("+ divToReloadInto +")");
 					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload);
 					$("#dialog__"+ sectionToReload).dialog('close').dialog('destroy');
 					

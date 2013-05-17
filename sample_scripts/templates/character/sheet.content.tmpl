@@ -492,7 +492,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
                 <table id="specialAbility" border="5">
                   <tbody><tr class="title">
                     <td colspan="4">
-                    	Feats &amp; Special Abilities [<a class="createRecord" href="javascript:void(showNewRecordDialog('dialog__specialAbility'));">Add</a>]
+                    	Feats &amp; Special Abilities
                     </td>
                   </tr>
                   <!-- BEGIN specialAbilitySlot -->
@@ -506,11 +506,12 @@ Powered by {CSBT_project_name}, v{CSBT_version}
                   <!-- END specialAbilitySlot -->
                 </tbody></table>
                 </div>
+                <button class="createRecord" href="showNewRecordDialog('dialog__specialAbility')">Add Feat/Special Ability</button>
                 
 				<div id="load__gear">
                 <table id="gear" cellspacing="0">
                   <tbody><tr class="title">
-                    <td colspan="3">Gear [<a href="javascript:void(showNewRecordDialog('dialog__gear'));">Add</a>]</td>
+                    <td colspan="3">Gear</td>
                   </tr>
                   <tr class="header">
                     <td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
@@ -533,6 +534,8 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 		
                 </tbody></table>
                 </div>
+                
+                <button class="newRecord" onClick="showNewRecordDialog('dialog__gear')'">Add Gear</button>
 
               </td>
             </tr>
