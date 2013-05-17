@@ -2,18 +2,12 @@
     <link type="text/css" rel="stylesheet" href="/css/ttorp/ttorp.css">
 <script language="javascript" src="/js/ttorp/ttorp.js" type="text/javascript"></script>
 
-<style type="text/css">
-body {
-	margin: 0;
-	padding: 0;
-}
-</style>
 Powered by {CSBT_project_name}, v{CSBT_version}
 
 <br style="clear: both;">
     <form action="javascript:void(0);" method="post" id="charactersheet">
 	<input type="hidden" name="character_id" id="form_character_id" value="{main__character_id}" />
-<table id="maintable" border="1">
+<table id="maintable" border="0">
       <tbody><tr>
         <td id="main">
 
@@ -489,7 +483,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
               <td id="featsandgearcontainer">
 
 				<div id="load__specialAbility">
-                <table id="specialAbility" border="5">
+                <table id="specialAbility" border="0">
                   <tbody><tr class="title">
                     <td colspan="4">
                     	Feats &amp; Special Abilities
@@ -506,7 +500,7 @@ Powered by {CSBT_project_name}, v{CSBT_version}
                   <!-- END specialAbilitySlot -->
                 </tbody></table>
                 </div>
-                <button class="createRecord" href="showNewRecordDialog('dialog__specialAbility')">Add Feat/Special Ability</button>
+                <button class="newRecord" onClick="showNewRecordDialog('dialog__specialAbility')">Add Feat/Special Ability</button>
                 
 				<div id="load__gear">
                 <table id="gear" cellspacing="0">
@@ -560,37 +554,43 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 
 <div class="dialog" class="hidden" style="display:none;">
 	<div id="dialog__specialAbility" class="form">
+		<div class="hidden title">Create a New Feat/Special Ability</div>
 		New Special Ability/Feat: 
 		<input name="specialAbility__special_ability_name__new" type="text" class="freestyle" />
 		<input name="nameField" value="specialAbility__special_ability_name__new" class="hidden" />
 		<input name="character_id" value="{main__character_id}" class="hidden" />
 		<input name="tableName" value="specialAbility" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
-		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return false;">Create New Feat/Special Ability</button>
+		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return false;">Create It!</button>
 	</div>
 	<div id="dialog__gear" class="form">
+		<div class="hidden title">Add Some Gear</div>
 		New Gear: 
 		<input name="gear__gear_name__new" type="text" class="freestyle" />
 		<input name="nameField" value="gear__gear_name__new" class="hidden" />
 		<input name="character_id" value="{main__character_id}" class="hidden" />
 		<input name="tableName" value="gear" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
-		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return false;">Create New Gear</button>
+		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return false;">Create It!</button>
 	</div>
 	<div id="dialog__characterWeapon" class="form">
+		<div class="hidden title">Create a New Weapon</div>
+		Weapon's Name:
 			<input class="left nameField freestyle" title="Weapon's name" name="characterWeapon__weapon_name__new" value="">
 			<input name="character_id" value="{main__character_id}" class="hidden" />
 			<input name="nameField" value="characterWeapon__weapon_name__new" class="hidden" />
 			<input name="tableName" value="characterWeapon" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return false;">Create New Weapon</button>
+			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return false;">Create It!</button>
 	</div>
 	<div id="dialog__characterArmor" class="form">
+		<div class="hidden title">Create New Armor</div>
+		Armor Name:
 			<input class="left nameField freestyle" title="Armor's name" name="characterArmor__armor_name__new" value="">
 			<input name="character_id" value="{main__character_id}" class="hidden" />
 			<input name="nameField" value="characterArmor__armor_name__new" class="hidden" />
 			<input name="tableName" value="characterArmor" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return false;">Create New Armor</button>
+			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return false;">Create It!</button>
 	</div>
 </div>
