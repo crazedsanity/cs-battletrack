@@ -12,7 +12,7 @@ function markDirtyInput(object) {
 	if($(object).data("timeout")) {
 		clearTimeout($(object).data("timeout"));
 	}
-	$(object).data('timeout', setTimeout(function() {processChange(object)}, globalUpdateDelay));
+	$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
 }
 function clearDirtyInput(object) {
 	if($(object).hasClass('dirtyInput')) {
@@ -281,7 +281,7 @@ function doHighlighting(object, mouseEvent) {
 	if($(object).attr("class") != undefined) {
 		var bits = $(object).attr("class").split(' ');
 		var littleBits = undefined;
-		for(i=0; i<bits.length; i++) {
+		for(var i=0; i<bits.length; i++) {
 			if(bits[i].match(/^hl--/)) {
 				littleBits = bits[i].split('--', 2);
 				highlightField(littleBits[1]);
@@ -296,6 +296,36 @@ function highlightField(id) {
 	else {
 		$("#"+ id).addClass("highlight");
 	}
+}
+
+var xObj = null;
+function swapCheckboxImg(pObj) {
+	xObj = pObj;
+	var mySrc = $(pObj).attr("src");
+	var newSrc = mySrc;
+	if(mySrc.match("checked.jpg")) {
+		newSrc = mySrc.replace(/checked.jpg/, '.jpg');
+	}
+	else {
+		newSrc = mySrc.replace(/checkbox.jpg/, 'checkboxchecked.jpg');
+	}
+	
+	$(pObj).attr("src", newSrc);
+	
+	var hiddenChk = $(pObj).parent("td").children("input.hidden.chk");
+	
+	var xOldVal = $(hiddenChk).attr("checked");
+	var xNewVal = xOldVal;
+	
+	if(xOldVal == true) {
+		xNewVal = false;
+	}
+	else {
+		xNewVal = true;
+	}
+	
+	$(hiddenChk).attr("checked", xNewVal);
+	ajax_processChange($(hiddenChk).attr("id"));
 }
 
 function bindInputMarking(pId) {
@@ -343,6 +373,10 @@ $(document).ready(function() {
 	});
 	$("input[class*='hl--']").mouseout(function(){
 		doHighlighting(this);
+	});
+	
+	$("img.chk").click(function() {
+		swapCheckboxImg($(this));
 	});
 	
 	//Disable non-name inputs for new record rows...

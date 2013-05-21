@@ -86,6 +86,11 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 	public function update_skill($skillId, array $updates) {
 		if(is_numeric($skillId) && $skillId > 0 && is_array($updates) && count($updates) > 0) {
 			try {
+				
+				if(isset($updates['is_class_skill'])) {
+					$updates['is_class_skill'] = $this->gfObj->interpret_bool($updates['is_class_skill'], array('false','true'));
+				}
+				
 				$retval = $this->tableHandlerObj->update_record($skillId, $updates, true);
 				$data = $this->get_skill_by_id($skillId);
 				foreach($data as $k=>$v) {

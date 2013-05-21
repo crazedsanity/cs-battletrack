@@ -461,7 +461,10 @@ Powered by {CSBT_project_name}, v{CSBT_version}
 		          <tr class="skillslot slot {addClassName}">
                     <td class="name"><input class="text nameField freestyle" title="Name of skill (ID #{skills_id})" id="skills__skill_name__{skills_id}" value="{skills__skill_name}" type="text"></td>
                     <td class="unit">{abilityDropDown}</td>
-                    <td class="char"><input class="chk {addClassName} {skills__is_class_skill_checked}" id="skills__is_class_skill__{skills_id}" type="checkbox" title="Checkmark indicates it is a CLASS SKILL"></td>
+                    <td class="char">
+                    	<img class="chk" title="Checkmark indicates it is a CLASS SKILL" border="0" src="/images/ttorp/checkbox{skills__is_class_skill_checked}.jpg" />
+                    	<input class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" checked="{skills__is_class_skill_checked}">
+                    </td>
                     <td class="unit"><input class="text derived" id="skills__skill_mod__{skills_id}" title="Total skill modifier" value="{skills__skill_mod}" type="text" readonly="readonly"></td>
                     <td class="char">=</td>
                     <td class="unit"><input class="text derived" title="Ability Modifier" id="skills__ability_mod__{skills_id}" class="derived" value="{skills__ability_mod}" type="text" readonly="readonly"></td>
