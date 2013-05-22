@@ -1,0 +1,31 @@
+          <table id="characterArmor" class="armor" cellspacing="0">
+		  <tbody>
+          <!-- BEGIN characterArmorSlot -->
+            <tr class="slot header {addClassName}">
+              <td class="type wide" title="Armor ID #{characterArmor_id}">Armor/Protective Item</td>
+              <td class="small">Type</td>
+              <td class="small">AC Bonus</td>
+              <td class="small">Check Pen</td>
+              <td class="small">Max Dex</td>
+            </tr>
+            <tr class="slot {addClassName}">
+              <td><input class="left nameField freestyle {addClassName}" title="Armor (or protective item)'s name" id="characterArmor__armor_name__{characterArmor_id}" value="{characterArmor__armor_name}"></td>
+              <td><input title="Type of armor (light, medium, heavy)" id="characterArmor__armor_type__{characterArmor_id}" class="freestyle" value="{characterArmor__armor_type}"></td>
+              <td><input title="AC Bonus" id="characterArmor__ac_bonus__{characterArmor_id}" value="{characterArmor__ac_bonus}"></td>
+              <td><input title="Armor check penalty" id="characterArmor__check_penalty__{characterArmor_id}" value="{characterArmor__check_penalty}"></td>
+              <td><input title="Maximum dexterity bonus" id="characterArmor__max_dex__{characterArmor_id}" value="{characterArmor__max_dex}"></td>
+            </tr>
+            <tr class="slot header {addClassName}">
+              <td colspan="2">Special Properties</td>
+              <td>Weight</td>
+              <td>Spell Fail</td>
+              <td>Speed</td>
+            </tr>
+            <tr class="slot {addClassName}">
+              <td colspan="2"><input class="left freestyle" title="Special properties" id="characterArmor__special__{characterArmor_id}" value="{characterArmor__special}"></td>
+              <td><input title="Weight of armor (or item)" id="characterArmor__weight__{characterArmor_id}" value="{characterArmor__weight}"></td>
+              <td><input title="Arcane spell failure %" id="characterArmor__spell_fail__{characterArmor_id}" value="{characterArmor__spell_fail}"></td>
+              <td><input title="Maximum speed while wearing this armor" id="characterArmor__max_speed__{characterArmor_id}" value="{characterArmor__max_speed}"></td>
+            </tr>
+          <!-- END characterArmorSlot -->
+          </tbody></table>

@@ -1,0 +1,24 @@
+                <table id="gear" cellspacing="0">
+                  <tbody><tr class="title">
+                    <td colspan="3">Gear</td>
+                  </tr>
+                  <tr class="header">
+                    <td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
+                    <td class="unit"><div id="sortGear_ByWeight" title="Weight">Weight<br>(lbs)</div></td>
+                    <td class="unit"><div id="sortGear_ByLoc" title="Location">Loc</div></td>
+                  </tr>
+
+				<!-- BEGIN gearSlot -->
+                  <tr class="slot {addClassName}">
+                    <td><input class="name nameField freestyle" title="Item name/description (ID #{gear_id})" id="gear__gear_name__{gear_id}" class="freestyle" value="{gear__gear_name}" type="text"></td>
+                    <td><input title="Item weight" id="gear__weight__{gear_id}" value="{gear__total_weight}" type="text"></td>
+                    <td><input title="Location of item" id="gear__location__{gear_id}" class="freestyle" value="{gear__location}" type="text"></td>
+                  </tr>
+				<!-- END gearSlot -->
+                  <tr class="footer">
+                    <td>Total Weight:</td>
+                    <td class="total"><span id="gear__total_weight__generated" title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
+                    <td>
+                  </td></tr>
+		
+                </tbody></table>

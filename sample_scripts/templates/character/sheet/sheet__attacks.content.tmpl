@@ -1,0 +1,61 @@
+          <!--
+            table#attacks contains the base melee and ranged attack bonuses.
+          -->
+          <table id="attacks">
+            <tbody><tr>
+              <td>
+              </td><td class="header">Total Attack Bonus</td>
+              <td>
+              </td><td class="header">Base Attack Bonus</td>
+              <td>
+              </td><td class="header">Str Mod *</td>
+              <td>
+              </td><td class="header">Size Mod</td>
+              <td>
+              </td><td class="header">Misc Mod</td>
+              <td>
+              </td><td class="header">Temp Mod</td>
+            </tr>
+            <tr>
+              <td class="tag"><span class="help" title="Melee Attack Bonus">MELEE</span></td>
+              <td class="wide"><input title="Melee Attack Bonus" id="main__melee_total" class="derived" value="{main__melee_total}" type="text" readonly="readonly"></td>
+              <td class="char">=</td>
+              <td class="wide"><input title="Base attack bonus" class="main__base_attack_bonus hl--main__base_attack_bonus derived" value="{main__base_attack_bonus}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Strength modifier" class="hl--characterAbility__str_modifier characterAbility__str_modifier derived" value="{characterAbility__str_modifier}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Size modifier" id="main__melee_size" value="{main__melee_size}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Miscellaneous modifer" id="main__melee_misc" value="{main__melee_misc}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input class="temp" title="Temporary melee attack modifier" id="main__melee_temp" value="{main__melee_temp}" type="text"></td>
+            </tr>
+            <tr>
+              <td class="tag"><span class="help" title="Ranged Attack Bonus">RANGED</span></td>
+              <td class="wide"><input title="Total ranged attack bonus" id="main__ranged_total" value="{main__ranged_total}" type="text" readonly="readonly"></td>
+              <td class="char">=</td>
+              <td class="wide"><input title="Base attack bonus" class="hl--main__base_attack_bonus main__base_attack_bonus" value="{main__base_attack_bonus}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Dexterity modifier" class="hl--characterAbility__dex_modifier characterAbility__dex_modifier" value="{characterAbility__dex_modifier}" type="text" readonly="readonly"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Size modifier" id="main__ranged_size" value="{main__ranged_size}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input title="Miscellaneous modifier" id="main__ranged_misc" value="{main__ranged_misc}" type="text"></td>
+              <td class="char">+</td>
+              <td class="unit"><input class="temp" title="Temporary ranged attack modifier" id="main__ranged_temp" value="{main__ranged_temp}" type="text"></td>
+            </tr>
+            <tr>
+              <td>
+              </td><td class="footer">Total Attack Bonus</td>
+              <td>
+              </td><td class="footer">Base Attack Bonus</td>
+              <td>
+              </td><td class="footer">Dex Mod</td>
+              <td>
+              </td><td class="footer">Size Mod</td>
+              <td>
+              </td><td class="footer">Misc Mod</td>
+              <td>
+              </td><td class="footer">Temp Mod</td>
+            </tr>
+          </tbody></table>

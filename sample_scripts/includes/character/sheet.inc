@@ -4,6 +4,13 @@
  */
 
 $page->rip_all_block_rows('content');
+
+//TODO: this may conflict with other systems if they have template variables that begin with "sheet__" and have block rows defined
+foreach($page->templateVars as $k=>$v) {
+	if(preg_match('/^sheet__/', $k)) {
+		$page->rip_all_block_rows($k);
+	}
+}
 $page->clear_content('header');
 $page->clear_content('menu');
 

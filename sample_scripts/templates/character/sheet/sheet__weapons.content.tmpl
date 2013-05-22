@@ -1,0 +1,33 @@
+          <table class="weapon" id="characterWeapon" cellspacing="0">
+		  <tbody>
+          <!-- BEGIN characterWeaponSlot -->
+           <tr class="slot header {addClassName}">
+              <td class="type wide" title="Weapon ID #{characterWeapon_id}">Weapon</td>
+              <td class="wide">Total Attack Bonus</td>
+              <td class="medium">Damage</td>
+              <td class="small">Critical</td>
+              <td class="small">Range</td>
+            </tr>
+            <tr class="slot {addClassName} multiRowFirst">
+              <td><input class="left nameField freestyle {addClassName}" title="Weapon's name" id="characterWeapon__weapon_name__{characterWeapon_id}" value="{characterWeapon__weapon_name}"></td>
+              <td><input title="Total attack bonus for this weapon" id="characterWeapon__total_attack_bonus__{characterWeapon_id}" value="{characterWeapon__total_attack_bonus}"></td>
+              <td><input title="Damage" id="characterWeapon__damage__{characterWeapon_id}" class="freestyle" value="{characterWeapon__damage}"></td>
+              <td><input title="Critical threat range" id="characterWeapon__critical__{characterWeapon_id}" class="freestyle" value="{characterWeapon__critical}"></td>
+              <td><input title="Range increment (applies only to throwable weapons)" id="characterWeapon__range__{characterWeapon_id}" class="freestyle" value="{characterWeapon__range}"></td>
+            </tr>
+            <tr class="slot header {addClassName}">
+              <td>Special Properties</td>
+              <td>Ammunition</td>
+              <td>Weight</td>
+              <td>Size</td>
+              <td>Type</td>
+            </tr>
+            <tr class="slot bottomSpacer {addClassName} multiRowSecond">
+              <td><input class="left freestyle" title="Special properties" id="characterWeapon__special__{characterWeapon_id}" class="freestyle" value="{characterWeapon__special}"></td>
+              <td><input title="Current ammunition (for ranged weapons)" id="characterWeapon__ammunition__{characterWeapon_id}" class="freestyle" value="{characterWeapon__ammunition}"></td>
+              <td><input title="Weight" id="characterWeapon__weight__{characterWeapon_id}" value="{characterWeapon__weight}"></td>
+              <td><input title="Size ([S]mall, [M]edium, [L]arge, [H]oly shit)" id="characterWeapon__size__{characterWeapon_id}" class="freestyle" value="{characterWeapon__size}"></td>
+              <td><input title="Damage type (slashing bludgeoning, etc)" id="characterWeapon__weapon_type__{characterWeapon_id}" class="freestyle" value="{characterWeapon__weapon_type}"></td>
+            </tr>
+          <!-- END characterWeaponSlot -->
+          </tbody></table>
