@@ -45,7 +45,7 @@ class csbt_characterArmor extends csbt_battleTrackAbstract	 {
 	//-------------------------------------------------------------------------
 	public function get_armor_by_id($armorId) {
 		try {
-			$data = $this->tableHandlerObj->get_record_by_id($armorId);
+			$retval = $this->tableHandlerObj->get_record_by_id($armorId);
 		}
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve armor with record id (". $armorId ."), DETAILS:::: ". $e->getMessage());

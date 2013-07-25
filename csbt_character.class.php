@@ -287,7 +287,7 @@ class csbt_character extends csbt_battleTrackAbstract {
 					$retval[$sheetId] = $val;
 				}
 				
-				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac')] = $this->get_total_ac();
+				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac')] = $this->get_total_ac("full");
 				$retval[$this->create_sheet_id(self::sheetIdPrefix, 'total_ac_bonus')] = $this->get_total_ac_bonus();
 				$retval[$this->create_sheet_id('generated', 'ac_touch')] = $this->get_total_ac_touch();
 				$retval[$this->create_sheet_id('generated', 'ac_flatfooted')] = $this->get_total_ac_flatfooted();
@@ -450,6 +450,8 @@ class csbt_character extends csbt_battleTrackAbstract {
 						$this->changesByKey[$k .'__'. $recordId] = $v;
 					}
 				}
+				$this->changesByKey['main__total_ac'] = $this->get_total_ac('full');
+				$this->changesByKey['main__total_ac_bonus'] = $this->get_total_ac_bonus();
 				break;
 			
 			case 'characterWeapon':
@@ -553,23 +555,28 @@ class csbt_character extends csbt_battleTrackAbstract {
 		try {
 			$totalAc = 0;
 			$characterInfo = $this->get_main_character_data();
-
-			if(is_null($type) || preg_match('/^flat/i', $type)) {
-				//full=yes; touch=no; flat=yes;
+			if(is_null($type)) {
+				//I think this is only supposed to get used when showing the "armor" box value...
 				$totalAc = $this->armorObj->get_ac_bonus();
 			}
-			
-			if(is_numeric($characterInfo['ac_size'])) {
-				//full=yes; touch=yes; flat=yes;
-				$totalAc += $characterInfo['ac_size'];
-			}
-			if(is_numeric($characterInfo['ac_misc'])) {
-				//full=yes; touch=yes; flat=yes
-				$totalAc += $characterInfo['ac_misc'];
-			}
-			if(is_numeric($characterInfo['ac_natural']) || preg_match('/^flat/i', $type)) {
-				//full=yes; touch=no; flat=yes
-				$totalAc += $characterInfo['ac_natural'];
+			else {
+				if(is_null($type) || preg_match('/^full/i', $type) || preg_match('/^flat/i', $type)) {
+					//full=yes; touch=no; flat=yes;
+					$totalAc = $this->armorObj->get_ac_bonus();
+				}
+
+				if(is_numeric($characterInfo['ac_size'])) {
+					//full=yes; touch=yes; flat=yes;
+					$totalAc += $characterInfo['ac_size'];
+				}
+				if(is_numeric($characterInfo['ac_misc'])) {
+					//full=yes; touch=yes; flat=yes
+					$totalAc += $characterInfo['ac_misc'];
+				}
+				if(is_numeric($characterInfo['ac_natural']) || preg_match('/^flat/i', $type)) {
+					//full=yes; touch=no; flat=yes
+					$totalAc += $characterInfo['ac_natural'];
+				}
 			}
 		}
 		catch(Exception $e) {

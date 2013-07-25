@@ -22,6 +22,12 @@ input
 table#maintable
 {
 	border: solid #000 2px;
+	max-width: 960px;
+}
+
+td
+{
+	font-size: 9px;
 }
 /************************************************************************/
 
@@ -34,12 +40,6 @@ table#maintable
 {
   padding: 0 2px 0 2px;
   margin: 0;
-}
-#info span
-{
-  letter-spacing: .1em;
-  color: gray;
-  background-color: white;
 }
 #info tbody tr td input
 {
@@ -60,17 +60,9 @@ input:not('.freestyle')
 
 /************************************************************************/
 
-#stats
-{
-  width: 100%;
-}
-#stats td.unit
-{
-  width: 33.3%;
-}
 #stats input
 {
-  width: 97%;
+  width: 97%; /* NOTE: removing this makes it suddenly take up the wole page... */
 }
 #stats td.top
 {
@@ -111,10 +103,7 @@ input:not('.freestyle')
   cursor: help;
 }
 
-#statblock
-{
-  width: 100%;
-}
+
 #statblock td
 {
   width: 20%;
