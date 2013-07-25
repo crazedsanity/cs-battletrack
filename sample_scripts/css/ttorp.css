@@ -10,7 +10,6 @@
 html
 , td
 {
-  font-size: 9px;
   color: black;
   background-color: white;
   font-family: Tahoma, Arial, sans-serif;
@@ -20,15 +19,10 @@ input
   font-size: 13px;
 }
 
-/*
-  Define the basic layout elements.
-*/
-
-#maintable
+table#maintable
 {
-  width: 100%;
+	border: solid #000 2px;
 }
-
 /************************************************************************/
 
 
@@ -47,7 +41,7 @@ input
   color: gray;
   background-color: white;
 }
-#info input
+#info tbody tr td input
 {
   width: 100%;
   border-style: solid;
@@ -57,6 +51,11 @@ input
 #info td.unit
 {
   width: 12.5%;
+}
+
+input:not('.freestyle') 
+{
+	width: 40px;
 }
 
 /************************************************************************/
@@ -634,258 +633,6 @@ table.weapon input.left
 {
   text-decoration: underline;
 }
-
-/************************************************************************/
-
-#spellstuff
-{
-  width: 100%;
-  margin-top: 1em;
-}
-#spellstuff td.saves
-{
-  width: 25%;
-  vertical-align: top;
-}
-
-#spellsaves
-{
-  width: 100%;
-}
-#spellsaves tr.title td
-{
-  background-color: black;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-#spellsaves tr.header td
-{
-  vertical-align: bottom;
-  text-align: center;
-  background-color: white;
-  color: gray;
-}
-#spellsaves tr.header td
-, #spellsaves tr.save td
-{
-  padding: 2px;
-}
-#spellsaves td.level
-, #spellsaves td.noinput
-{
-  background-color: white;
-  color: black;
-  text-align: center;
-}
-#spellsaves td
-{
-  width: 25%;
-}
-#spellsaves td input
-{
-  text-align: center;
-  border: 1px solid black;
-  width: 100%;
-}
-
-#spellstuff td.currency
-{
-  vertical-align: top;
-}
-#currency
-{
-  width: 100%;
-}
-#currency tr.title td
-{
-  background-color: black;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-#currency textarea
-{
-  border: 1px solid black;
-  width: 100%;
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  height: 90px;
-  padding: 2px;
-}
-
-#spellstuff td.languages
-{
-  vertical-align: bottom;
-}
-#languages
-{
-  width: 100%;
-}
-#languages tr.title td
-{
-  background-color: black;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-#languages td
-{
-  padding: 0 0 1px 0;
-}
-#languages td input
-{
-  border-style: none;
-  border-top: 1px solid white;
-  border-bottom: 1px solid black;
-  width: 100%;
-  font-size: 9px;
-}
-
-#spells
-{
-  width: 98%;
-  margin-left: 2%;
-}
-#spells tr.title td
-{
-  background-color: black;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-#spells table.spellsknown
-{
-  width: 80%;
-  margin-left: 10%;
-  margin-right: 10%;
-}
-#spells table.spellsknown td
-{
-  text-align: right;
-  width: 20%;
-}
-#spells table.spellsknown tr.header td
-{
-  text-align: center;
-}
-#spells table.spellsknown input
-{
-  width: 5em;
-  border-style: none;
-  border-top: 1px solid white;
-  border-bottom: 1px solid black;
-  font-size: 9px;
-  text-align: center;
-}
-
-#spells table.spelllist td
-{
-  padding: 1px 2px 0 2px;;
-}
-#spells table.spelllist
-{
-  width: 100%;
-  margin-top: 1em;
-}
-#spells table.spelllist tr.header td
-{
-  background-color: white;
-  color: gray;
-  vertical-align: bottom;
-}
-#spells table.spelllist tr.header td.mem
-, #spells table.spelllist tr td.mem input
-{
-  text-align: center;
-}
-#spells table.spelllist tr td.help
-{
-  cursor: help;
-}
-#spells table.spelllist td.name
-{
-  width: 85%;
-}
-#spells table.spelllist input
-{
-  width: 100%;
-  border-style: solid;
-  border-color: black;
-  border-width: 0 0 1px 0;
-  font-size: 9px;
-}
-#spells a
-{
-  color: black;
-  background-color: white;
-  text-decoration: none;
-}
-#spells a:hover
-{
-  text-decoration: underline;
-}
-
-/************************************************************************/
-
-#statsummary
-{
-	width: 100%;
-	margin-top: 1em;
-}
-#statsummary textarea
-{
-	border: 1px solid black;
-	width: 100%;
-	font-size: 12px;
-	font-family: Arial, sans-serif;
-	height: 1.25in;
-	padding: 2px;
-}
-#statsummary tr.header td
-{
-	background-color: black;
-	color: white;
-	font-size: 14px;
-	font-weight: bold;
-	font-family: Arial, sans-serif;
-	text-align: center;
-}
-#statsummary tr.header td span 
-, #statsummary tr.header td a
-{
-	background-color: black;
-	color: white;
-	font-size: 12px;
-	font-weight: normal;
-	font-variant: small-caps;
-	text-decoration: none;
-}
-
-
-#statsummary tr.header td a:hover
-{
-	background-color: black;
-	color: white;
-	text-decoration: underline;
-}
-#statsummary div
-{
-	border: 1px solid black;
-	font-size: 12px;
-	font-family: Arial, sans-serif;
-	padding: 2px;
-}
-
-/************************************************************************/
 
 
 
