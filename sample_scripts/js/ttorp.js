@@ -12,7 +12,11 @@ function markDirtyInput(object) {
 	if($(object).data("timeout")) {
 		clearTimeout($(object).data("timeout"));
 	}
+	
 	if($(object).val() !== undefined && $(object).val() !== '') {
+		$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
+	}
+	else if(($(object).val() === undefined || $(object).val() === '') && ($(object).hasClass('nullable'))) {
 		$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
 	}
 }
@@ -20,7 +24,7 @@ function clearDirtyInput(object) {
 	if($(object).hasClass('dirtyInput')) {
 		$(object).removeClass('dirtyInput');
 	}
-	if($(object).attr("readonly") == true && !$(object).hasClass("derived")) {
+	if($(object).attr("readonly") === true && !$(object).hasClass("derived")) {
 		$(object).attr("readonly",false);
 	}
 	clearUpdatedInput(object);
@@ -34,7 +38,7 @@ function isDirtyInput(object) {
 	return(retval);
 }
 function markUpdatedInput(object, newVal, forceChange) {
-	if(forceChange == undefined || forceChange == null) {
+	if(forceChange === undefined || forceChange === null) {
 		forceChange=false;
 	}
 	
@@ -46,8 +50,8 @@ function markUpdatedInput(object, newVal, forceChange) {
 	}
 	
 	clearDirtyInput(object);
-	if(originalVal != newVal || forceChange) {
-		if(updateTextInstead == true) {
+	if(originalVal !== newVal || forceChange) {
+		if(updateTextInstead === true) {
 			$(object).text(newVal);
 		}
 		else {
