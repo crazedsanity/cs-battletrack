@@ -12,7 +12,9 @@ function markDirtyInput(object) {
 	if($(object).data("timeout")) {
 		clearTimeout($(object).data("timeout"));
 	}
-	$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
+	if($(object).val() !== undefined && $(object).val() !== '') {
+		$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
+	}
 }
 function clearDirtyInput(object) {
 	if($(object).hasClass('dirtyInput')) {
