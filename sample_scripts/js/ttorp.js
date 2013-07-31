@@ -14,10 +14,20 @@ function markDirtyInput(object) {
 	}
 	
 	if($(object).val() !== undefined && $(object).val() !== '') {
-		$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
+		$(object).data('timeout', setTimeout(function() {
+			processChange(object);
+		}, globalUpdateDelay));
 	}
 	else if(($(object).val() === undefined || $(object).val() === '') && ($(object).hasClass('nullable'))) {
-		$(object).data('timeout', setTimeout(function() {processChange(object);}, globalUpdateDelay));
+		$(object).data('timeout', setTimeout(function() {
+			processChange(object);
+		}, globalUpdateDelay));
+	}
+	else {
+		// there's something we didn't like... so we'll revisit it in a second.
+		$(object).data('timeout', setTimeout(function() {
+			markDirtyInput(object);
+		}, 1000));
 	}
 }
 function clearDirtyInput(object) {
