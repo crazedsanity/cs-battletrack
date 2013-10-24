@@ -510,28 +510,3 @@ $(document).ready(function(){
 
 var _responseXML = undefined;
 
-function ajax_getRequest(type, isAsync, url) {
-	if(isAsync != false && isAsync != true) {
-		isAsync = true;
-	}
-	
-	myUrl='/ajax/';
-	if(url != undefined) {
-		myUrl = url;
-	}
-	
-	$.ajax ({
-		url			: myUrl + type,
-		cache		: false,
-		async		: isAsync,
-		dataType	: 'text/xml',
-		timeout		: (30 * 1000),
-		success: function (returnXml) {
-			_responseXML = returnXml;
-		},
-		error: function (returnXml) {
-			alert("Call to " + type + " failed::: " + returnXml);
-		}
-	});
-}
-
