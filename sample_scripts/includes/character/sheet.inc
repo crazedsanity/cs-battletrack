@@ -11,8 +11,6 @@ foreach($page->templateVars as $k=>$v) {
 		$page->rip_all_block_rows($k);
 	}
 }
-$page->clear_content('header');
-$page->clear_content('menu');
 
 if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);

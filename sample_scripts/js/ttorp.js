@@ -378,9 +378,13 @@ function bindInputMarking(pId) {
 	});
 }
 
+function togglePrintable() {
+	return($(".templateSection").not("#main__content").toggle());
+}
+
 
 $(document).ready(function() {
-	
+	togglePrintable();
 	bindInputMarking(undefined);
 	
 	//Highlighting associated fields (i.e. highlight the main "base attack bonus" for melee/ranged so they know what to modify).
