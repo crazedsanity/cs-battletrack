@@ -263,6 +263,7 @@ class csbt_characterSheet extends csbt_tableHandler {
 			$skillId = 'new';
 		}
 		$optionListRepArr = array(
+			'skills__selectAbility__extra'	=> '',
 			'skill_id'						=> $skillId,
 			'optionList'					=> $abilityOptionList
 		);

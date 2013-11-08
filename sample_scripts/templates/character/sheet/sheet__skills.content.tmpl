@@ -24,20 +24,20 @@
                     </td><td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
                   </tr>
                   <!-- BEGIN skillsSlot -->
-		          <tr class="skillslot slot {addClassName}">
-                    <td class="name"><input class="text nameField freestyle" title="Name of skill (ID #{skills_id})" id="skills__skill_name__{skills_id}" value="{skills__skill_name}" type="text"></td>
-                    <td class="unit">{abilityDropDown}</td>
+		          <tr class="skillslot slot data {addClassName}">
+                    <td class="name"><span class="text nameField freestyle" title="Name of skill (ID #{skills_id})" id="skills__skill_name__{skills_id}">{skills__skill_name}</span></td>
+                    <td class="unit"><span class="derived">{skills__ability_name}</span></td>
                     <td class="char">
                     	<img class="chk" title="Checkmark indicates it is a CLASS SKILL" border="0" src="/images/ttorp/checkbox{skills__is_class_skill_checked}.jpg" />
-                    	<input class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" checked="{skills__is_class_skill_checked}">
+                    	<span class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" checked="{skills__is_class_skill_checked}">
                     </td>
-                    <td class="unit"><input class="text derived" id="skills__skill_mod__{skills_id}" title="Total skill modifier" value="{skills__skill_mod}" type="text" readonly="readonly"></td>
+                    <td class="unit"><span class="text derived" id="skills__skill_mod__{skills_id}" title="Total skill modifier">{skills__skill_mod}</span></td>
                     <td class="char">=</td>
-                    <td class="unit"><input class="text derived" title="Ability Modifier" id="skills__ability_mod__{skills_id}" class="derived" value="{skills__ability_mod}" type="text" readonly="readonly"></td>
+                    <td class="unit"><span class="text derived" title="Ability Modifier" id="skills__ability_mod__{skills_id}" class="derived">{skills__ability_mod}</span></td>
                     <td class="char">+</td>
-                    <td class="unit"><input class="text" title="Ranks" id="skills__ranks__{skills_id}" value="{skills__ranks}" type="text"></td>
+                    <td class="unit"><span class="text" title="Ranks" id="skills__ranks__{skills_id}">{skills__ranks}</span></td>
                     <td class="char">+</td>
-                    <td class="unit"><input class="text" title="Miscellaneous Modifier" id="skills__misc_mod__{skills_id}" value="{skills__misc_mod}" type="text"></td>
+                    <td class="unit"><span class="text" title="Miscellaneous Modifier" id="skills__misc_mod__{skills_id}">{skills__misc_mod}</span></td>
                   </tr>
                   <!-- END skillsSlot -->
                   <!-- BEGIN skills__selectAbility --><select id="skills__ability_id__%%skill_id%%" %%skills__selectAbility__extra%%>

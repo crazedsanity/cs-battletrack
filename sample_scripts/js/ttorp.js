@@ -60,6 +60,8 @@ function markUpdatedInput(object, newVal, forceChange) {
 	}
 	
 	clearDirtyInput(object);
+	
+	//TODO: this "if" statement causes a lot of timing issues (resetting values in one field when another finishes updating)
 	if(originalVal !== newVal || forceChange) {
 		if(updateTextInstead === true) {
 			$(object).text(newVal);
@@ -291,14 +293,6 @@ function submitNewRecordDialog(pButtonObj) {
 	}
 }
 
-function handlePendingChanges() {
-	//this will submit changes for all pending (dirty) inputs (that are NOT new records).
-	//NOTE::: this is intended as a "fail-safe", and probably only for testing...
-	$("input.dirtyInput").each(function(item, object){
-		processChange(object);
-	});
-}
-
 function doHighlighting(object, mouseEvent) {
 	if($(object).attr("class") != undefined) {
 		var bits = $(object).attr("class").split(' ');
@@ -317,6 +311,13 @@ function highlightField(id) {
 	}
 	else {
 		$("#"+ id).addClass("highlight");
+	}
+	
+	if($("."+ id).hasClass("highlight")) {
+		$("."+ id).removeClass("highlight");
+	}
+	else {
+		$("."+ id).addClass("highlight");
 	}
 }
 
@@ -354,8 +355,8 @@ function swapCheckboxImg(pObj) {
 * No idea why I can't do this in CSS properly.
  */
 function setColoringForWeapons() {
-	var oddRow = '#C5C8CC';
-	var evenRow = '#F2EFE9';
+	var oddRow = '#F2EFE9';
+	var evenRow = '#C5C8CC';
 	$("table.weapon tr.multiRowFirst:odd td").css('background-color', oddRow).css('height', '20px');
 	$("table.weapon tr.multiRowSecond:odd td").css('background-color', oddRow).css('height', '20px');
 	$("table.weapon tr.multiRowFirst:even td").css('background-color', evenRow).css('height', '20px');
@@ -363,7 +364,6 @@ function setColoringForWeapons() {
 }
 
 function bindInputMarking(pId) {
-	console.log('binding marking for ('+ pId +')');
 	setColoringForWeapons();
 	// if we've got an ID, add a prefix when selecting so it only applies to a subset; otherwise, apply it to everything.
 	var tPrefix = "";
@@ -407,10 +407,7 @@ function bindInputSwitching() {
 
 var xDebug;
 function switchToInput(target) {
-	//console.log($(target));
-	
-	console.log($(target).data('inputSwitch'));
-	if($(target).data('inputSwitch') === undefined) {
+	if(!$(target).children("span").first().hasClass('derived') && $(target).data('inputSwitch') === undefined) {
 		//$(target).data('inputSwitch', 1);
 
 		// first, add an input...
