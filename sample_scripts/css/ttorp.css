@@ -254,6 +254,11 @@ input:not('.freestyle')
   text-align: center;
 }
 
+td span
+{
+	font-size: 13px;
+}
+
 /************************************************************************/
 
 #attacks
@@ -645,22 +650,6 @@ table.weapon input.left
   font-family: Arial, sans-serif;
   text-align: center;
 }
-#notes tr.header td span
-, #notes tr.header td a
-{
-  background-color: black;
-  color: white;
-  font-size: 12px;
-  font-weight: normal;
-  font-variant: small-caps;
-  text-decoration: none;
-}
-#notes tr.header td a:hover
-{
-  background-color: black;
-  color: white;
-  text-decoration: underline;
-}
 #notes textarea
 {
   border: 1px solid black;
@@ -671,35 +660,7 @@ table.weapon input.left
   padding: 2px;
 }
 
-textarea.bordered {
-border: 1px solid black;
-}
-
-textarea.bordered_gray {
-border: 1px solid gray;
-}
-
-#notes div
-{
-  border: 1px solid black;
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  padding: 2px;
-}
-
 /************************************************************************/
-
-#footer
-{
-  font-size: 9px;
-  background-color: white;
-  color: gray;
-  text-align: right;
-}
-#save
-{
-  text-align: center;
-}
 
 
 /* Beginning of CS-BattleTrack stuff */
@@ -748,4 +709,48 @@ input[readonly].highlight {
 }
 
 .bottomSpacer {
+}
+
+
+/*
+* FOR WHATEVER REASON, THE FOLLOWING DOESN'T WORK...  ACCOMPLISED USING JAVASCRIPT.
+table#specialAbility tr:nth-child(even):not(.title) td
+{
+	background-color: #b8cede;
+	font-size: 13px;
+}
+table#specialAbility tr:nth-child(odd):not(.title) td
+{
+	background-color: #8bbcde;
+	font-size: 13px;
+}
+*/
+/*table#specialAbility tbody tr td span 
+{
+	font-size: 13px;
+	height: 18px;
+}
+table#specialAbility tbody tr:nth-child(odd) td
+{
+	background-color: #C7C3BF;
+	height: 18px;
+}
+table#specialAbility tbody tr:nth-child(even) td
+{
+	background-color: #A6ABAC;
+	height: 18px;
+}*/
+
+table tbody tr.slot.data td
+{
+	border-bottom: solid #000 1px;
+	height: 20px;
+}
+table tbody tr.slot.data:nth-child(odd) td
+{
+	background-color: #C5C8CC;
+}
+table tbody tr.slot.data:nth-child(even) td
+{
+	background-color: #F2EFE9;
 }

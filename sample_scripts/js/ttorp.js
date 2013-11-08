@@ -219,10 +219,12 @@ function showNewRecordDialog(pDialogId) {
 	if($("#"+ pDialogId +" div.hidden.title").text() != undefined) {
 		theTitle = $("#"+ pDialogId +" div.hidden.title").text();
 	}
+	$("#"+ pDialogId +" input.nameField").val("");
 	
 	$("#"+ pDialogId).dialog({
-		modal:	true,
-		title:	theTitle,
+		modal: true,
+		title: theTitle,
+		position: 'top',
 		close:	function(event,ui) {
 			$(this).dialog('destroy');
 		}
@@ -273,6 +275,10 @@ function submitNewRecordDialog(pButtonObj) {
 					
 					// NOTE::: the response actually needs to list these items... currently, it does not.
 					callback_showUpdatedInput(tData);
+					
+					if(sectionToReload.match(/weapon/i)) {
+						setColoringForWeapons();
+					}
 				}
 			});
 		}
@@ -344,8 +350,21 @@ function swapCheckboxImg(pObj) {
 	ajax_processChange($(hiddenChk).attr("id"));
 }
 
+/* 
+* No idea why I can't do this in CSS properly.
+ */
+function setColoringForWeapons() {
+	var oddRow = '#C5C8CC';
+	var evenRow = '#F2EFE9';
+	$("table.weapon tr.multiRowFirst:odd td").css('background-color', oddRow).css('height', '20px');
+	$("table.weapon tr.multiRowSecond:odd td").css('background-color', oddRow).css('height', '20px');
+	$("table.weapon tr.multiRowFirst:even td").css('background-color', evenRow).css('height', '20px');
+	$("table.weapon tr.multiRowSecond:even td").css('background-color', evenRow).css('height', '20px');
+}
+
 function bindInputMarking(pId) {
-	
+	console.log('binding marking for ('+ pId +')');
+	setColoringForWeapons();
 	// if we've got an ID, add a prefix when selecting so it only applies to a subset; otherwise, apply it to everything.
 	var tPrefix = "";
 	if(pId != undefined && pId != null && pId.length > 1) {
@@ -358,6 +377,7 @@ function bindInputMarking(pId) {
 		  $(this).data('old_bgcolor', $(this).css("background-color"));
 	});
 	
+			
 	$(tPrefix + "input,textarea").not(".derived").keyup(function() {
 		if($(this).attr("id")) {
 			if ($(this).val() != $(this).data('last_value')) {
@@ -376,6 +396,46 @@ function bindInputMarking(pId) {
 		markDirtyInput(this);
 		processChange(this);
 	});
+}
+
+function bindInputSwitching() {
+	//switch spans into inputs...
+	$("tr.slot.data td").click(function() {
+		switchToInput($(this));
+	});
+}
+
+var xDebug;
+function switchToInput(target) {
+	//console.log($(target));
+	
+	console.log($(target).data('inputSwitch'));
+	if($(target).data('inputSwitch') === undefined) {
+		//$(target).data('inputSwitch', 1);
+
+		// first, add an input...
+		//$(target).prepend("<input name='' value='"+ $(target).text() +"'>");
+		var useWidth = $(target).width();
+		
+		$(target).data('obj', $(target).children('span').first());
+		var theSpan = $(target).children("span").first();
+		xDebug = theSpan;
+		
+		var theInput = document.createElement("input");
+		theInput.type="text";
+		theInput.className=$(theSpan).attr("class");
+		theInput.id = $(theSpan).attr("id");
+		theInput.value = $(theSpan).text();
+		$(theInput).css('width', useWidth);
+		$(target).css('width', useWidth);
+		
+		$(target).data('inputSwitch', $(target).children("span").first());
+		
+		$(target).children("span").first().replaceWith(theInput);
+		$(theInput).addClass("temp").focus();
+		
+		bindInputMarking();
+	}
 }
 
 function togglePrintable() {
@@ -405,4 +465,7 @@ $(document).ready(function() {
 	$("#skills tr.newRecord input").not(".nameField").attr("readonly",true);
 	$("#specialAbility tr.newRecord input").not(".nameField").attr("readonly",true);
 	$("#gear tr.newRecord input").not(".nameField").attr("readonly",true);
+	
+	bindInputSwitching();
+	
 });
