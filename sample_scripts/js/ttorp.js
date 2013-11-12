@@ -58,6 +58,7 @@ function markUpdatedInput(object, newVal, forceChange) {
 		originalVal = $(object).text();
 		updateTextInstead = true;
 	}
+	var myId = $(object).attr('id');
 	
 	clearDirtyInput(object);
 	
@@ -67,6 +68,7 @@ function markUpdatedInput(object, newVal, forceChange) {
 			$(object).text(newVal);
 		}
 		else {
+				console.log("SETTING xxvalue in ("+ myId +")... ");
 			$(object).val(newVal);
 		}
 		$(object).data("last_value", newVal);
@@ -74,13 +76,13 @@ function markUpdatedInput(object, newVal, forceChange) {
 		
 		if($(object).attr('id')) {
 			
-			var myId = $(object).attr('id');
 			
 			/* Special: update any input that has a class name that matches the given id: this 
 			 * helps deal with things like the "base attack bonus" field for ranged/melee, as 
 			 * they are technically repeats of the original/master value.
 			//*/
 			if(myId != undefined && $("."+ myId).length >0) {
+				console.log("SETTING value in ("+ myId +")... ");
 				$("."+ myId).val(newVal).addClass("updatedInput");
 			}
 		}
@@ -107,8 +109,6 @@ function isUpdatedInput(object) {
 function markProcessingInput(object) {
 	clearDirtyInput(object);
 	$(object).addClass("processingInput");
-	$(object).attr("readonly",true);
-	$(object).attr("disabled",true);
 	
 	//Update the "last_value" info, it doesn't attempt to get processed again WHILE it is being processed.
 	$(object).data("last_value", $(object).val());
@@ -123,8 +123,8 @@ function isProcessingInput(object) {
 function clearProcessingInput(object) {
 	if($(object).hasClass("processingInput")) {
 		$(object).removeClass("processingInput");
-		$(object).attr("readonly",false);
-		$(object).attr("disabled",false);
+//		$(object).attr("readonly",false);
+//		$(object).attr("disabled",false);
 	}
 }
 /*======================================
@@ -161,6 +161,7 @@ function callback_showUpdatedInput(xmlObj) {
 	if($(xmlObj).find('id_was').text()) {
 		forceNameChange = $(xmlObj).find('id_was').text();
 	}
+	
 	if($(xmlObj).find('changesbykey').text()) {
 		
 		for (var iNode = 0; iNode < xmlObj.childNodes.length; iNode++) {
@@ -209,7 +210,7 @@ function processChange(object) {
 			
 			//NOTE::: the change MUST be submitted before marking it as being processed so "new" records will work properly.
 			var id = $(object).attr('id');
-			$("#"+ id).attr('readonly', 'readonly');
+//			$("#"+ id).attr('readonly', 'readonly');
 			ajax_processChange(id);
 			markProcessingInput(object);
 		}
@@ -221,16 +222,14 @@ function showNewRecordDialog(pDialogId) {
 	if($("#"+ pDialogId +" div.hidden.title").text() != undefined) {
 		theTitle = $("#"+ pDialogId +" div.hidden.title").text();
 	}
-	$("#"+ pDialogId +" input.nameField").val("");
-	
+	console.log("DialogID=("+ pDialogId +")");
 	$("#"+ pDialogId).dialog({
 		modal: true,
 		title: theTitle,
-		position: 'top',
-		close:	function(event,ui) {
-			$(this).dialog('destroy');
-		}
+		position: 'top'
 	});
+	//$(".ui-dialog").find("input:visible").val('');
+	
 	$("div.ui-dialog button.submit").click(function() {
 		submitNewRecordDialog(this);
 	});
@@ -255,9 +254,6 @@ function submitNewRecordDialog(pButtonObj) {
 		var fetchUrl = window.location.href;
 		
 		if(myData.length > 0) {
-			// Make all the items readonly, so users can't try updating while the section reloads
-			$("#"+ sectionToReload).find("input").attr("readonly", "readonly");
-			
 			
 			// Now send the update.
 			$.ajax({
@@ -268,19 +264,16 @@ function submitNewRecordDialog(pButtonObj) {
 					$("#"+ divToReloadInto).load(fetchUrl + " #"+ sectionToReload, function() {
 						//alert("Content loaded, time to do stuff");
 						bindInputMarking(divToReloadInto);
+						bindInputSwitching();
 					});
 					
-					$("#dialog__"+ sectionToReload).dialog('close').dialog('destroy');
+					$("#dialog__"+ sectionToReload).dialog('close');
 					
 					/// Without the next line, each additional attempt to add will cause it to submit multiple times... so the third will submit three, fourth will submit four, etc.
 					$("#dialog__"+ sectionToReload +" button.submit").unbind('click');
 					
 					// NOTE::: the response actually needs to list these items... currently, it does not.
 					callback_showUpdatedInput(tData);
-					
-					if(sectionToReload.match(/weapon/i)) {
-						setColoringForWeapons();
-					}
 				}
 			});
 		}
@@ -340,31 +333,21 @@ function swapCheckboxImg(pObj) {
 	var xOldVal = $(hiddenChk).attr("checked");
 	var xNewVal = xOldVal;
 	
-	if(xOldVal == true) {
-		xNewVal = false;
+	
+	if(xOldVal === false || xOldVal === undefined) {
+		xNewVal = "checked";
+		$(hiddenChk).attr('checked', 'checked');
 	}
 	else {
-		xNewVal = true;
+		xNewVal = "";
+		$(hiddenChk).removeAttr('checked');
 	}
+	console.log("ID=("+ $(hiddenChk).attr("id") +"), oldVal=("+ xOldVal +"), newVal=("+ xNewVal +")");
 	
-	$(hiddenChk).attr("checked", xNewVal);
 	ajax_processChange($(hiddenChk).attr("id"));
 }
 
-/* 
-* No idea why I can't do this in CSS properly.
- */
-function setColoringForWeapons() {
-	var oddRow = '#F2EFE9';
-	var evenRow = '#C5C8CC';
-	$("table.weapon tr.multiRowFirst:odd td").css('background-color', oddRow).css('height', '20px');
-	$("table.weapon tr.multiRowSecond:odd td").css('background-color', oddRow).css('height', '20px');
-	$("table.weapon tr.multiRowFirst:even td").css('background-color', evenRow).css('height', '20px');
-	$("table.weapon tr.multiRowSecond:even td").css('background-color', evenRow).css('height', '20px');
-}
-
 function bindInputMarking(pId) {
-	setColoringForWeapons();
 	// if we've got an ID, add a prefix when selecting so it only applies to a subset; otherwise, apply it to everything.
 	var tPrefix = "";
 	if(pId != undefined && pId != null && pId.length > 1) {
@@ -399,7 +382,6 @@ function bindInputMarking(pId) {
 }
 
 function bindInputSwitching() {
-	//switch spans into inputs...
 	$("tr.slot.data td").click(function() {
 		switchToInput($(this));
 	});
@@ -408,10 +390,6 @@ function bindInputSwitching() {
 var xDebug;
 function switchToInput(target) {
 	if(!$(target).children("span").first().hasClass('derived') && $(target).data('inputSwitch') === undefined) {
-		//$(target).data('inputSwitch', 1);
-
-		// first, add an input...
-		//$(target).prepend("<input name='' value='"+ $(target).text() +"'>");
 		var useWidth = $(target).width();
 		
 		$(target).data('obj', $(target).children('span').first());
@@ -432,6 +410,9 @@ function switchToInput(target) {
 		$(theInput).addClass("temp").focus();
 		
 		bindInputMarking();
+	}
+	else {
+		console.log("switchToInput("+ $(target).attr("id") +"): nope!");
 	}
 }
 
@@ -455,13 +436,6 @@ $(document).ready(function() {
 	$("img.chk").click(function() {
 		swapCheckboxImg($(this));
 	});
-	
-	//Disable non-name inputs for new record rows...
-	$("#characterWeapon tr.newRecord input").not(".nameField").attr("readonly",true);
-	$("#characterArmor tr.newRecord input").not(".nameField").attr("readonly",true);
-	$("#skills tr.newRecord input").not(".nameField").attr("readonly",true);
-	$("#specialAbility tr.newRecord input").not(".nameField").attr("readonly",true);
-	$("#gear tr.newRecord input").not(".nameField").attr("readonly",true);
 	
 	bindInputSwitching();
 	
