@@ -28,8 +28,8 @@
                     <td class="name"><span class="text nameField freestyle" title="Name of skill (ID #{skills_id})" id="skills__skill_name__{skills_id}">{skills__skill_name}</span></td>
                     <td class="unit"><span class="derived">{skills__ability_name}</span></td>
                     <td class="char">
-                    	<img class="chk" title="Checkmark indicates it is a CLASS SKILL" border="0" src="/images/ttorp/checkbox{skills__is_class_skill_checked}.jpg" />
-                    	<span class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" checked="{skills__is_class_skill_checked}">
+                    	<img class="chk" title="Checkmark indicates it is a CLASS SKILL" border="0" src="/images/ttorp/checkbox{skills__is_checked_checkbox}.jpg" />
+                    	<input class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" {skills__is_class_skill_checked}>
                     </td>
                     <td class="unit"><span class="text derived" id="skills__skill_mod__{skills_id}" title="Total skill modifier">{skills__skill_mod}</span></td>
                     <td class="char">=</td>

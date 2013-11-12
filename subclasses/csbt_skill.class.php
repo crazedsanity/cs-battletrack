@@ -200,7 +200,9 @@ class csbt_skill extends csbt_battleTrackAbstract	 {
 					}
 					
 					//add a key so the form can be checked (easier to run the form like this)
-					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'is_class_skill_checked')] = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked'));
+					$isChecked = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked="checked"'));
+					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'is_class_skill_checked')] = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked="checked"'));
+					$retval[$id][$this->create_sheet_id(self::sheetIdPrefix, 'is_checked_checkbox')] = $this->gfObj->interpret_bool($skillData['is_class_skill'], array('','checked'));
 					$skillModData[$indexName] = $data[$id][$indexName];
 				}
 				

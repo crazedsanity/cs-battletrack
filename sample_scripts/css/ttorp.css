@@ -708,38 +708,6 @@ input[readonly].highlight {
 	display: none;
 }
 
-.bottomSpacer {
-}
-
-
-/*
-* FOR WHATEVER REASON, THE FOLLOWING DOESN'T WORK...  ACCOMPLISED USING JAVASCRIPT.
-table#specialAbility tr:nth-child(even):not(.title) td
-{
-	background-color: #b8cede;
-	font-size: 13px;
-}
-table#specialAbility tr:nth-child(odd):not(.title) td
-{
-	background-color: #8bbcde;
-	font-size: 13px;
-}
-*/
-/*table#specialAbility tbody tr td span 
-{
-	font-size: 13px;
-	height: 18px;
-}
-table#specialAbility tbody tr:nth-child(odd) td
-{
-	background-color: #C7C3BF;
-	height: 18px;
-}
-table#specialAbility tbody tr:nth-child(even) td
-{
-	background-color: #A6ABAC;
-	height: 18px;
-}*/
 
 table tbody tr.slot.data td
 {
