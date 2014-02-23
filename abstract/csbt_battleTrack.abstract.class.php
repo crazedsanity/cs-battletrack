@@ -52,11 +52,11 @@ abstract class csbt_battleTrackAbstract extends cs_webapplibsAbstract {
 		parent::__construct(true);
 		$this->set_version_file_location(dirname(__FILE__) . '/../VERSION');
 		
-		if(!defined('csbt__UPGRADE') && !defined('SIMPLE_TEST')) {
-			$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
-			define('csbt__UPGRADE', 1);
-			$upgradeObj->check_versions(true);
-		}
+//		if(!defined('csbt__UPGRADE') && !defined('SIMPLE_TEST')) {
+//			$upgradeObj = new cs_webdbupgrade(dirname(__FILE__) .'/../VERSION', dirname(__FILE__) .'/../upgrades/upgrade.xml', $dbObj->connectParams, __CLASS__ .'.lock');
+//			define('csbt__UPGRADE', 1);
+//			$upgradeObj->check_versions(true);
+//		}
 		$this->pkeyField = $pkeyField;
 		$this->tableHandlerObj = new csbt_tableHandler($dbObj, $tableName, $seqName, $pkeyField, $cleanStringArr, $this->characterId);
 		if($createAbilityObj===true) {

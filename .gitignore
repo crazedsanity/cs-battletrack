@@ -1,1 +1,4 @@
 .svn
+/nbproject/
+/vendor/
+composer.lock

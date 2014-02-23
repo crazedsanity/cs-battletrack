@@ -1,0 +1,24 @@
+{
+	"name":	"crazedsanity/cs-battletrack",
+	"type": "library",
+	"description": "PHP-Based web application for tracking data in traditional paper-and-pencil role playing games.",
+	"keywords": ["php", "web", "database", "role-playing", "rpg", "ttorp"],
+	"homepage": "https://github.com/crazedsanity/cs-battletrack",
+	"license": "GPLv2",
+	"version": "0.8.0",
+	"authors": [
+		{
+			"name":	"Dan Falconer",
+			"email": "github@crazedsanity.com",
+			"homepage": "http://www.crazedsanity.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0",
+		"crazedsanity/cs-content": ">=1.2.9",
+		"crazedsanity/cs-phpxml": ">=1.1.3",
+		"crazedsanity/cs-webapplibs": ">=0.8.1"
+	},
+	"minimum-stability": "dev"
+}

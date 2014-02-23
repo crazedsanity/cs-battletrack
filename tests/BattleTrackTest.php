@@ -2,29 +2,23 @@
 /*
  * Created on June 21, 2010
  * 
- * FILE INFORMATION:
- * 
- * $HeadURL: https://cs-webapplibs.svn.sourceforge.net/svnroot/cs-webapplibs/trunk/0.3/tests/testOfCSGenericPermissions.php $
- * $Id: testOfCSGenericPermissions.php 175 2010-06-23 13:45:57Z crazedsanity $
- * $LastChangedDate: 2010-06-23 08:45:57 -0500 (Wed, 23 Jun 2010) $
- * $LastChangedBy: crazedsanity $
- * $LastChangedRevision: 175 $
- * 
  * TODO: fix to use the test database code...
  */
 
-class testOfCSBattleTrack extends UnitTestCase {
+class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
 		$this->gfObj = new cs_globalFunctions;
 		$this->gfObj->debugPrintOpt=1;
-		if(!defined('CS_UNITTEST')) {
-			throw new exception(__METHOD__ .": FATAL: constant 'CS_UNITTEST' not set, can't do testing safely");
-		}
-		$this->dbObj = $this->create_dbconn();
-		$this->dbObj->beginTrans();
+//		if(!defined('CS_UNITTEST')) {
+//			throw new exception(__METHOD__ .": FATAL: constant 'CS_UNITTEST' not set, can't do testing safely");
+//		}
+		$this->reset_db(dirname(__FILE__) .'/../vendor/crazedsanity/cs-webapplibs/setup/schema.pgsql.sql');
+		parent::setUp();
+//		$this->dbObj = $this->dbObj;
+//		$this->dbObj->beginTrans();
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
@@ -33,61 +27,17 @@ class testOfCSBattleTrack extends UnitTestCase {
 	//--------------------------------------------------------------------------
 	public function tearDown() {
 		#$this->remove_tables();
-		$this->dbObj->rollbackTrans();
+//		$this->dbObj->rollbackTrans();
+		parent::tearDown();
 	}//end tearDown()
 	//--------------------------------------------------------------------------
 	
 	
 	
 	//--------------------------------------------------------------------------
-	private function create_dbconn() {
-		$dbParams = array(
-			'host'		=> constant('cs_battletrack-DB_PG_HOST'),
-			'dbname'	=> constant('cs_battletrack-DB_PG_DBNAME'),
-			'user'		=> constant('cs_battletrack-DB_PG_DBUSER'),
-			'password'	=> constant('cs_battletrack-DB_PG_DBPASS'),
-			'port'		=> constant('cs_battletrack-DB_PG_PORT')
-		);
-		$db = new cs_phpDB(constant('DBTYPE'));
-		$db->connect($dbParams);
-		return($db);
-	}//end create_dbconn()
-	//--------------------------------------------------------------------------
-	
-	
-	
-	//--------------------------------------------------------------------------
 	private function dependent_test_checker() {
-		$okayToContinue = false;
-		if($this->assertTrue(($this->_reporter->_exceptions == 0 && $this->_reporter->_fails == 0), "Failures detected, dependent tests not run")) {
-			$okayToContinue=true;
-		}
-		return($okayToContinue);
+		return true;
 	}//end dependent_test_checker()
-	//--------------------------------------------------------------------------
-	
-	
-	
-	//--------------------------------------------------------------------------
-	private function remove_tables() {
-		$tableList = array(
-			'csbt_attribute_table', 'csbt_campaign_table', 'csbt_character_armor_table',
-			'csbt_character_attribute_table', 'csbt_character_feat_ability_table', 
-			'csbt_character_gear_table', 'csbt_character_skill_table', 'csbt_character_table',
-			'csbt_character_weapon_table', 'csbt_ability_table'
-		);
-		
-		$db = $this->create_dbconn();
-		foreach($tableList as $name) {
-			try {
-				$db->run_update("DROP TABLE ". $name ." CASCADE", true);
-			}
-			catch(exception $e) {
-				//force an error.
-				//$this->assertTrue(false, "Error while dropping (". $name .")::: ". $e->getMessage());
-			}
-		}
-	}//end remove_tables()
 	//--------------------------------------------------------------------------
 	
 	
@@ -97,14 +47,14 @@ class testOfCSBattleTrack extends UnitTestCase {
 		//TODO: put this into a big loop: create several characters, and add checks to ensure the records are attached to the correct character_id.
 		$numCharacters = 0;
 		$maxCharacters = 3;
-		$dbObj = $this->create_dbconn();
+		$dbObj = $this->dbObj;
 		
 		$x = new csbt_tester($dbObj);
 		$x->load_schema();
 		for($x=0; $x< $maxCharacters; $x++) {
 			$characterSuffix = " Test #". $numCharacters;
 			$playerName = __METHOD__;
-			$playerUid = 101;
+			$playerUid = 1;
 			$char = new csbt_character($dbObj, $playerName, true, $playerUid);
 			
 			$this->assertTrue(is_numeric($char->characterId));
@@ -115,7 +65,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 					$calculatedModifier = (int)floor(($i - 10)/2);
 					
 					$modifierFromCall = $char->abilityObj->get_ability_modifier($i);
-					$this->assertEqual($modifierFromCall, $calculatedModifier, "Failed to determine modifier for (". $i ."): expected (". $calculatedModifier ."), actual=(". $modifierFromCall .")");
+					$this->assertEquals($modifierFromCall, $calculatedModifier, "Failed to determine modifier for (". $i ."): expected (". $calculatedModifier ."), actual=(". $modifierFromCall .")");
 				}
 			}
 			
@@ -207,8 +157,8 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$abilityList = $char->abilityObj->get_character_abilities();
 			
 			foreach($abilityList as $i=>$arr) {
-				$this->assertEqual($arr['ability_score'], $char->abilityObj->get_ability_score($arr['ability_name']));
-				$this->assertEqual($arr['character_id'], $char->characterId, "Character ID mismatch, expected (". $char->characterId ."), got (". $arr['character_id'] .")");
+				$this->assertEquals($arr['ability_score'], $char->abilityObj->get_ability_score($arr['ability_name']));
+				$this->assertEquals($arr['character_id'], $char->characterId, "Character ID mismatch, expected (". $char->characterId ."), got (". $arr['character_id'] .")");
 			}
 		}
 	}//_check_ability_scores()
@@ -306,7 +256,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		foreach($scoreToMaxLoad as $score => $maxLoad) {
 			$derivedMaxLoad = $char->abilityObj->get_max_load($score);
-			$this->assertEqual($derivedMaxLoad, $maxLoad, "Wrong max load for strength of (". $score ."), got (". $derivedMaxLoad .") instead of (". $maxLoad .")");
+			$this->assertEquals($derivedMaxLoad, $maxLoad, "Wrong max load for strength of (". $score ."), got (". $derivedMaxLoad .") instead of (". $maxLoad .")");
 			
 			//now get **ALL** the extra strength stats & test them.
 			$extraStats = $char->abilityObj->get_strength_stats($score);
@@ -322,20 +272,20 @@ class testOfCSBattleTrack extends UnitTestCase {
 				$foundIndexes++;
 			}
 			
-			if($this->assertEqual($foundIndexes, count($requiredIndexes), "Did not meet required number of fields for extra stats, not running further tests")) {
+			if($this->assertEquals($foundIndexes, count($requiredIndexes), "Did not meet required number of fields for extra stats, not running further tests")) {
 				//make sure the calculations are correct.
 				$lightLoad = (int)floor($derivedMaxLoad/3);
 				$medLoad = (int)floor($lightLoad*2);
 				
 				
-				$this->assertEqual($extraStats['generated__load_light'], $lightLoad);
-				$this->assertEqual($extraStats['generated__load_medium'], $medLoad);
-				$this->assertEqual($extraStats['generated__load_heavy'], $derivedMaxLoad);
+				$this->assertEquals($extraStats['generated__load_light'], $lightLoad);
+				$this->assertEquals($extraStats['generated__load_medium'], $medLoad);
+				$this->assertEquals($extraStats['generated__load_heavy'], $derivedMaxLoad);
 				
 				//other stats.
-				$this->assertEqual($extraStats['generated__lift_over_head'], $derivedMaxLoad);
-				$this->assertEqual($extraStats['generated__lift_off_ground'], (int)floor($derivedMaxLoad *2));
-				$this->assertEqual($extraStats['generated__push_pull_drag'], (int)floor($derivedMaxLoad *5));
+				$this->assertEquals($extraStats['generated__lift_over_head'], $derivedMaxLoad);
+				$this->assertEquals($extraStats['generated__lift_off_ground'], (int)floor($derivedMaxLoad *2));
+				$this->assertEquals($extraStats['generated__push_pull_drag'], (int)floor($derivedMaxLoad *5));
 			}
 		}
 	}//end _check_strength_stats()
@@ -364,7 +314,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			}
 			
 			$newKey = $char->create_sheet_id($bits[0], $bits[1], $bit3);
-			$this->assertEqual($newKey, $key, "Re-assembly of key (". $key .") failed, got (". $newKey .")");
+			$this->assertEquals($newKey, $key, "Re-assembly of key (". $key .") failed, got (". $newKey .")");
 		}
 	}//end _check_reassemble_keys()
 	//--------------------------------------------------------------------------
@@ -373,7 +323,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 	//--------------------------------------------------------------------------
 	public function _check_main_character_updates($char) {
 		$sheetData = $char->get_sheet_data();
-		$this->assertEqual($char->characterId, $sheetData['main__character_id']);
+		$this->assertEquals($char->characterId, $sheetData['main__character_id']);
 		$testSheetData = $sheetData;
 		$listOfChanges = array(
 			'hair_color'			=> "purple",
@@ -407,7 +357,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 				$updateRes = $char->handle_update('main__'. $column, null, $newValue);
 				$this->assertTrue($updateRes);
 				$sheetData = $char->get_sheet_data();
-				$this->assertEqual($newValue, $sheetData['main__'. $column]);
+				$this->assertEquals($newValue, $sheetData['main__'. $column]);
 			}
 		}
 	}//end _check_main_character_updates()
@@ -428,12 +378,12 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$testData = $char->skillsObj->get_skill_by_name($skillName);
 			
 			$this->assertTrue(isset($testData['skill_name']));
-			$this->assertEqual($testData['skill_name'], $skillName);
+			$this->assertEquals($testData['skill_name'], $skillName);
 			
-			$this->assertEqual($char->characterId, $testData['character_id']);
+			$this->assertEquals($char->characterId, $testData['character_id']);
 			
 			$this->assertTrue(isset($testData['ability_name']));
-			$this->assertEqual($testData['ability_name'], $skillAbility);
+			$this->assertEquals($testData['ability_name'], $skillAbility);
 			
 			@$testListOfSkillsByAbility[$testData['ability_name']] += 1;
 			
@@ -444,7 +394,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$this->assertTrue(isset($testData['ability_mod']));
 			
 			//make sure the ability modifier is correct.
-			$this->assertEqual($testData['ability_mod'], $char->abilityObj->get_ability_modifier($testData['ability_name']), "Ability modifier on "
+			$this->assertEquals($testData['ability_mod'], $char->abilityObj->get_ability_modifier($testData['ability_name']), "Ability modifier on "
 					."skill '". $testData['skill_name'] ."' (". $testData['ability_mod'] .") does not match actual ability modifier "
 					."(". $char->abilityObj->get_ability_modifier($testData['ability_name']) .") for ability (". $testData['ability_name'] ." "
 					.", abilityScore=". $char->abilityObj->get_ability_score($testData['ability_name']) .")");
@@ -472,7 +422,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			//verify that the 'skill_mod' is correct.
 			$calculatedSkillMod = $testData['ranks'] + $testData['ability_mod'] + $testData['misc_mod'];
-			$this->assertEqual($testData['skill_mod'], $calculatedSkillMod, "Incorrect skill mod, expecting (". $calculatedSkillMod ."), found (". $testData['skill_mod'] .")");
+			$this->assertEquals($testData['skill_mod'], $calculatedSkillMod, "Incorrect skill mod, expecting (". $calculatedSkillMod ."), found (". $testData['skill_mod'] .")");
 		}
 		
 		$totalSkillCount = count($defaults['skills']);
@@ -490,12 +440,12 @@ class testOfCSBattleTrack extends UnitTestCase {
 		$countOfSkillsByAbility = 0;
 		$passed=0;
 		$failedItems = "";
-		if($this->assertEqual(count($skillsByAbility), 6, "Expecting 6 abilities, found (". count($skillsByAbility) .")")) {
+		if($this->assertEquals(count($skillsByAbility), 6, "Expecting 6 abilities, found (". count($skillsByAbility) .")")) {
 			foreach($skillsByAbility as $abilityName=>$skillsData) {
 				$countOfSkillsByAbility += count($skillsData);
 				$this->assertTrue(is_array($skillsData));
 				$this->assertTrue(count($skillsData));
-				if($this->assertEqual($testListOfSkillsByAbility[$abilityName], count($skillsData))) {
+				if($this->assertEquals($testListOfSkillsByAbility[$abilityName], count($skillsData))) {
 					$passed++;
 				}
 				else {
@@ -503,11 +453,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 				}
 				
 				foreach($skillsData as $i=>$x) {
-					$this->assertEqual($x['ability_name'], $abilityName, "Retrieval by abilityName=(". $abilityName .") failed, got (". $x['ability_name'] .") for (". $x['skill_name'] .")");
+					$this->assertEquals($x['ability_name'], $abilityName, "Retrieval by abilityName=(". $abilityName .") failed, got (". $x['ability_name'] .") for (". $x['skill_name'] .")");
 				}
 			}
-			$this->assertEqual($totalSkillCount, $countOfSkillsByAbility, "List of skills by ability (". $countOfSkillsByAbility .") does not match total number of skills (". $totalSkillCount .")");
-			$this->assertEqual($passed, count($skillsByAbility), "Passed (". $passed .") abilities, list of failures::: ". $failedItems);
+			$this->assertEquals($totalSkillCount, $countOfSkillsByAbility, "List of skills by ability (". $countOfSkillsByAbility .") does not match total number of skills (". $totalSkillCount .")");
+			$this->assertEquals($passed, count($skillsByAbility), "Passed (". $passed .") abilities, list of failures::: ". $failedItems);
 		}
 	}//end _check_skills()
 	//--------------------------------------------------------------------------
@@ -521,7 +471,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 		$abilityList = $char->skillsObj->abilityObj->get_ability_list();
 		$abilities = $abilityList['byId'];
 		
-		$this->assertEqual(count($abilities), 6);
+		$this->assertEquals(count($abilities), 6);
 		$this->assertTrue(is_array($abilities));
 		
 		if($this->dependent_test_checker()) {
@@ -545,9 +495,9 @@ class testOfCSBattleTrack extends UnitTestCase {
 					$newMod = $sheetData[$sheetIdForModifier];
 					
 					$this->assertNotEqual($oldValue, $newValue);
-					$this->assertEqual($sheetData[$sheetIdForScore], ($oldValue +2));
+					$this->assertEquals($sheetData[$sheetIdForScore], ($oldValue +2));
 					$this->assertNotEqual($oldMod, $newMod);
-					$this->assertEqual($sheetData[$sheetIdForModifier], ($oldMod +1));
+					$this->assertEquals($sheetData[$sheetIdForModifier], ($oldMod +1));
 					
 					//now check to ensure that the ability modifiers for skills have been updated.
 					$skillsByAbility = $char->skillsObj->get_character_skills($abilityName);
@@ -555,9 +505,9 @@ class testOfCSBattleTrack extends UnitTestCase {
 					$this->assertTrue(count($skillsByAbility) > 0);
 					
 					foreach($skillsByAbility as $id=>$skillInfo) {
-						$this->assertEqual($skillInfo['ability_name'], $abilityName);
-						$this->assertEqual($skillInfo['ability_mod'], $newMod);
-						$this->assertEqual($char->characterId, $skillInfo['character_id']);
+						$this->assertEquals($skillInfo['ability_name'], $abilityName);
+						$this->assertEquals($skillInfo['ability_mod'], $newMod);
+						$this->assertEquals($char->characterId, $skillInfo['character_id']);
 					}
 				}
 				else {
@@ -595,11 +545,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$gearInfo = $char->gearObj->get_gear_by_id($createRes);
 			$this->assertTrue(is_array($gearInfo));
 			$this->assertTrue(count($gearInfo) > 0);
-			$this->assertEqual($char->characterId, $gearInfo['character_id']);
+			$this->assertEquals($char->characterId, $gearInfo['character_id']);
 			
 			//
 			$expectedRecordWeight = round(($gearInfo['quantity'] * $gearInfo['weight']),1);
-			$this->assertEqual($gearInfo['total_weight'], $expectedRecordWeight);
+			$this->assertEquals($gearInfo['total_weight'], $expectedRecordWeight);
 			
 			$expectedTotalWeight += $expectedRecordWeight;
 		}
@@ -608,7 +558,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 		
 		//make sure the total weight carried makes sense.
 		$this->assertTrue(isset($sheetData['gear__total_weight__generated']));
-		$this->assertEqual($sheetData['gear__total_weight__generated'], $expectedTotalWeight);
+		$this->assertEquals($sheetData['gear__total_weight__generated'], $expectedTotalWeight);
 		
 		//do a couple of updates to make sure it works.
 		$addWeight = 5;
@@ -621,11 +571,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$expectedItemWeight = (($listOfGear[$name]['weight'] + $addWeight) * ($listOfGear[$name]['quantity'] + $addQuantity));
 			$updatedExpectedTotalWeight += $expectedItemWeight;
 			$itemData = $char->gearObj->get_gear_by_id($id);
-			$this->assertEqual($expectedItemWeight, $itemData['total_weight']);
+			$this->assertEquals($expectedItemWeight, $itemData['total_weight']);
 		}
 		
 		$sheetData = $char->get_sheet_data();
-		$this->assertEqual($updatedExpectedTotalWeight, $sheetData['gear__total_weight__generated']);
+		$this->assertEquals($updatedExpectedTotalWeight, $sheetData['gear__total_weight__generated']);
 	}//end check_gear()
 	//--------------------------------------------------------------------------
 	
@@ -672,27 +622,27 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			//make sure the proper number of pieces have been created so far.
 			$allArmorRecords = $char->armorObj->get_character_armor();
-			$this->assertEqual(count($allArmorRecords), $piecesCreated);
+			$this->assertEquals(count($allArmorRecords), $piecesCreated);
 			
 			//make sure the character_id is correct.
 			foreach($allArmorRecords as $k=>$v) {
-				$this->assertEqual($char->characterId, $v['character_id']);
+				$this->assertEquals($char->characterId, $v['character_id']);
 			}
 		}
 		
 		$allArmorRecords = $char->armorObj->get_character_armor();
-		$this->assertEqual(count($listOfArmor), $piecesCreated);
-		$this->assertEqual(count($allArmorRecords), count($listOfArmor));
+		$this->assertEquals(count($listOfArmor), $piecesCreated);
+		$this->assertEquals(count($allArmorRecords), count($listOfArmor));
 		
 		//make sure each record has the right details.
 		$nameToKey = array();
 		foreach($allArmorRecords as $i=>$armorDetails) {
-			$this->assertEqual($i, $armorDetails['character_armor_id']);
+			$this->assertEquals($i, $armorDetails['character_armor_id']);
 			$nameToKey[$armorDetails['armor_name']] = $i;
 		}
 		
 		//make sure the list of names to ID's is sane.
-		$this->assertEqual(count($nameToKey), count($listOfArmor));
+		$this->assertEquals(count($nameToKey), count($listOfArmor));
 		
 		foreach($nameToKey as $name=>$key) {
 			$this->assertTrue(isset($allArmorRecords[$key]));
@@ -704,11 +654,11 @@ class testOfCSBattleTrack extends UnitTestCase {
 			//retrieve the individual record for testing!
 			$singleRecordData = $char->armorObj->get_armor_by_id($key);
 			$this->assertTrue(is_array($singleRecordData));
-			$this->assertEqual($singleRecordData['character_armor_id'], $key);
+			$this->assertEquals($singleRecordData['character_armor_id'], $key);
 			
 			foreach($createSpecs as $columnName=>$expectedValue) {
-				$this->assertEqual($recordData[$columnName], $expectedValue);
-				$this->assertEqual($singleRecordData[$columnName], $expectedValue);
+				$this->assertEquals($recordData[$columnName], $expectedValue);
+				$this->assertEquals($singleRecordData[$columnName], $expectedValue);
 			}
 		}
 		
@@ -723,7 +673,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			//pull the single record & check that it matches.
 			$recordData = $char->armorObj->get_armor_by_id($updateThisId);
 			foreach($armorDetails as $columnName=>$expectedValue) {
-				$this->assertEqual($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
+				$this->assertEquals($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
 			}
 			
 			$this->assertNotEqual($armorDetails['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
@@ -747,7 +697,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 			//pull the single record & check that it matches.
 			$recordData = $char->armorObj->get_armor_by_id($updateThisId);
 			foreach($armorDetails as $columnName=>$expectedValue) {
-				$this->assertEqual($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
+				$this->assertEquals($recordData[$columnName], $expectedValue, "Failed to update recordId=(". $updateThisId ."), name=(". $name .")... column=(". $columnName ."), expectedValue=(". $expectedValue ."), actual=(". $recordData[$columnName] .")");
 			}
 			
 			$this->assertNotEqual($armorDetails['ac_bonus'], $listOfArmor[$name]['ac_bonus']);
@@ -796,13 +746,13 @@ class testOfCSBattleTrack extends UnitTestCase {
 			
 			$recordData = $char->weaponObj->get_weapon_by_id($createRes);
 			foreach($weaponInfo as $f=>$v) {
-				$this->assertEqual($recordData[$f], $v); //? WTF?
+				$this->assertEquals($recordData[$f], $v); //? WTF?
 			}
-			$this->assertEqual($char->characterId, $recordData['character_id'], "Character ID mismatch, expected (". $char->characterId ."), got (". $recordData['character_id'] .")");
+			$this->assertEquals($char->characterId, $recordData['character_id'], "Character ID mismatch, expected (". $char->characterId ."), got (". $recordData['character_id'] .")");
 		}
 		
 		$createdWeapons = $char->weaponObj->get_character_weapons();
-		$this->assertEqual(count($listOfWeapons), count($createdWeapons));
+		$this->assertEquals(count($listOfWeapons), count($createdWeapons));
 		
 		$sheetData = $char->get_sheet_data();
 		
@@ -812,7 +762,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 		$this->assertTrue(is_numeric($updateRes));
 		
 		$updatedSheetData = $char->get_sheet_data();
-		$this->assertEqual($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
+		$this->assertEquals($updatedSheetData['characterWeapon__damage__'. $useForUpdates[0]['recId']], "30d30, SUCK");
 	}//end _check_weapons()
 	//--------------------------------------------------------------------------
 	
@@ -842,8 +792,8 @@ class testOfCSBattleTrack extends UnitTestCase {
 			$this->assertTrue(is_array($recordById));
 			$this->assertTrue(is_array($recordByName));
 			
-			$this->assertEqual($char->characterId, $recordById['character_id']);
-			$this->assertEqual($char->characterId, $recordByName['character_id']);
+			$this->assertEquals($char->characterId, $recordById['character_id']);
+			$this->assertEquals($char->characterId, $recordByName['character_id']);
 		}
 	}//end _check_special_abilities()
 	//--------------------------------------------------------------------------
@@ -854,7 +804,7 @@ class testOfCSBattleTrack extends UnitTestCase {
 	private function _check_saves($char) {
 		$savesData = $char->savesObj->get_character_saves();
 		
-		$this->assertEqual(count($savesData), 3);
+		$this->assertEquals(count($savesData), 3);
 		
 	}//end _check_saves()
 	//--------------------------------------------------------------------------
