@@ -4,8 +4,7 @@
 	"description": "PHP-Based web application for tracking data in traditional paper-and-pencil role playing games.",
 	"keywords": ["php", "web", "database", "role-playing", "rpg", "ttorp"],
 	"homepage": "https://github.com/crazedsanity/cs-battletrack",
-	"license": "GPLv2",
-	"version": "0.8.0",
+	"license": "GPL-2.0+",
 	"authors": [
 		{
 			"name":	"Dan Falconer",
