@@ -15,9 +15,11 @@ class csbt_basicRecord {
 	//==========================================================================
 	/**
 	 * 
-	 * @param type $dbTable
-	 * @param type $dbSeq
-	 * @param type $dbPkey
+	 * @param cs_phpDB $dbObj
+	 * @param str $dbTable
+	 * @param str $dbSeq
+	 * @param str $dbPkey
+	 * @param array $initialData (optional)
 	 */
 	public function __construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array()) {
 		$this->dbObj = $dbObj;
@@ -40,6 +42,9 @@ class csbt_basicRecord {
 		}
 		elseif(isset($this->_data[$name])) {
 			$retval = $this->_data[$name];
+		}
+		elseif($name === 'data' || strtolower($name) == 'datacache') {
+			$retval = $this->_data;
 		}
 		
 		return $retval;
@@ -142,20 +147,21 @@ class csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function create() {
+	public function create(array $data) {
 		
-		$fields = $this->_data;//array_keys($this->_clean_data_array());
-		$values = $fields;
+		$params = array();
 		
-		foreach($values as $k=>$v) {
-			$values[$k] = ':'. $v;
+		foreach($data as $k=>$v) {
+			$params[] = ':'. $k;
 		}
 		
-		$sql = "INSERT INTO " . $this->_dbTable . " (". implode(', ', $fields) .") VALUES 
-				(". implode(', ', $values) .")";
+		$sql = "INSERT INTO " . $this->_dbTable . " (". implode(', ', array_keys($data)) .") VALUES 
+				(". implode(', ', $params) .")";
 		try {
-			$this->id = $this->dbObj->run_insert($sql, $fields, $this->_dbSeq);
+			$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
 		} catch (Exception $e) {
+cs_global::debug_print($sql,1);
+cs_global::debug_print($data,1);
 			throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
 		}
 		

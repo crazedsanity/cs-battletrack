@@ -1,9 +1,4 @@
 <?php
-/*
- * Created on June 21, 2010
- * 
- * TODO: fix to use the test database code...
- */
 
 class testOfCSBattleTrack extends testDbAbstract {
 	
@@ -12,13 +7,8 @@ class testOfCSBattleTrack extends testDbAbstract {
 		
 		$this->gfObj = new cs_globalFunctions;
 		$this->gfObj->debugPrintOpt=1;
-//		if(!defined('CS_UNITTEST')) {
-//			throw new exception(__METHOD__ .": FATAL: constant 'CS_UNITTEST' not set, can't do testing safely");
-//		}
 		$this->reset_db(dirname(__FILE__) .'/../vendor/crazedsanity/cs-webapplibs/setup/schema.pgsql.sql');
 		parent::setUp();
-//		$this->dbObj = $this->dbObj;
-//		$this->dbObj->beginTrans();
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
@@ -26,18 +16,8 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function tearDown() {
-		#$this->remove_tables();
-//		$this->dbObj->rollbackTrans();
 		parent::tearDown();
 	}//end tearDown()
-	//--------------------------------------------------------------------------
-	
-	
-	
-	//--------------------------------------------------------------------------
-	private function dependent_test_checker() {
-		return true;
-	}//end dependent_test_checker()
 	//--------------------------------------------------------------------------
 	
 	

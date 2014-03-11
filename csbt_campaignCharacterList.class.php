@@ -1,24 +1,21 @@
 <?php
 
 
-class csbt_campaignCharacterList extends csbt_tableHandler {
+class csbt_campaignCharacterList extends csbt_basicRecord {
 	
 	private $campaignId;
-	
-	
-	protected $cleanStringArr = array(
-			'campaign_id'					=> 'int',
-			'character_name'		=> 'sql'
-		);
 	
 	const tableName= 'csbt_character_table';
 	const seqName =  'csbt_character_table_character_id_seq';
 	const pkeyField = 'character_id';
 	
+	
+	public $charList = array();
+	
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $campaignId) {
 		$this->dbObj = $dbObj;
-		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr, null);
+		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField);
 		
 		if(is_numeric($campaignId) && $campaignId > 0) {
 			$this->campaignId = $campaignId;
@@ -42,9 +39,17 @@ class csbt_campaignCharacterList extends csbt_tableHandler {
 	
 	//-------------------------------------------------------------------------
 	public function get_character_list() {
-		
+		$characterList = array();
 		try {
-			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
+//			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
+			
+			$sql = "SELECT character_id FROM csbt_character_table WHERE campaign_id=:id";
+			
+			$numrows = $this->dbObj->run_query($sql, array('id'=>$this->campaignId));
+			
+			if($numrows > 0) {
+				$characterList = $this->dbObj->farray_fieldnames('character_id');
+			}
 		}
 		catch(exception $e) {
 			throw new exception(__METHOD__ .": failed to retrieve character list::: ". $e->getMessage());
@@ -54,5 +59,3 @@ class csbt_campaignCharacterList extends csbt_tableHandler {
 	//-------------------------------------------------------------------------
 	
 }
-
-?>
