@@ -1,11 +1,11 @@
 <?php 
 
-class csbt_ability extends csbt_basicRecord {
+class csbt_gear extends csbt_basicRecord {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
-	const tableName = 'csbt_ability_table';
-	const tableSeq  = 'csbt_ability_table_ability_id_seq';
-	const pkeyField = 'ability_id';
+	const tableName = 'csbt_character_gear_table';
+	const tableSeq  = 'csbt_character_gear_table_character_gear_id_seq';
+	const pkeyField = 'character_gear_id';
 	
 	
 	//==========================================================================
@@ -44,6 +44,20 @@ class csbt_ability extends csbt_basicRecord {
 	//==========================================================================
 	public function get_temp_modifier() {
 		return $this->calculate_modifier($this->_data['temporary_score']);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_total_weight() {
+		$weight = $this->_data['weight'];
+		
+		if(isset($this->_data['quantity']) && is_numeric($this->_data['quantity']) && $this->_data['quantity'] > 0) {
+			$weight = $this->_data['quantity'] * $this->_data['weight'];
+		}
+		
+		return $weight;
 	}
 	//==========================================================================
 }
