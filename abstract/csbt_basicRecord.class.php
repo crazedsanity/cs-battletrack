@@ -78,10 +78,11 @@ class csbt_basicRecord {
 	
 	//==========================================================================
 	public function save() {
+		$retval = false;
 		if(is_numeric($this->id)) {
 			$updateSql = "";
 			$params = $this->_clean_data_array($this->_data);
-			foreach($this->_data as $k=>$v) {
+			foreach($params as $k=>$v) {
 				$updateSql = $this->gfObj->create_list($updateSql, $k .'=:'. $k, ',');
 			}
 
@@ -91,13 +92,18 @@ class csbt_basicRecord {
 
 			try {
 				$this->dbObj->run_update($sql, $params);
+				$retval = true;
 			} catch (Exception $ex) {
+cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
+cs_global::debug_print($params,1);
 				throw new LogicException(__METHOD__ .": unable to update table '". $this->_dbTable ."', DETAILS::: ". $ex->getMessage());
 			}
 		}
 		else {
-			$this->create();
+			$retval = $this->create();
 		}
+		
+		return $retval;
 	}
 	//==========================================================================
 	
@@ -120,7 +126,7 @@ class csbt_basicRecord {
 				$sql .= $updateStr;
 			}
 			else {
-				$sql = $this->_dbPkey ."=:id";
+				$sql .= $this->_dbPkey ."=:id";
 			}
 			
 			try {
@@ -133,12 +139,15 @@ class csbt_basicRecord {
 					$retval = $this->dbObj->farray_fieldnames($this->_dbPkey);
 				}
 			} catch (Exception $ex) {
+cs_global::debug_print($sql, 1);
+cs_global::debug_print($params, 1);
 				throw new ErrorException(__METHOD__ .": failed to load data for (". $this->id ."), DETAILS::: ". $ex->getMessage());
 			}
 		}
 		else {
 			throw new LogicException(__METHOD__ .": invalid characterId (". $this->id .")");
 		}
+		$this->_data = $retval;
 		
 		return $retval;
 	}
@@ -160,8 +169,6 @@ class csbt_basicRecord {
 		try {
 			$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
 		} catch (Exception $e) {
-cs_global::debug_print($sql,1);
-cs_global::debug_print($data,1);
 			throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
 		}
 		
