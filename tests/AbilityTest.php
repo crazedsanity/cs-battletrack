@@ -129,18 +129,18 @@ class AbilityTest extends testDbAbstract {
 		$x = new csbt_ability($this->dbObj);
 		$x->characterId = $this->id;
 		
+		$minScore = rand(1,10);
+		$maxScore = rand(11,50);
+		
 		$abCache = $x->get_all_abilities();
-		$res = $x->create_character_defaults();
+		$res = $x->create_character_defaults($minScore, $maxScore);
 		
 		$this->assertTrue(count($abCache) > 0);
 		$this->assertTrue(is_numeric($res));
 		$this->assertTrue($res > 0);
 		$this->assertEquals(count($abCache), $res, "Failed to create all abilities for character (". count($abCache) ."/". $res.")");
 		
-		$minScore = rand(1,10);
-		$maxScore = rand(11,50);
-		
-		$list = $x->get_all_character_abilities($minScore, $maxScore);
+		$list = $x->get_all_character_abilities();
 		$uniq = array();
 		foreach($list as $n=>$data) {
 			$this->assertTrue(isset($data['character_id']));
@@ -156,8 +156,8 @@ class AbilityTest extends testDbAbstract {
 			$this->assertTrue(array_key_exists('temporary_score', $data));
 			$this->assertEquals(null, $data['temporary_score']);
 			
-			$this->assertTrue($data['ability_score'] >= $minScore);
-			$this->assertTrue($data['ability_score'] <= $maxScore);
+			$this->assertTrue($data['ability_score'] >= $minScore, "score is too low? (". $data['ability_score'] .")");
+			$this->assertTrue($data['ability_score'] <= $maxScore, "score is too high? (". $data['ability_score'] .")");
 		}
 	}
 	//--------------------------------------------------------------------------
