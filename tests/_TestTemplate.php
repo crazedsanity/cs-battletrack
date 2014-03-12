@@ -25,12 +25,3 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	
 }
-
-class _test_character extends csbt_character {
-	public $_data;
-	
-	public function _clean_data_array() {
-		return parent::_clean_data_array();
-	}
-}
-
