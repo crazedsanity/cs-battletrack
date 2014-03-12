@@ -119,6 +119,20 @@ class CharacterTest extends testDbAbstract {
 		$data['character_name'] = __CLASS__;
 		$this->assertEquals($data, $x->data);
 		
+		
+		$changes = array(
+			'speed'			=> 999,
+			'hair_color'	=> "GReEEN",
+			'size'			=> "Medium Large-ish",
+			'notes'			=> "MOREea STUFfl   qaewrqwe   \n\t",
+		);
+		$x->mass_update($changes);
+		$this->assertTrue($x->save());
+		
+		$afterMassUpdate = $x->load();
+		foreach($changes as $k=>$v) {
+			$this->assertEquals($v, $afterMassUpdate[$k]);
+		}
 	}
 	//--------------------------------------------------------------------------
 	

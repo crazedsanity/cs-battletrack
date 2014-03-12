@@ -32,12 +32,11 @@ class csbt_save extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function load() {
-		if(!is_null($this->characterId) && $this->characterId > 0) { 
-			$sql = "SELECT s.*, a.ability_name FROM " . self::tableName . " AS s "
-					. "INNER JOIN ". csbt_ability::tableName ." AS a USING ("
-					. csbt_ability::pkeyField .") WHERE "
-					. "s.character_id=:id";
+	public function get_all_character_saves() {
+		if(!is_null($this->characterId) && $this->characterId > 0 && !is_null($this->id) && $this->id > 0) { 
+			$sql = "SELECT cs.*, a.ability_name FROM csbt_character_save_table "
+					. "AS cs INNER JOIN csbt_ability_table AS a USING "
+					. "(ability_id) WHERE cs.character_id=:id";
 			$params = array(
 				'id' => $this->characterId,
 			);
@@ -49,13 +48,46 @@ class csbt_save extends csbt_basicRecord {
 				$retval = $this->dbObj->farray_fieldnames($this->pkeyField);
 
 			} catch (Exception $e) {
-				$this->_exception_handler(__METHOD__ . ":: failed to retrieve character saves, DETAILS::: " . $e->getMessage());
+				throw new ErrorException(__METHOD__ . ":: failed to retrieve character saves, DETAILS::: " . $e->getMessage());
 			}
 		}
 		else {
 			throw new ErrorException(__METHOD__ .": cannot load without characterId");
 		}
 		return($retval);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function create_character_defaults() {
+		$result = 0;
+		
+		$defaults = array(
+			'fort'		=> 'con',
+			'reflex'	=> 'dex',
+			'will'		=> 'wis',
+		);
+		$x = new csbt_ability($this->dbObj);
+		$abilityList = $x->get_all_abilities();
+		
+		foreach($defaults as $k=>$v) {
+			if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
+				$createData = array(
+					'character_id'	=> $this->characterId,
+					'save_name'		=> $k,
+					'ability_id'	=> $abilityList[$v]
+				);
+				$this->create($createData);
+				$result++;
+			}
+			else {
+				throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
+			}
+		}
+		
+		return $result;
 	}
 	//==========================================================================
 
