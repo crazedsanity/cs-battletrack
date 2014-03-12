@@ -100,7 +100,7 @@ cs_global::debug_print($params,1);
 			}
 		}
 		else {
-			$retval = $this->create();
+			$retval = $this->create($this->_data);
 		}
 		
 		return $retval;
@@ -110,12 +110,14 @@ cs_global::debug_print($params,1);
 	
 	
 	//==========================================================================
-	public function load(array $crit=null) {
+	public function load(array $crit=null, $sql=null) {
 		$retval = array();
 		
 		$params = array('id' => $this->id);
 		if(!is_null($this->id) && is_numeric($this->id)) {
-			$sql = "SELECT * FROM ". $this->_dbTable ." WHERE ";//. $this->_dbPkey ."=:id";
+			if(is_null($sql)) {
+				$sql = "SELECT * FROM ". $this->_dbTable ." WHERE ";//. $this->_dbPkey ."=:id";
+			}
 			
 			if(!is_null($crit) && is_array($crit)) {
 				$params = $crit;
@@ -139,8 +141,6 @@ cs_global::debug_print($params,1);
 					$retval = $this->dbObj->farray_fieldnames($this->_dbPkey);
 				}
 			} catch (Exception $ex) {
-cs_global::debug_print($sql, 1);
-cs_global::debug_print($params, 1);
 				throw new ErrorException(__METHOD__ .": failed to load data for (". $this->id ."), DETAILS::: ". $ex->getMessage());
 			}
 		}
@@ -156,6 +156,12 @@ cs_global::debug_print($params, 1);
 	
 	
 	//==========================================================================
+	/**
+	 * 
+	 * @param array $data
+	 * @return int
+	 * @throws ErrorException
+	 */
 	public function create(array $data) {
 		
 		$params = array();

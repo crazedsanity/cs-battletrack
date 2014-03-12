@@ -1,6 +1,6 @@
 <?php
 
-class testOfCSBattleTrack extends testDbAbstract {
+class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
@@ -30,6 +30,8 @@ class testOfCSBattleTrack extends testDbAbstract {
 		$new = new csbt_character($this->dbObj, __METHOD__, 1);
 		
 		$x = new csbt_character($this->dbObj, $new->characterId, 1);
+		
+		$data = $x->data;
 		
 		$this->assertEquals($new->characterId, $x->characterId);
 		$this->assertTrue(is_array($new->data));
