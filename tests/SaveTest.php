@@ -157,7 +157,7 @@ class SavesTest extends testDbAbstract {
 		
 		foreach($allSaves as $k=>$data) {
 			
-			$this->assertEquals($numLeft, $x->get_all_character_saves());
+			$this->assertEquals($numLeft, count($x->get_all_character_saves()));
 			
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(isset($data['character_save_id']));
