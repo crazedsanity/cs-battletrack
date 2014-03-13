@@ -161,5 +161,39 @@ class AbilityTest extends testDbAbstract {
 		}
 	}
 	//--------------------------------------------------------------------------
+	
+	
+	//--------------------------------------------------------------------------
+	public function test_delete() {
+		$x = new csbt_ability($this->dbObj);
+		$x->characterId = $this->id;
+		$x->create_character_defaults();
+		
+		$allRecords = $x->get_all_character_abilities();
+		$this->assertTrue(count($allRecords) > 0);
+		
+		$keys = array_keys($allRecords);
+		
+		$lastRec = count($allRecords);
+		
+		foreach($allRecords as $ability=>$data) {
+			$this->assertEquals($lastRec, count($x->get_all_character_abilities()));
+			
+			$this->assertTrue(is_string($ability), "ID=(". $ability .")");
+			$this->assertTrue(is_array($data));
+			$this->assertTrue(count($data) > 0);
+			
+			$x->id = $data['character_ability_id'];
+			$this->assertEquals(1, $x->delete());
+			$lastRec--;
+		}
+		
+		$this->assertEquals(0, $lastRec);
+		
+		$allAbilities = $x->get_all_character_abilities();
+		$this->assertEquals(0, count($allAbilities), cs_global::debug_print($allAbilities));
+		$this->assertEquals(array(), $allAbilities);
+	}
+	//--------------------------------------------------------------------------
 }
 

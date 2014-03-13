@@ -104,8 +104,6 @@ class csbt_basicRecord {
 				$this->dbObj->run_update($sql, $params);
 				$retval = true;
 			} catch (Exception $ex) {
-cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
-cs_global::debug_print($params,1);
 				throw new LogicException(__METHOD__ .": unable to update table '". $this->_dbTable ."', DETAILS::: ". $ex->getMessage());
 			}
 		}
@@ -189,6 +187,66 @@ cs_global::debug_print($params,1);
 		}
 		
 		return $this->id;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function calculate_ability_modifier($score) {
+		if(is_numeric($score) && $score > 0) {
+			$modifier = floor(($score -10)/2);
+		}
+		elseif(is_null($score)) {
+			$modifier = null;
+		}
+		else {
+			$this->_exception_handler(__METHOD__ .":: invalid score (". $score .")");
+		}
+		return($modifier);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function calculate_total_save_modifier(array $data) {
+		$addThese = array('ability_mod', 'base_mod', 'misc_mod', 'magic_mod', 'temp_mod');
+		if(is_array($data) && count($data) > count($addThese)) {
+			$mod = 0;
+			foreach($addThese as $idx) {
+				if(isset($this->_data[$idx]) && is_numeric($this->_data[$idx])) {
+					$mod += $this->_data[$idx];
+				}
+			}
+		}
+		else {
+			throw new InvalidArgumentException(__METHOD__ .": missing indexes in array");
+		}
+		return $mod;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function delete() {
+		if(!is_null($this->id) && is_numeric($this->id)) {
+			$sql = "DELETE FROM ". $this->_dbTable ." WHERE ". $this->_dbPkey ."=:id";
+			$params = array('id'=>$this->id);
+			
+			try {
+				$res = $this->dbObj->run_query($sql, $params);
+			} catch (Exception $ex) {
+				throw new ErrorException(__METHOD__ .": failed to delete record "
+						. "with id=(". $this->id .") from table=("
+						. $this->_dbTable ."), DETAILS::: ". $ex->getMessage());
+			}
+		}
+		else {
+			throw new ErrorException(__METHOD__ .": missing ID to delete record from table '". $this->_dbTable ."'");
+		}
+		return $res;
 	}
 	//==========================================================================
 }

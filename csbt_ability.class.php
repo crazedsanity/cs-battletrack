@@ -16,25 +16,8 @@ class csbt_ability extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function calculate_modifier($score) {
-		if(is_numeric($score) && $score > 0) {
-			$modifier = floor(($score -10)/2);
-		}
-		elseif(is_null($score)) {
-			$modifier = null;
-		}
-		else {
-			$this->_exception_handler(__METHOD__ .":: invalid score (". $score .")");
-		}
-		return($modifier);
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
 	public function get_modifier() {
-		return $this->calculate_modifier($this->_data['ability_score']);
+		return $this->calculate_ability_modifier($this->_data['ability_score']);
 	}
 	//==========================================================================
 	
@@ -42,7 +25,7 @@ class csbt_ability extends csbt_basicRecord {
 	
 	//==========================================================================
 	public function get_temp_modifier() {
-		return $this->calculate_modifier($this->_data['temporary_score']);
+		return $this->calculate_ability_modifier($this->_data['temporary_score']);
 	}
 	//==========================================================================
 	
@@ -80,14 +63,8 @@ class csbt_ability extends csbt_basicRecord {
 					. "WHERE ca.character_id=:id";
 			$params = array('id'=>$this->characterId);
 			try {
-				$numrows = $this->dbObj->run_query($sql, $params);
-
-				if($numrows > 0) {
-					$data = $this->dbObj->farray_fieldnames('ability_name');
-				}
-				else {
-					throw new LogicException(__METHOD__ .": no data available");
-				}
+				$this->dbObj->run_query($sql, $params);
+				$data = $this->dbObj->farray_fieldnames('ability_name');
 			} catch (Exception $ex) {
 				throw new ErrorException(__METHOD__ .": failed to retrieve cache, DETAILS::: ". $ex->getMessage());
 			}

@@ -22,7 +22,7 @@ class SavesTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function tearDown() {
-		parent::tearDown();
+//		parent::tearDown();
 	}//end tearDown()
 	//--------------------------------------------------------------------------
 	
@@ -59,14 +59,24 @@ class SavesTest extends testDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_create_character_defaults() {
+	public function test_create_character_defaults_and_modifier() {
 		$x = new csbt_save($this->dbObj);
+		$y = new csbt_ability($this->dbObj);
+		
+		$y->characterId = $this->id;
 		$x->characterId = $this->id;
+		
+		$y->create_character_defaults();
 		
 		$numCreated = $x->create_character_defaults();
 		$list = $x->get_all_character_saves();
 		
-		$this->assertEquals($numCreated, count($list));
+		$this->assertEquals($numCreated, count($list), cs_global::debug_print($list));
+		
+		foreach($list as $k=>$data) {
+			$this->assertEquals($data['total_mod'], $x->calculate_total_save_modifier($data));
+			
+		}
 	}
 	//--------------------------------------------------------------------------
 	
@@ -76,6 +86,10 @@ class SavesTest extends testDbAbstract {
 	public function test_updates() {
 		$x = new csbt_save($this->dbObj);
 		$x->characterId = $this->id;
+		
+		$y = new csbt_ability($this->dbObj);
+		$y->characterId = $this->id;
+		$y->create_character_defaults();
 		
 		$numCreated = $x->create_character_defaults();
 		$list = $x->get_all_character_saves();
@@ -120,6 +134,42 @@ class SavesTest extends testDbAbstract {
 		foreach($changes as $k=>$v) {
 			$this->assertEquals($v, $afterMassUpdate[$k]);
 		}
+	}
+	//--------------------------------------------------------------------------
+	
+	
+	
+	//--------------------------------------------------------------------------
+	public function test_delete() {
+		$x = new csbt_save($this->dbObj);
+		$x->characterId = $this->id;
+		$y = new csbt_ability($this->dbObj);
+		$y->characterId = $this->id;
+		
+		$y->create_character_defaults();
+		$numCreated = $x->create_character_defaults();
+		
+		$this->assertTrue(is_numeric($numCreated));
+		$this->assertTrue($numCreated > 0);
+		
+		$allSaves = $x->get_all_character_saves();
+		$numLeft = count($allSaves);
+		
+		foreach($allSaves as $k=>$data) {
+			
+			$this->assertEquals($numLeft, $x->get_all_character_saves());
+			
+			$this->assertTrue(is_array($data));
+			$this->assertTrue(isset($data['character_save_id']));
+			
+			$x->id = $data['character_save_id'];
+			$this->assertEquals(1, $x->delete());
+			
+			$numLeft--;
+		}
+		
+		$this->assertEquals(0, $numLeft);
+		$this->assertEquals(array(), $x->get_all_character_saves());
 	}
 	//--------------------------------------------------------------------------
 }

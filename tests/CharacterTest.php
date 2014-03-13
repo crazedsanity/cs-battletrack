@@ -215,6 +215,20 @@ class CharacterTest extends testDbAbstract {
 	//--------------------------------------------------------------------------
 	
 	
+	
+	//--------------------------------------------------------------------------
+	public function test_delete() {
+		$x = new csbt_character($this->dbObj, __METHOD__, 1);
+		$charData = $x->load();
+		
+		$this->assertTrue(count($charData) > 0);
+		
+		$this->assertEquals(1, $x->delete());
+		
+		$this->assertEquals(0, count($x->load()));
+	}
+	//--------------------------------------------------------------------------
+	
 }
 
 class _test_character extends csbt_character {
