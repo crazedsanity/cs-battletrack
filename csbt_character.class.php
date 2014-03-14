@@ -21,7 +21,7 @@ class csbt_character extends csbt_basicRecord {
 	const seqName =  'csbt_character_table_character_id_seq';
 	const pkeyField = 'character_id';
 	
-	
+	public $gear = array();
 	//==========================================================================
 	/**
 	 * 
@@ -62,6 +62,46 @@ class csbt_character extends csbt_basicRecord {
 		$this->characterId = parent::create($data);
 		return $this->characterId;
 	}//end create()
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function load_all() {
+		$x = new csbt_gear($this->dbObj);
+		$x->characterId = $this->characterId;
+		
+		$myData = $x->get_all_character_gear();
+		foreach($myData as $k=>$v) {
+			$this->gear[$k] = new csbt_gear($this->dbObj, $v);
+		}
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_total_weight() {
+		$weight = 0;
+		
+		if(is_array($this->gear) && count($this->gear) > 0) {
+			foreach($this->gear as $k=>$obj) {
+				$data = $obj->data;
+				$itemWeight = 0;
+				if(isset($data['weight']) && is_numeric($data['weight']) && $data['weight'] > 0) {
+					if(isset($data['quantity']) && is_numeric($data['quantity']) && $data['quantity'] > 0) {
+						$itemWeight = ($itemWeight * $data['quantity']);
+					}
+					else {
+						$itemWeight = $data['weight'];
+					}
+				}
+				$weight += $itemWeight;
+			}
+		}
+		
+		return $weight;
+	}
 	//==========================================================================
 }
 

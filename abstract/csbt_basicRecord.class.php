@@ -172,18 +172,23 @@ class csbt_basicRecord {
 	 */
 	public function create(array $data) {
 		
-		$params = array();
-		
-		foreach($data as $k=>$v) {
-			$params[] = ':'. $k;
+		if(is_array($data) && count($data) > 0) {
+			$params = array();
+
+			foreach($data as $k=>$v) {
+				$params[] = ':'. $k;
+			}
+
+			$sql = "INSERT INTO " . $this->_dbTable . " (". implode(', ', array_keys($data)) .") VALUES 
+					(". implode(', ', $params) .")";
+			try {
+				$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
+			} catch (Exception $e) {
+				throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
+			}
 		}
-		
-		$sql = "INSERT INTO " . $this->_dbTable . " (". implode(', ', array_keys($data)) .") VALUES 
-				(". implode(', ', $params) .")";
-		try {
-			$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
-		} catch (Exception $e) {
-			throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
+		else {
+			throw new exception(__METHOD__ .": cannot create record in '". $this->_dbTable ."' with no data");
 		}
 		
 		return $this->id;

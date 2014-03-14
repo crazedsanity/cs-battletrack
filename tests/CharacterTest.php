@@ -229,6 +229,57 @@ class CharacterTest extends testDbAbstract {
 	}
 	//--------------------------------------------------------------------------
 	
+	
+	
+	//--------------------------------------------------------------------------
+	public function test_gear_total_weight() {
+		$char = new csbt_character($this->dbObj, __METHOD__, 1);
+		$gear = new csbt_gear($this->dbObj);
+		$gear->characterId = $char->characterId;
+		
+		$createThis = array('torches', 'silk rope', 'bullseye lantern');
+		
+		$manualWeight = 0;
+		
+		$testData = array();
+		foreach($createThis as $name) {
+			$_createData = array(
+				'character_id'	=> $char->characterId,
+				'gear_name'		=> $name,
+				'weight'		=> rand(1,10),
+				'quantity'		=> rand(1,10),
+			);
+			
+			$manualWeight += ($_createData['weight'] * $_createData['quantity']);
+			
+			$id = $gear->create($_createData);
+			$this->assertTrue(is_numeric($id));
+			$this->assertTrue($id > 0);
+			$this->assertFalse(isset($testData[$id]));
+			
+			
+			$testData[$id] = $gear->load();
+			$this->assertTrue(is_array($testData[$id]));
+			$this->assertTrue(count($testData[$id]) > 0);
+		}
+		
+		$this->assertEquals(count($testData), count($createThis));
+		
+		$char->load_all();
+		$this->assertEquals(count($char->gear), count($testData));
+		
+		$manualWeight = 0;
+		
+		foreach($testData as $k=>$v) {
+			$this->assertTrue(isset($char->gear[$id]));
+			$this->assertTrue(is_object($char->gear[$id]));
+			$this->assertEquals($v, $char->gear[$k]->data);
+		}
+		
+		$this->assertEquals($manualWeight, $char->get_total_weight());
+	}
+	//--------------------------------------------------------------------------
+	
 }
 
 class _test_character extends csbt_character {
