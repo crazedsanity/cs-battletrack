@@ -53,7 +53,7 @@ class GearTest extends testDbAbstract {
 			$x->create(null);
 			$this->fail("creation with null data succeeded");
 		} catch (Exception $ex) {
-			if(!preg_match('/create\(\) must be of the type array, null given/', $ex->getMessage())) {
+			if(!preg_match('/create\(\) must be .+ array, none given/', $ex->getMessage())) {
 				$this->fail("Malformed or unexpected error: ". $ex->getMessage());
 			}
 		}
