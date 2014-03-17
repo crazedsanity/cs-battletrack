@@ -16,43 +16,31 @@ class csbt_skill extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function load(array $crit=null) {
-		$sql = 'SELECT t.*, t2.ability_name FROM '. self::tableName .' AS t INNER JOIN '. csbt_character::tableName .' AS t2 '
-			. ' USING ('. csbt_character::pkeyField .') WHERE character_id=:id';
+	public function get_all_character_skills() {
+		$sql = 'SELECT 
+					cs.*, a.ability_name, ca.ability_score, 
+					ca.temporary_score 
+				FROM csbt_character_skill_table AS cs 
+					INNER JOIN csbt_ability_table AS a 
+						ON (cs.ability_id=a.ability_id) 
+					INNER JOIN csbt_character_ability_table AS ca 
+						ON (cs.character_id=ca.character_id AND a.ability_id=ca.ability_id) 
+				WHERE 
+					cs.character_id=:id
+				ORDER BY cs.skill_name';
 		
-		$abilityId = null;
-		if(!is_null($byAbilityName) && !is_numeric($byAbilityName) && strlen($byAbilityName)) {
-			$abilityId =  $this->abilityObj->get_ability_id($byAbilityName);
-		}
 		$params = array(
 			'id'	=> $this->characterId,
 		);
 		
-		$sql .= ' ORDER BY skill_name';
-		
 		try {
 			$this->dbObj->run_query($sql, $params);
-			$retval = $this->dbObj->farray_fieldnames($this->pkeyField);
+			$retval = $this->dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function calculate_modifier() {
-		#array('ability_mod', 'ranks', 'misc_mod')
-		$mod = 0;
-		
-		$mod += $this->_data['ability_mod'];
-		$mod += $this->_data['ranks'];
-		$mod += $this->_data['misc_mod'];
-		
-		return($mod);
 	}
 	//==========================================================================
 }

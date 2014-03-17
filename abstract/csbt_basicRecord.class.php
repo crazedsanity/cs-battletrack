@@ -254,4 +254,22 @@ class csbt_basicRecord {
 		return $res;
 	}
 	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function calculate_skill_modifier(array $data) {
+		$mod = 0;
+		if(is_array($data) && count($data) > 0) {
+			$bits = array('ability_mod', 'ranks', 'misc_mod');
+			
+			foreach($bits as $k) {
+				if(isset($data[$k]) && is_numeric($data[$k])) {
+					$mod += $data[$k];
+				}
+			}
+		}
+		return($mod);
+	}
+	//==========================================================================
 }
