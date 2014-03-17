@@ -181,6 +181,9 @@ class csbt_basicRecord {
 			$params = array();
 
 			foreach($data as $k=>$v) {
+				if(count($this->booleanFields) && in_array($k, $this->booleanFields)) {
+					$data[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
+				}
 				$params[] = ':'. $k;
 			}
 
