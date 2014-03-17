@@ -7,6 +7,8 @@ class csbt_skill extends csbt_basicRecord {
 	const tableSeq  = 'csbt_character_skill_table_character_skill_id_seq';
 	const pkeyField = 'character_skill_id';
 	
+	public $booleanFields = array('is_class_skill');
+	
 	//==========================================================================
 	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
 		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);

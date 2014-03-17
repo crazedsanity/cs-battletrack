@@ -7,6 +7,8 @@ class csbt_basicRecord {
 	public $id;
 	public $characterId;
 	public $dbObj;
+	public $gfObj;
+	public $booleanFields = array();
 	
 	protected $_dbTable;
 	protected $_dbSeq;
@@ -93,6 +95,9 @@ class csbt_basicRecord {
 			$updateSql = "";
 			$params = $this->_clean_data_array($this->_data);
 			foreach($params as $k=>$v) {
+				if(count($this->booleanFields) && in_array($k, $this->booleanFields)) {
+					$params[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
+				}
 				$updateSql = $this->gfObj->create_list($updateSql, $k .'=:'. $k, ',');
 			}
 
