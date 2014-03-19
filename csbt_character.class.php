@@ -14,9 +14,6 @@ class csbt_character extends csbt_data {
 	public $characterId;
 	protected $ownerUid;
 	
-	public $dbObj;
-	public $gfObj;
-	
 	const tableName= 'csbt_character_table';
 	const seqName =  'csbt_character_table_character_id_seq';
 	const pkeyField = 'character_id';
@@ -33,8 +30,6 @@ class csbt_character extends csbt_data {
 	public function __construct($characterIdOrName, $ownerUid, cs_phpDB $dbObj=null) {
 		parent::__construct(null, self::tableName, self::seqName, self::pkeyField);
 		$this->ownerUid = $ownerUid;
-		
-		$this->gfObj = new cs_globalFunctions;
 		
 		if(!is_null($characterIdOrName)) {
 			if(is_numeric($characterIdOrName)) {
@@ -68,26 +63,13 @@ class csbt_character extends csbt_data {
 	
 	
 	//==========================================================================
-	public function load_all(cs_phpDB $dbObj) {
-		$x = new csbt_gear();
-		$x->characterId = $this->characterId;
-		
-		$myData = $x->get_all_character_gear($dbObj);
-		foreach($myData as $k=>$v) {
-			$this->gear[$k] = new csbt_gear($v);
-		}
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function get_total_weight() {
+	public function get_total_weight(cs_phpDB $dbObj) {
 		$weight = 0;
 		
-		if(is_array($this->gear) && count($this->gear) > 0) {
-			foreach($this->gear as $k=>$obj) {
-				$data = $obj->data;
+		$allGear = csbt_gear::get_all_character_gear($dbObj, $this->characterId);
+		
+		if(is_array($allGear) && count($allGear) > 0) {
+			foreach($allGear as $k=>$data) {
 				$itemWeight = 0;
 				if(isset($data['weight']) && is_numeric($data['weight']) && $data['weight'] > 0) {
 					if(isset($data['quantity']) && is_numeric($data['quantity']) && $data['quantity'] > 0) {

@@ -263,18 +263,18 @@ class CharacterTest extends testDbAbstract {
 		
 		$this->assertEquals(count($testData), count($createThis));
 		
-		$char->load_all($this->dbObj);
-		$this->assertEquals(count($char->gear), count($testData));
+		$allGear = csbt_gear::get_all_character_gear($this->dbObj, $char->id);
+		$this->assertEquals(count($allGear), count($testData));
 		
 		$manualWeight = 0;
 		
 		foreach($testData as $k=>$v) {
-			$this->assertTrue(isset($char->gear[$id]));
-			$this->assertTrue(is_object($char->gear[$id]));
-			$this->assertEquals($v, $char->gear[$k]->data);
+			$this->assertTrue(isset($allGear[$id]));
+			$this->assertTrue(is_array($allGear[$id]));
+			$this->assertEquals($v, $allGear[$k]);
 		}
 		
-		$this->assertEquals($manualWeight, $char->get_total_weight());
+		$this->assertEquals($manualWeight, $char->get_total_weight($this->dbObj));
 	}
 	//--------------------------------------------------------------------------
 	

@@ -17,13 +17,13 @@ class csbt_gear extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_all_character_gear(cs_phpDB $dbObj) {
+	public static function get_all_character_gear(cs_phpDB $dbObj, $characterId) {
 		$sql = "SELECT * FROM " . self::tableName . " WHERE character_id=:id";
-		$params = array('id' => $this->characterId);
+		$params = array('id' => $characterId);
 		
 		try {
 			$dbObj->run_query($sql, $params);
-			$retval = $dbObj->farray_fieldnames($this->_dbPkey);
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
 		} catch (Exception $ex) {
 			throw new ErrorException(__METHOD__ . ": error while retrieving character gear, DETAILS::: " . $ex->getMessage());
 		}
