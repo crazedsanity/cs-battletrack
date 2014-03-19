@@ -1,6 +1,6 @@
 <?php 
 
-class csbt_weapon extends csbt_basicRecord {
+class csbt_weapon extends csbt_data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_weapon_table';
@@ -9,8 +9,8 @@ class csbt_weapon extends csbt_basicRecord {
 	
 	public $booleanFields = array('in_use');
 	//==========================================================================
-	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);
+	public function __construct(array $initialData=array()) {
+		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
 	
@@ -25,7 +25,7 @@ class csbt_weapon extends csbt_basicRecord {
 	 * @return type
 	 * @throws ErrorException
 	 */
-	public function get_all_character_weapons($onlyInUse=null) {
+	public function get_all_character_weapons(cs_phpDB $dbObj, $onlyInUse=null) {
 		$sql = 'SELECT * FROM '. self::tableName .' WHERE ';//'character_id=:id';
 		
 		$params = array(
@@ -33,18 +33,18 @@ class csbt_weapon extends csbt_basicRecord {
 		);
 		
 		if(!is_null($onlyInUse) && is_bool($onlyInUse)) {
-			$params['in_use'] = $this->gfObj->interpret_bool($onlyInUse, array('f', 't'));
+			$params['in_use'] = cs_global::interpret_bool($onlyInUse, array('f', 't'));
 		}
 		
 		$addThis = "";
 		foreach(array_keys($params) as $n) {
-			$addThis = $this->gfObj->create_list($addThis, $n .'=:'. $n, ' AND ');
+			$addThis = cs_global::create_list($addThis, $n .'=:'. $n, ' AND ');
 		}
 		$sql .= $addThis;
 		
 		try {
-			$this->dbObj->run_query($sql, $params);
-			$retval = $this->dbObj->farray_fieldnames(self::pkeyField);
+			$dbObj->run_query($sql, $params);
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(Exception $e) {
 			throw new ErrorException(__METHOD__ .":: failed to retrieve character weapons, DETAILS::: ". $e->getMessage());

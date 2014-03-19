@@ -13,7 +13,7 @@ class WeaponTest extends testDbAbstract {
 		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character($this->dbObj, __CLASS__, 1);
+		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
@@ -29,7 +29,7 @@ class WeaponTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_and_get_all() {
-		$x = new csbt_weapon($this->dbObj);
+		$x = new csbt_weapon();
 		$x->characterId = $this->char->characterId;
 		
 		$createdWeapons = array();
@@ -58,12 +58,12 @@ class WeaponTest extends testDbAbstract {
 		
 		foreach($testData as $cData) {
 			$cData['character_id'] = $x->characterId;
-			$id = $x->create($cData);
+			$id = $x->create($this->dbObj, $cData);
 
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 
-			$data = $x->load();
+			$data = $x->load($this->dbObj);
 
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(count($data) >= count($cData));
@@ -79,7 +79,7 @@ class WeaponTest extends testDbAbstract {
 			}
 		}
 		
-		$allWeapons = $x->get_all_character_weapons();
+		$allWeapons = $x->get_all_character_weapons($this->dbObj);
 		$this->assertTrue(is_array($allWeapons));
 		$this->assertEquals(count($testData), count($allWeapons), cs_global::debug_print($allWeapons));
 		$this->assertTrue(isset($allWeapons[$id]));
@@ -87,8 +87,8 @@ class WeaponTest extends testDbAbstract {
 		$this->assertEquals($data, $allWeapons[$id]);
 		
 		
-		$testUsedWpns = $x->get_all_character_weapons(true);
-		$testNotUsedWpns = $x->get_all_character_weapons(false);
+		$testUsedWpns = $x->get_all_character_weapons($this->dbObj, true);
+		$testNotUsedWpns = $x->get_all_character_weapons($this->dbObj, false);
 		
 		$this->assertNotEquals($testNotUsedWpns, $testUsedWpns);
 		
@@ -108,7 +108,7 @@ class WeaponTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_and_delete() {
-		$x = new csbt_weapon($this->dbObj);
+		$x = new csbt_weapon();
 		$x->characterId = $this->char->characterId;
 		
 		$wpns = array('long sword', 'short sword', 'testing');
@@ -120,13 +120,13 @@ class WeaponTest extends testDbAbstract {
 				'character_id'	=> $x->characterId,
 				'weapon_name'	=> $n,
 			);
-			$id = $x->create($xData);
+			$id = $x->create($this->dbObj, $xData);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			$this->assertFalse(isset($createdList[$id]));
 			
-			$data = $x->load();
+			$data = $x->load($this->dbObj);
 			
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(count($data) > count($xData));
@@ -134,7 +134,7 @@ class WeaponTest extends testDbAbstract {
 			$createdList[$id] = $data;
 		}
 		
-		$allWpns = $x->get_all_character_weapons();
+		$allWpns = $x->get_all_character_weapons($this->dbObj);
 		
 		$this->assertTrue(is_array($allWpns));
 		$this->assertEquals(count($createdList), count($allWpns));
@@ -148,16 +148,16 @@ class WeaponTest extends testDbAbstract {
 			$this->assertNotEquals($data, $newData);
 			
 			$this->assertNull($x->mass_update($newData));
-			$this->assertEquals(1, $x->save());
+			$this->assertEquals(1, $x->save($this->dbObj));
 			
-			$this->assertEquals($newData, $x->load());
+			$this->assertEquals($newData, $x->load($this->dbObj));
 			
 			
 			$this->assertEquals($id, $x->id);
-			$this->assertEquals(1, $x->delete());
+			$this->assertEquals(1, $x->delete($this->dbObj));
 		}
 		
-		$this->assertEquals(array(), $x->get_all_character_weapons());
+		$this->assertEquals(array(), $x->get_all_character_weapons($this->dbObj));
 	}
 	//--------------------------------------------------------------------------
 }

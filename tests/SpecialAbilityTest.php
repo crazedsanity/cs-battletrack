@@ -13,7 +13,7 @@ class SpecialAbilityTest extends testDbAbstract {
 		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character($this->dbObj, __METHOD__, 1);
+		$this->char = new csbt_character(__METHOD__, 1, $this->dbObj);
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
@@ -29,7 +29,7 @@ class SpecialAbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_and_load() {
-		$x = new csbt_specialAbility($this->dbObj);
+		$x = new csbt_specialAbility();
 		$x->characterId = $this->char->characterId;
 		
 		$createThese = array(
@@ -46,13 +46,13 @@ class SpecialAbilityTest extends testDbAbstract {
 				'book_reference'		=> "PHB ". __LINE__,
 			);
 			
-			$id = $x->create($xData);
+			$id = $x->create($this->dbObj, $xData);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			$this->assertFalse(isset($list[$id]));
 			
-			$data = $x->load();
+			$data = $x->load($this->dbObj);
 			
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(count($data) >= count($xData));
@@ -68,25 +68,28 @@ class SpecialAbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_and_delete() {
-		$x = new csbt_specialAbility($this->dbObj);
+		$x = new csbt_specialAbility();
 		$x->characterId = $this->char->characterId;
 		
-		$id = $x->create(array(
-			'character_id'	=> $x->characterId,
-			'special_ability_name'	=> __METHOD__,
-		));
+		$id = $x->create(
+			$this->dbObj, 
+			array(
+				'character_id'	=> $x->characterId,
+				'special_ability_name'	=> __METHOD__,
+			)
+		);
 		
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
 		
-		$data = $x->load();
+		$data = $x->load($this->dbObj);
 		
 		$this->assertTrue(is_array($data));
 		$this->assertTrue(count($data) > 0);
 		
-		$this->assertEquals(1, $x->delete());
+		$this->assertEquals(1, $x->delete($this->dbObj));
 		
-		$this->assertEquals(array(), $x->load());
+		$this->assertEquals(array(), $x->load($this->dbObj));
 	}
 	//--------------------------------------------------------------------------
 	
@@ -94,7 +97,7 @@ class SpecialAbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_all() {
-		$x = new csbt_specialAbility($this->dbObj);
+		$x = new csbt_specialAbility();
 		$x->characterId = $this->char->characterId;
 		
 		$created = array();
@@ -104,12 +107,12 @@ class SpecialAbilityTest extends testDbAbstract {
 				'character_id'	=> $x->characterId,
 				'special_ability_name'	=> __METHOD__ ." #". $i,
 			);
-			$id = $x->create($xData);
+			$id = $x->create($this->dbObj, $xData);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			
-			$data = $x->load();
+			$data = $x->load($this->dbObj);
 			
 			$this->assertFalse(isset($created[$id]));
 			$this->assertTrue(is_array($data));
@@ -118,7 +121,7 @@ class SpecialAbilityTest extends testDbAbstract {
 			$created[$id] = $data;
 		}
 		
-		$allRecs = $x->get_all();
+		$allRecs = $x->get_all($this->dbObj);
 		
 		$this->assertEquals($i, count($allRecs));
 		$this->assertEquals(count($created), count($allRecs));

@@ -13,7 +13,7 @@ class ArmorTest extends testDbAbstract {
 		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character($this->dbObj, __CLASS__, 1);
+		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
 		$this->id = $this->char->id;
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_armor($this->dbObj);
+		$x = new csbt_armor();
 		$x->characterId = $this->id;
 		
 		$data = array(
@@ -46,10 +46,10 @@ class ArmorTest extends testDbAbstract {
 			'is_worn'		=> 'f',
 		);
 		
-		$id = $x->create($data);
+		$id = $x->create($this->dbObj, $data);
 		$this->assertTrue(is_numeric($id));
 		
-		$dbData = $x->load();
+		$dbData = $x->load($this->dbObj);
 		
 		//make sure we understand how "interpret_bool()" works..
 		$gf = new cs_globalFunctions();
@@ -75,21 +75,22 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_armor($this->dbObj);
+		$x = new csbt_armor();
 		$x->characterId = $this->id;
 		
 		$createData = array(
 			'character_id'	=> $this->id,
 			'armor_name'	=> __METHOD__ ." + 5",
 		);
-		$id = $x->create($createData);
+		$id = $x->create($this->dbObj, $createData);
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
+		$this->assertEquals($id, $x->id);
 		$testData = $createData;
 		
 		unset($testData['character_id']);
 		
-		$dbData = $x->load();
+		$dbData = $x->load($this->dbObj);
 		foreach($testData as $k=>$v) {
 			$this->assertEquals($v, $dbData[$k]);
 		}
@@ -99,9 +100,9 @@ class ArmorTest extends testDbAbstract {
 			'armor_name'	=> "Balor Armor of Magickness +2",
 		);
 		$x->mass_update($newVals);
-		$this->assertTrue($x->save());
+		$this->assertTrue($x->save($this->dbObj));
 		
-		$dbData = $x->load();
+		$dbData = $x->load($this->dbObj);
 		
 		foreach($testData as $k=>$v) {
 			$this->assertNotEquals($v, $dbData[$k]);
@@ -116,7 +117,7 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_armor($this->dbObj);
+		$x = new csbt_armor();
 		$x->characterId = $this->id;
 		
 		$allArmor = array(
@@ -133,7 +134,7 @@ class ArmorTest extends testDbAbstract {
 		$myIds = array();
 		foreach($allArmor as $data) {
 			$data['character_id'] = $this->id;
-			$thisId = $x->create($data);
+			$thisId = $x->create($this->dbObj, $data);
 			
 			$this->assertTrue(is_numeric($thisId));
 			
@@ -143,7 +144,7 @@ class ArmorTest extends testDbAbstract {
 		$numLeft = count($myIds);
 		foreach($myIds as $i=>$insertData) {
 			$x->id = $i;
-			$testData = $x->load();
+			$testData = $x->load($this->dbObj);
 			
 			foreach($insertData as $k=>$v) {
 				$this->assertEquals($v, $testData[$k]);

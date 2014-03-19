@@ -1,6 +1,6 @@
 <?php 
 
-class csbt_skill extends csbt_basicRecord {
+class csbt_skill extends csbt_data {
 	
 	
 	const tableName = 'csbt_character_skill_table';
@@ -10,15 +10,15 @@ class csbt_skill extends csbt_basicRecord {
 	public $booleanFields = array('is_class_skill');
 	
 	//==========================================================================
-	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);
+	public function __construct(array $initialData=array()) {
+		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
 	
 	
 	
 	//==========================================================================
-	public function get_all_character_skills() {
+	public function get_all_character_skills(cs_phpDB $dbObj) {
 		$sql = 'SELECT 
 					cs.*, a.ability_name, ca.ability_score, 
 					ca.temporary_score 
@@ -36,8 +36,8 @@ class csbt_skill extends csbt_basicRecord {
 		);
 		
 		try {
-			$this->dbObj->run_query($sql, $params);
-			$retval = $this->dbObj->farray_fieldnames(self::pkeyField);
+			$dbObj->run_query($sql, $params);
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(Exception $e) {
 			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());

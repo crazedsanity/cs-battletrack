@@ -1,6 +1,6 @@
 <?php 
 
-class csbt_specialAbility extends csbt_basicRecord {
+class csbt_specialAbility extends csbt_data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_sa_table';
@@ -9,21 +9,21 @@ class csbt_specialAbility extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);
+	public function __construct(array $initialData=array()) {
+		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
 	
 	
 	
 	//==========================================================================
-	public function get_all() {
+	public function get_all(cs_phpDb $dbObj) {
 		$sql = 'SELECT * FROM '. self::tableName .' WHERE character_id=:id';
 		$params = array('id'=>$this->characterId);
 		
 		try {
-			$this->dbObj->run_query($sql, $params);
-			$retval = $this->dbObj->farray_fieldnames(self::pkeyField);
+			$dbObj->run_query($sql, $params);
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(Exception $e) {
 			throw new ErrorException(__METHOD__ .":: failed to retrieve character weapons, DETAILS::: ". $e->getMessage());

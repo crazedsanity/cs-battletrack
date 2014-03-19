@@ -3,7 +3,7 @@
 
 //TODO: consider optionally adding the logging system.
 
-class csbt_characterSheet extends cs_webapplibsAbstract {
+class csbt_characterSheet {
 	
 	protected $characterId;
 	protected $ownerUid;
@@ -12,22 +12,77 @@ class csbt_characterSheet extends cs_webapplibsAbstract {
 	public $gfObj;
 	
 	
-	protected $_char;
+	protected $_char = "TeST";
 	protected $_abilities = array();
 	protected $_armor = array();
 	protected $_gear = array();
-	protected $_skillList = array();
+	protected $_skills = array();
 	
 	//==========================================================================
 	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid) {
 		$this->dbObj = $db;
 		
-		$this->characterId = $characterIdOrName;
 		$this->ownerUid = $ownerUid;
 		
-		parent::__construct(true);
+		$this->_char = new csbt_character($this->dbObj, $characterIdOrName, $ownerUid);
+		$this->characterId = $this->_char->characterId;
 		
-		$this->load();
+		
+//		parent::__construct(true);
+		
+		if(!is_numeric($characterIdOrName)) {
+			$this->create_defaults();
+		}
+		else {
+			$this->load();
+		}
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function __get($name) {
+		$retval = null;
+		
+		switch($name) {
+			case 'skills':
+				$retval = $this->_skills;
+				break;
+			
+			case 'char':
+				$retval = $this->_char;
+				break;
+		}
+		
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function create_defaults() {
+		$abilities = new csbt_ability($this->dbObj);
+		$abilities->characterId = $this->characterId;
+		
+		$abilities->create_character_defaults();
+		$this->_abilities = $abilities->get_all_character_abilities();
+		
+		$abilityCache = $abilities->get_all_abilities();
+		
+		$skills = new csbt_skill($this->dbObj);
+		$skills->characterId = $this->characterId;
+		
+		foreach($this->get_default_skill_list() as $k=>$v) {
+			$createData = array(
+				'character_id'	=> $this->characterId,
+				'skill_name'	=> $v[0],
+				'ability_id'	=> $abilityCache[$v[1]]
+			);
+			$skills->create($createData);
+			$this->_skills[$skills->id] = new csbt_skill($this->dbObj, $skills->load());
+		}
 	}
 	//==========================================================================
 	

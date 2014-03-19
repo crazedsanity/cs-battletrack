@@ -56,24 +56,6 @@ class csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function update($index, $value) {
-		$this->mass_update(array($index=>$value));
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function mass_update(array $data) {
-		foreach($data as $f=>$v) {
-			$this->_data[$f] = $v;
-		}
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
 	protected function _clean_data_array() {
 		$data = $this->_data;
 		if(isset($data['character_id'])) {
@@ -109,6 +91,8 @@ class csbt_basicRecord {
 				$this->dbObj->run_update($sql, $params);
 				$retval = true;
 			} catch (Exception $ex) {
+cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
+cs_global::debug_print($params,1);
 				throw new LogicException(__METHOD__ .": unable to update table '". $this->_dbTable ."', DETAILS::: ". $ex->getMessage());
 			}
 		}
@@ -158,7 +142,7 @@ class csbt_basicRecord {
 			}
 		}
 		else {
-			throw new LogicException(__METHOD__ .": invalid characterId (". $this->id .")");
+			throw new LogicException(__METHOD__ .": invalid ID (". $this->id .")");
 		}
 		$this->_data = $retval;
 		
@@ -192,6 +176,9 @@ class csbt_basicRecord {
 			try {
 				$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
 			} catch (Exception $e) {
+cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
+cs_global::debug_print($params,1);
+cs_global::debug_print($this,1);
 				throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
 			}
 		}
@@ -200,43 +187,6 @@ class csbt_basicRecord {
 		}
 		
 		return $this->id;
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function calculate_ability_modifier($score) {
-		if(is_numeric($score) && $score > 0) {
-			$modifier = floor(($score -10)/2);
-		}
-		elseif(is_null($score)) {
-			$modifier = null;
-		}
-		else {
-			$this->_exception_handler(__METHOD__ .":: invalid score (". $score .")");
-		}
-		return($modifier);
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function calculate_total_save_modifier(array $data) {
-		$addThese = array('ability_mod', 'base_mod', 'misc_mod', 'magic_mod', 'temp_mod');
-		if(is_array($data) && count($data) > count($addThese)) {
-			$mod = 0;
-			foreach($addThese as $idx) {
-				if(isset($this->_data[$idx]) && is_numeric($this->_data[$idx])) {
-					$mod += $this->_data[$idx];
-				}
-			}
-		}
-		else {
-			throw new InvalidArgumentException(__METHOD__ .": missing indexes in array");
-		}
-		return $mod;
 	}
 	//==========================================================================
 	
@@ -260,24 +210,6 @@ class csbt_basicRecord {
 			throw new ErrorException(__METHOD__ .": missing ID to delete record from table '". $this->_dbTable ."'");
 		}
 		return $res;
-	}
-	//==========================================================================
-	
-	
-	
-	//==========================================================================
-	public function calculate_skill_modifier(array $data) {
-		$mod = 0;
-		if(is_array($data) && count($data) > 0) {
-			$bits = array('ability_mod', 'ranks', 'misc_mod');
-			
-			foreach($bits as $k) {
-				if(isset($data[$k]) && is_numeric($data[$k])) {
-					$mod += $data[$k];
-				}
-			}
-		}
-		return($mod);
 	}
 	//==========================================================================
 }

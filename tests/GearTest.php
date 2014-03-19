@@ -13,7 +13,7 @@ class GearTest extends testDbAbstract {
 		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character($this->dbObj, __CLASS__, 1);
+		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
 		$this->id = $this->char->id;
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class GearTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_gear($this->dbObj);
+		$x = new csbt_gear();
 		$x->characterId = $this->id;
 		
 		$insertData = array(
@@ -42,7 +42,7 @@ class GearTest extends testDbAbstract {
 		);
 		
 		try {
-			$x->create();
+			$x->create($this->dbObj);
 			$this->fail("creation without any data succeeded");
 		} catch (Exception $ex) {
 			if(!preg_match('/create\(\) must be .+ array, none given/', $ex->getMessage())) {
@@ -50,7 +50,7 @@ class GearTest extends testDbAbstract {
 			}
 		}
 		try {
-			$x->create(null);
+			$x->create($this->dbObj, null);
 			$this->fail("creation with null data succeeded");
 		} catch (Exception $ex) {
 			if(!preg_match('/create\(\) must be .+ array, null given/', $ex->getMessage())) {
@@ -58,7 +58,7 @@ class GearTest extends testDbAbstract {
 			}
 		}
 		try {
-			$x->create(array());
+			$x->create($this->dbObj, array());
 			$this->fail("creation with empty array succeeded");
 		} catch (Exception $ex) {
 			if(!preg_match("/create: cannot create record in '". $x::tableName ."' with no data/", $ex->getMessage())) {
@@ -66,12 +66,12 @@ class GearTest extends testDbAbstract {
 			}
 		}
 		
-		$id = $x->create($insertData);
+		$id = $x->create($this->dbObj, $insertData);
 		
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
 		
-		$data = $x->load();
+		$data = $x->load($this->dbObj);
 		
 		$this->assertTrue(is_array($data));
 		$this->assertTrue(count($data) > count($insertData));
@@ -87,19 +87,19 @@ class GearTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_gear($this->dbObj);
+		$x = new csbt_gear();
 		$x->characterId = $this->id;
 		
 		$initial = array(
 			'character_id'	=> $x->characterId,
 			'gear_name'		=> ""
 		);
-		$id = $x->create($initial);
+		$id = $x->create($this->dbObj, $initial);
 		
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
 		
-		$afterCreate = $x->load();
+		$afterCreate = $x->load($this->dbObj);
 		$this->assertTrue(is_array($afterCreate));
 		$this->assertTrue(count($afterCreate) > count($initial));
 		
@@ -115,9 +115,9 @@ class GearTest extends testDbAbstract {
 		);
 		
 		$this->assertEquals(null, $x->mass_update($updates));
-		$this->assertTrue($x->save());
+		$this->assertTrue($x->save($this->dbObj));
 		
-		$afterUpdate = $x->load();
+		$afterUpdate = $x->load($this->dbObj);
 		$this->assertTrue(is_array($afterUpdate));
 		$this->assertTrue(count($afterUpdate) > count($updates));
 		$this->assertEquals(count($afterUpdate), count($afterCreate));
@@ -138,16 +138,16 @@ class GearTest extends testDbAbstract {
 			'character_id'	=> $this->id,
 			'gear_name'		=> "Specially invalid",
 		);
-		$x = new csbt_gear($this->dbObj, $initial);
+		$x = new csbt_gear($initial);
 		
 		$this->assertEquals(null, $x->id);
 		
-		$id = $x->save();
+		$id = $x->save($this->dbObj);
 		
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
 		
-		$data = $x->load();
+		$data = $x->load($this->dbObj);
 		$this->assertTrue(is_array($data));
 		$this->assertTrue(count($data) > 0);
 		
@@ -162,7 +162,7 @@ class GearTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_gear($this->dbObj);
+		$x = new csbt_gear();
 		$x->characterId = $this->id;
 		
 		$allGear = array('torch', 'silk rope', 'bullseye lantern');
@@ -176,13 +176,13 @@ class GearTest extends testDbAbstract {
 				'weight'		=> __LINE__,
 				'quantity'		=> $numCreated++,
 			);
-			$id = $x->create($insert);
+			$id = $x->create($this->dbObj, $insert);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			$this->assertFalse(isset($createdGear[$id]));
 			
-			$createdGear[$id] = $x->load();
+			$createdGear[$id] = $x->load($this->dbObj);
 			$this->assertTrue(isset($createdGear[$id]));
 			$this->assertTrue(is_array($createdGear[$id]));
 			$this->assertTrue(count($createdGear[$id]) > count($insert));
@@ -192,11 +192,11 @@ class GearTest extends testDbAbstract {
 		
 		foreach(array_keys($createdGear) as $id) {
 			$x->id = $id;
-			$this->assertEquals($createdGear[$id], $x->load());
-			$this->assertEquals(1, $x->delete());
+			$this->assertEquals($createdGear[$id], $x->load($this->dbObj));
+			$this->assertEquals(1, $x->delete($this->dbObj));
 			
 			$this->assertEquals($id, $x->id);
-			$this->assertEquals(array(), $x->load());
+			$this->assertEquals(array(), $x->load($this->dbObj));
 		}
 	}
 	//--------------------------------------------------------------------------
@@ -205,7 +205,7 @@ class GearTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_all_character_gear() {
-		$x = new csbt_gear($this->dbObj);
+		$x = new csbt_gear();
 		$x->characterId = $this->id;
 		
 		$createThis = array('torches', 'silk rope', 'bullseye lantern');
@@ -216,16 +216,16 @@ class GearTest extends testDbAbstract {
 				'character_id'	=> $x->characterId,
 				'gear_name'		=> $name
 			);
-			$id = $x->create($_createData);
+			$id = $x->create($this->dbObj, $_createData);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			
-			$list[$id] = $x->load();
+			$list[$id] = $x->load($this->dbObj);
 		}
 		$this->assertEquals(count($createThis), count($list));
 		
-		$allGear = $x->get_all_character_gear();
+		$allGear = $x->get_all_character_gear($this->dbObj);
 		
 		$this->assertTrue(is_array($allGear));
 		$this->assertTrue(count($allGear) > 0);

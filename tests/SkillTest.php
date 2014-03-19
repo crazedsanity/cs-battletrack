@@ -16,7 +16,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character($this->dbObj, __CLASS__, 1);
+		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
 		
 		
 		// list of default skills...
@@ -81,13 +81,13 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_skill($this->dbObj);
+		$x = new csbt_skill();
 		$x->characterId = $this->char->characterId;
 		
-		$a = new csbt_ability($this->dbObj);
+		$a = new csbt_ability();
 		$a->characterId = $this->char->characterId;
-		$a->create_character_defaults();
-		$cache = $a->get_all_character_abilities();
+		$a->create_character_defaults($this->dbObj);
+		$cache = $a->get_all_character_abilities($this->dbObj);
 		
 		$createdSkills = array();
 		
@@ -109,12 +109,12 @@ class testOfCSBattleTrack extends testDbAbstract {
 				'skill_name'	=> $name,
 			);
 			
-			$id = $x->create($insertData);
+			$id = $x->create($this->dbObj, $insertData);
 			
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			
-			$testData = $x->load();
+			$testData = $x->load($this->dbObj);
 			$this->assertTrue(is_array($testData));
 			$this->assertTrue(count($testData) > 0);
 			
@@ -132,13 +132,13 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_and_delete() {
-		$x = new csbt_skill($this->dbObj);
+		$x = new csbt_skill();
 		$x->characterId = $this->char->characterId;
 		
-		$a = new csbt_ability($this->dbObj);
+		$a = new csbt_ability();
 		$a->characterId = $x->characterId;
-		$a->create_character_defaults();
-		$cache = $a->get_all_character_abilities();
+		$a->create_character_defaults($this->dbObj);
+		$cache = $a->get_all_character_abilities($this->dbObj);
 		
 		$createdSkills = array();
 		foreach($this->autoSkills as $i=>$data) {
@@ -151,32 +151,32 @@ class testOfCSBattleTrack extends testDbAbstract {
 				'skill_name'	=> $name,
 			);
 			
-			$id = $x->create($insertThis);
-			$createdSkills[$id] = $x->load();
+			$id = $x->create($this->dbObj, $insertThis);
+			$createdSkills[$id] = $x->load($this->dbObj);
 		}
 		
 		foreach($createdSkills as $id=>$data) {
 			$x->id = $id;
 			
-			$this->assertEquals($data, $x->load());
+			$this->assertEquals($data, $x->load($this->dbObj));
 			$this->assertEquals($data, $x->data);
 			
 			$this->assertEquals(null, $x->update('skill_name', $data['skill_name'] .' -- '. __METHOD__));
-			$this->assertEquals(1, $x->save());
-			$this->assertNotEquals($data, $x->load());
+			$this->assertEquals(1, $x->save($this->dbObj));
+			$this->assertNotEquals($data, $x->load($this->dbObj));
 			
 			$data['skill_name'] .= ' -- '. __METHOD__;
 			$this->assertEquals($data, $x->data);
 			
-			$this->assertEquals(1, $x->delete());
-			$this->assertEquals(array(), $x->load());
+			$this->assertEquals(1, $x->delete($this->dbObj));
+			$this->assertEquals(array(), $x->load($this->dbObj));
 			$this->assertEquals($id, $x->id);
 			unset($createdSkills[$id]);
 		}
 		
 		$this->assertEquals(0, count($createdSkills));
 		$this->assertEquals(array(), $createdSkills);
-		$this->assertEquals(array(), $x->get_all_character_skills());
+		$this->assertEquals(array(), $x->get_all_character_skills($this->dbObj));
 	}
 	//--------------------------------------------------------------------------
 	
@@ -184,7 +184,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_calculate_skill_modifier() {
-		$x = new csbt_skill($this->dbObj);
+		$x = new csbt_skill();
 		
 		$this->assertEquals(0, $x->calculate_skill_modifier(array()));
 		$this->assertEquals(0, $x->calculate_skill_modifier(array('ability_mod'=>0)));
@@ -225,13 +225,13 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_load() {
-		$x = new csbt_skill($this->dbObj);
+		$x = new csbt_skill();
 		$x->characterId = $this->char->characterId;
-		$a = new csbt_ability($this->dbObj);
+		$a = new csbt_ability();
 		$a->characterId = $x->characterId;
-		$a->create_character_defaults();
+		$a->create_character_defaults($this->dbObj);
 		
-		$cache = $a->get_all_character_abilities();
+		$cache = $a->get_all_character_abilities($this->dbObj);
 		
 		$createData = array(
 			'character_id'		=> $x->characterId,
@@ -242,11 +242,11 @@ class testOfCSBattleTrack extends testDbAbstract {
 			'misc_mod'			=> -2,
 		);
 		
-		$id = $x->create($createData);
+		$id = $x->create($this->dbObj, $createData);
 		$this->assertTrue(is_numeric($id));
 		$this->assertTrue($id > 0);
 		
-		$myData = $x->load();
+		$myData = $x->load($this->dbObj);
 		
 		$this->assertTrue(is_array($myData));
 		$this->assertTrue(count($myData) > 0);

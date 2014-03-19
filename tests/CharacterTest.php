@@ -27,9 +27,9 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_creation() {
-		$new = new csbt_character($this->dbObj, __METHOD__, 1);
+		$new = new csbt_character(__METHOD__, 1, $this->dbObj);
 		
-		$x = new csbt_character($this->dbObj, $new->characterId, 1);
+		$x = new csbt_character($new->characterId, 1, $this->dbObj);
 		
 		$data = $x->data;
 		
@@ -43,7 +43,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_magicProperties() {
-		$x = new csbt_character($this->dbObj, __METHOD__, 1);
+		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
 		
 		$data = $x->data;
 		
@@ -61,11 +61,11 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_load() {
-		$x = new csbt_character($this->dbObj, __METHOD__, 1);
+		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
 		
 		$this->assertEquals(array(), $x->data);
 		
-		$x->load();
+		$x->load($this->dbObj);
 		
 		$this->assertTrue($x->characterId > 0);
 		$this->assertTrue(is_array($x->data));
@@ -96,8 +96,8 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_character($this->dbObj, __METHOD__, 1);
-		$x->load();
+		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x->load($this->dbObj);
 		
 		$data = $x->data;
 		
@@ -108,14 +108,14 @@ class CharacterTest extends testDbAbstract {
 		$x->update('character_name', __FUNCTION__);
 		$this->assertNotEquals($data, $x->data);
 		
-		$x->load();
+		$x->load($this->dbObj);
 		$this->assertEquals($data, $x->data);
 		
 		
 		$x->update('character_name', __CLASS__);
 		$this->assertNotEquals($data, $x->data);
-		$this->assertTrue($x->save());
-		$this->assertNotEquals($data, $x->load());
+		$this->assertTrue($x->save($this->dbObj));
+		$this->assertNotEquals($data, $x->load($this->dbObj));
 		$data['character_name'] = __CLASS__;
 		$this->assertEquals($data, $x->data);
 		
@@ -127,9 +127,9 @@ class CharacterTest extends testDbAbstract {
 			'notes'			=> "MOREea STUFfl   qaewrqwe   \n\t",
 		);
 		$x->mass_update($changes);
-		$this->assertTrue($x->save());
+		$this->assertTrue($x->save($this->dbObj));
 		
-		$afterMassUpdate = $x->load();
+		$afterMassUpdate = $x->load($this->dbObj);
 		foreach($changes as $k=>$v) {
 			$this->assertEquals($v, $afterMassUpdate[$k]);
 		}
@@ -140,14 +140,14 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_after_removing_field() {
-		$x = new _test_character($this->dbObj, __METHOD__, 1);
-		$x->load();
+		$x = new _test_character(__METHOD__, 1, $this->dbObj);
+		$x->load($this->dbObj);
 		$this->assertEquals(__METHOD__, $x->_data['character_name']);
 		
 		unset($x->_data['character_name']);
 		
-		$x->save();
-		$x->load();
+		$x->save($this->dbObj);
+		$x->load($this->dbObj);
 		
 		$this->assertEquals(__METHOD__, $x->_data['character_name']);
 	}
@@ -157,7 +157,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_big_update() {
-		$x = new csbt_character($this->dbObj, __METHOD__, 1);
+		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
 		
 		$this->assertEquals(array(), $x->data);
 		
@@ -202,13 +202,13 @@ class CharacterTest extends testDbAbstract {
 			$x->update($idx, $val);
 		}
 		
-		$this->assertTrue($x->save());
+		$this->assertTrue($x->save($this->dbObj));
 		
 		$this->assertTrue(count($x->data) > 0);
 		$this->assertNotEquals($x->characterId, $newData['character_id']);
 		$this->assertEquals($x->uid, $newData['uid'], "extra data (uid) was unexpectedly removed...");
 		
-		$x->load();
+		$x->load($this->dbObj);
 		
 		$this->assertNotEquals($x->uid, $newData['uid']);
 	}
@@ -218,14 +218,14 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_character($this->dbObj, __METHOD__, 1);
-		$charData = $x->load();
+		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$charData = $x->load($this->dbObj);
 		
 		$this->assertTrue(count($charData) > 0);
 		
-		$this->assertEquals(1, $x->delete());
+		$this->assertEquals(1, $x->delete($this->dbObj));
 		
-		$this->assertEquals(0, count($x->load()));
+		$this->assertEquals(0, count($x->load($this->dbObj)));
 	}
 	//--------------------------------------------------------------------------
 	
@@ -233,8 +233,8 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_gear_total_weight() {
-		$char = new csbt_character($this->dbObj, __METHOD__, 1);
-		$gear = new csbt_gear($this->dbObj);
+		$char = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$gear = new csbt_gear();
 		$gear->characterId = $char->characterId;
 		
 		$createThis = array('torches', 'silk rope', 'bullseye lantern');
@@ -252,20 +252,20 @@ class CharacterTest extends testDbAbstract {
 			
 			$manualWeight += ($_createData['weight'] * $_createData['quantity']);
 			
-			$id = $gear->create($_createData);
+			$id = $gear->create($this->dbObj, $_createData);
 			$this->assertTrue(is_numeric($id));
 			$this->assertTrue($id > 0);
 			$this->assertFalse(isset($testData[$id]));
 			
 			
-			$testData[$id] = $gear->load();
+			$testData[$id] = $gear->load($this->dbObj);
 			$this->assertTrue(is_array($testData[$id]));
 			$this->assertTrue(count($testData[$id]) > 0);
 		}
 		
 		$this->assertEquals(count($testData), count($createThis));
 		
-		$char->load_all();
+		$char->load_all($this->dbObj);
 		$this->assertEquals(count($char->gear), count($testData));
 		
 		$manualWeight = 0;

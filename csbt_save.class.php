@@ -1,6 +1,6 @@
 <?php 
 
-class csbt_save extends csbt_basicRecord {
+class csbt_save extends csbt_data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_save_table';
@@ -9,15 +9,15 @@ class csbt_save extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);
+	public function __construct(array $initialData=array()) {
+		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
 	
 	
 	
 	//==========================================================================
-	public function get_all_character_saves() {
+	public function get_all_character_saves(cs_phpDB $dbObj) {
 		if(!is_null($this->characterId) && $this->characterId > 0 && !is_null($this->id) && $this->id > 0) { 
 			$sql = "SELECT cs.*, ca.* FROM csbt_character_save_table AS cs 
 					INNER JOIN csbt_character_ability_table AS ca 
@@ -34,8 +34,8 @@ class csbt_save extends csbt_basicRecord {
 			$sql .= " ORDER BY save_name";
 			
 			try {
-				$this->dbObj->run_query($sql, $params);
-				$retval = $this->dbObj->farray_fieldnames($this->pkeyField);
+				$dbObj->run_query($sql, $params);
+				$retval = $dbObj->farray_fieldnames($this->pkeyField);
 				foreach($retval as $i=>$data) {
 					$data['ability_mod'] = $this->calculate_ability_modifier($data['ability_score']);
 					$data['total_mod'] = $this->calculate_total_save_modifier($data);
@@ -57,7 +57,7 @@ class csbt_save extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function create_character_defaults() {
+	public function create_character_defaults(cs_phpDB $dbObj) {
 		$result = 0;
 		
 		$defaults = array(
@@ -65,8 +65,8 @@ class csbt_save extends csbt_basicRecord {
 			'reflex'	=> 'dex',
 			'will'		=> 'wis',
 		);
-		$x = new csbt_ability($this->dbObj);
-		$abilityList = $x->get_all_abilities();
+		$x = new csbt_ability();
+		$abilityList = $x->get_all_abilities($dbObj);
 		
 		foreach($defaults as $k=>$v) {
 			if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
@@ -75,7 +75,7 @@ class csbt_save extends csbt_basicRecord {
 					'save_name'		=> $k,
 					'ability_id'	=> $abilityList[$v]
 				);
-				$this->create($createData);
+				$this->create($dbObj, $createData);
 				$result++;
 			}
 			else {

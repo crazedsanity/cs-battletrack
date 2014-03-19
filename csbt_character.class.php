@@ -9,7 +9,7 @@
  * 	classes when the need arises.
  */
 
-class csbt_character extends csbt_basicRecord {
+class csbt_character extends csbt_data {
 	
 	public $characterId;
 	protected $ownerUid;
@@ -25,13 +25,13 @@ class csbt_character extends csbt_basicRecord {
 	//==========================================================================
 	/**
 	 * 
-	 * @param cs_phpDB $dbObj
 	 * @param type $characterIdOrName
 	 * @param type $ownerUid
+	 * @param cs_phpDB $dbObj
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct(cs_phpDB $dbObj, $characterIdOrName, $ownerUid) {
-		parent::__construct($dbObj, self::tableName, self::seqName, self::pkeyField);
+	public function __construct($characterIdOrName, $ownerUid, cs_phpDB $dbObj=null) {
+		parent::__construct(null, self::tableName, self::seqName, self::pkeyField);
 		$this->ownerUid = $ownerUid;
 		
 		$this->gfObj = new cs_globalFunctions;
@@ -42,6 +42,7 @@ class csbt_character extends csbt_basicRecord {
 			}
 			else {
 				$this->characterId = $this->create(
+						$dbObj,
 						array(
 							'character_name'=>$characterIdOrName,
 							'uid'			=> $this->ownerUid
@@ -58,8 +59,8 @@ class csbt_character extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function create(array $data=null) {
-		$this->characterId = parent::create($data);
+	public function create(cs_phpDB $db, array $data=null) {
+		$this->characterId = parent::create($db, $data);
 		return $this->characterId;
 	}//end create()
 	//==========================================================================
@@ -67,13 +68,13 @@ class csbt_character extends csbt_basicRecord {
 	
 	
 	//==========================================================================
-	public function load_all() {
-		$x = new csbt_gear($this->dbObj);
+	public function load_all(cs_phpDB $dbObj) {
+		$x = new csbt_gear();
 		$x->characterId = $this->characterId;
 		
-		$myData = $x->get_all_character_gear();
+		$myData = $x->get_all_character_gear($dbObj);
 		foreach($myData as $k=>$v) {
-			$this->gear[$k] = new csbt_gear($this->dbObj, $v);
+			$this->gear[$k] = new csbt_gear($v);
 		}
 	}
 	//==========================================================================

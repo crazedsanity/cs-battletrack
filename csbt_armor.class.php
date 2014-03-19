@@ -1,6 +1,6 @@
 <?php 
 
-class csbt_armor extends csbt_basicRecord {
+class csbt_armor extends csbt_data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_armor_table';
@@ -9,8 +9,8 @@ class csbt_armor extends csbt_basicRecord {
 	
 	public $booleanFields = array('is_worn');
 	//==========================================================================
-	public function __construct(cs_phpDB $dbObj, array $initialData=array()) {
-		parent::__construct($dbObj, self::tableName, self::tableSeq, self::pkeyField, $initialData);
+	public function __construct(array $initialData=array()) {
+		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
 }
