@@ -74,27 +74,7 @@ class csbt_basicRecord {
 	public function save() {
 		$retval = false;
 		if(is_numeric($this->id)) {
-			$updateSql = "";
-			$params = $this->_clean_data_array($this->_data);
-			foreach($params as $k=>$v) {
-				if(count($this->booleanFields) && in_array($k, $this->booleanFields)) {
-					$params[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
-				}
-				$updateSql = $this->gfObj->create_list($updateSql, $k .'=:'. $k, ',');
-			}
-
-			$sql = "UPDATE ". $this->_dbTable ." SET ". $updateSql ." WHERE ". $this->_dbPkey ."=:id";
-
-			$params['id'] = $this->id;
-
-			try {
-				$this->dbObj->run_update($sql, $params);
-				$retval = true;
-			} catch (Exception $ex) {
-cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
-cs_global::debug_print($params,1);
-				throw new LogicException(__METHOD__ .": unable to update table '". $this->_dbTable ."', DETAILS::: ". $ex->getMessage());
-			}
+			$retval = $this->update();
 		}
 		else {
 			$retval = $this->create($this->_data);
@@ -176,9 +156,6 @@ cs_global::debug_print($params,1);
 			try {
 				$this->id = $this->dbObj->run_insert($sql, $data, $this->_dbSeq);
 			} catch (Exception $e) {
-cs_global::debug_print(__METHOD__ .": SQL::: ". $sql,1);
-cs_global::debug_print($params,1);
-cs_global::debug_print($this,1);
 				throw new ErrorException(__METHOD__ .": error creating record in '". $this->_dbTable ."', DETAILS::: ". $e->getMessage());
 			}
 		}
@@ -187,6 +164,34 @@ cs_global::debug_print($this,1);
 		}
 		
 		return $this->id;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function update() {
+		$updateSql = "";
+		$params = $this->_clean_data_array($this->_data);
+		foreach ($params as $k => $v) {
+			if (count($this->booleanFields) && in_array($k, $this->booleanFields)) {
+				$params[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
+			}
+			$updateSql = cs_global::create_list($updateSql, $k . '=:' . $k, ',');
+		}
+
+		$sql = "UPDATE " . $this->_dbTable . " SET " . $updateSql . " WHERE " . $this->_dbPkey . "=:id";
+
+		$params['id'] = $this->id;
+
+		try {
+			$this->dbObj->run_update($sql, $params);
+			$retval = true;
+		} catch (Exception $ex) {
+			throw new LogicException(__METHOD__ . ": unable to update table '" . $this->_dbTable . "', DETAILS::: " . $ex->getMessage());
+		}
+
+		return $retval;
 	}
 	//==========================================================================
 	
