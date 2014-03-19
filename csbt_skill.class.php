@@ -40,7 +40,7 @@ class csbt_skill extends csbt_data {
 			$retval = $dbObj->farray_fieldnames(self::pkeyField);
 		}
 		catch(Exception $e) {
-			$this->_exception_handler(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
+			throw new ErrorException(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
 	}

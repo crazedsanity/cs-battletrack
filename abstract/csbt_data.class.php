@@ -185,7 +185,7 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function calculate_ability_modifier($score) {
+	public static function calculate_ability_modifier($score) {
 		if(is_numeric($score) && $score > 0) {
 			$modifier = floor(($score -10)/2);
 		}
@@ -193,7 +193,7 @@ class csbt_data {
 			$modifier = null;
 		}
 		else {
-			$this->_exception_handler(__METHOD__ .":: invalid score (". $score .")");
+			throw new ErrorException(__METHOD__ .":: invalid score (". $score .")");
 		}
 		return($modifier);
 	}
@@ -202,13 +202,13 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function calculate_total_save_modifier(array $data) {
+	public static function calculate_total_save_modifier(array $data) {
 		$addThese = array('ability_mod', 'base_mod', 'misc_mod', 'magic_mod', 'temp_mod');
 		if(is_array($data) && count($data) > count($addThese)) {
 			$mod = 0;
 			foreach($addThese as $idx) {
-				if(isset($this->_data[$idx]) && is_numeric($this->_data[$idx])) {
-					$mod += $this->_data[$idx];
+				if(isset($data[$idx]) && is_numeric($data[$idx])) {
+					$mod += $data[$idx];
 				}
 			}
 		}
@@ -222,7 +222,7 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function calculate_skill_modifier(array $data) {
+	public static function calculate_skill_modifier(array $data) {
 		$mod = 0;
 		if(is_array($data) && count($data) > 0) {
 			$bits = array('ability_mod', 'ranks', 'misc_mod');

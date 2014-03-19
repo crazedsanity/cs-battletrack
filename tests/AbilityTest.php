@@ -30,9 +30,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_ability_list() {
-		$x = new csbt_ability();
-		
-		$myCache = $x->get_all_abilities($this->dbObj);
+		$myCache = csbt_ability::get_all_abilities($this->dbObj);
 		
 		$requiredStats = array('str', 'con', 'dex', 'wis', 'int', 'cha');
 		
@@ -101,7 +99,7 @@ class AbilityTest extends testDbAbstract {
 		$this->assertTrue($res > 0);
 		$this->assertEquals(count($abCache), $res, "Failed to create all abilities for character (". count($abCache) ."/". $res.")");
 		
-		$list = $x->get_all_character_abilities($this->dbObj);
+		$list = $x->get_all_character_abilities($this->dbObj, $this->id);
 		$uniq = array();
 		foreach($list as $n=>$data) {
 			$this->assertTrue(isset($data['character_id']));
@@ -138,7 +136,7 @@ class AbilityTest extends testDbAbstract {
 		$this->assertTrue($res > 0);
 		$this->assertEquals(count($abCache), $res, "Failed to create all abilities for character (". count($abCache) ."/". $res.")");
 		
-		$list = $x->get_all_character_abilities($this->dbObj);
+		$list = $x->get_all_character_abilities($this->dbObj, $this->id);
 		$uniq = array();
 		foreach($list as $n=>$data) {
 			$this->assertTrue(isset($data['character_id']));
@@ -167,7 +165,7 @@ class AbilityTest extends testDbAbstract {
 		$x->characterId = $this->id;
 		$x->create_character_defaults($this->dbObj);
 		
-		$allRecords = $x->get_all_character_abilities($this->dbObj);
+		$allRecords = $x->get_all_character_abilities($this->dbObj, $this->id);
 		$this->assertTrue(count($allRecords) > 0);
 		
 		$keys = array_keys($allRecords);
@@ -175,7 +173,7 @@ class AbilityTest extends testDbAbstract {
 		$lastRec = count($allRecords);
 		
 		foreach($allRecords as $ability=>$data) {
-			$this->assertEquals($lastRec, count($x->get_all_character_abilities($this->dbObj)));
+			$this->assertEquals($lastRec, count($x->get_all_character_abilities($this->dbObj, $this->id)));
 			
 			$this->assertTrue(is_string($ability), "ID=(". $ability .")");
 			$this->assertTrue(is_array($data));
@@ -188,7 +186,7 @@ class AbilityTest extends testDbAbstract {
 		
 		$this->assertEquals(0, $lastRec);
 		
-		$allAbilities = $x->get_all_character_abilities($this->dbObj);
+		$allAbilities = $x->get_all_character_abilities($this->dbObj, $this->id);
 		$this->assertEquals(0, count($allAbilities), cs_global::debug_print($allAbilities));
 		$this->assertEquals(array(), $allAbilities);
 	}

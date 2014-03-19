@@ -17,7 +17,7 @@ class csbt_ability extends csbt_data {
 	
 	//==========================================================================
 	public function get_modifier() {
-		return $this->calculate_ability_modifier($this->_data['ability_score']);
+		return self::calculate_ability_modifier($this->_data['ability_score']);
 	}
 	//==========================================================================
 	
@@ -25,14 +25,14 @@ class csbt_ability extends csbt_data {
 	
 	//==========================================================================
 	public function get_temp_modifier() {
-		return $this->calculate_ability_modifier($this->_data['temporary_score']);
+		return self::calculate_ability_modifier($this->_data['temporary_score']);
 	}
 	//==========================================================================
 	
 	
 	
 	//==========================================================================
-	public function get_all_abilities(cs_phpDB $dbObj) {
+	public static function get_all_abilities(cs_phpDB $dbObj) {
 		$sql = "SELECT * FROM csbt_ability_table";
 		
 		try {
@@ -55,13 +55,13 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_all_character_abilities(cs_phpDB $dbObj) {
-		if(!is_null($this->characterId) && $this->characterId > 0) {
+	public static function get_all_character_abilities(cs_phpDB $dbObj, $characterId) {
+		if(!is_null($characterId) && $characterId > 0) {
 
 			$sql = "SELECT ca.*, a.ability_name FROM csbt_character_ability_table "
 					. "AS ca INNER JOIN csbt_ability_table AS a USING (ability_id) "
 					. "WHERE ca.character_id=:id";
-			$params = array('id'=>$this->characterId);
+			$params = array('id'=>$characterId);
 			try {
 				$dbObj->run_query($sql, $params);
 				$data = $dbObj->farray_fieldnames('ability_name');
@@ -72,7 +72,6 @@ class csbt_ability extends csbt_data {
 		else {
 			throw new ErrorException(__METHOD__ .": characterId required");
 		}
-		
 		
 		return $data;
 	}

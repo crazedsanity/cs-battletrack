@@ -4,6 +4,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 	
 	
 	public $autoSkills = array();
+	public $char;
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
@@ -87,7 +88,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		$a = new csbt_ability();
 		$a->characterId = $this->char->characterId;
 		$a->create_character_defaults($this->dbObj);
-		$cache = $a->get_all_character_abilities($this->dbObj);
+		$cache = $a->get_all_character_abilities($this->dbObj, $this->char->id);
 		
 		$createdSkills = array();
 		
@@ -138,7 +139,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		$a = new csbt_ability();
 		$a->characterId = $x->characterId;
 		$a->create_character_defaults($this->dbObj);
-		$cache = $a->get_all_character_abilities($this->dbObj);
+		$cache = $a->get_all_character_abilities($this->dbObj, $this->char->id);
 		
 		$createdSkills = array();
 		foreach($this->autoSkills as $i=>$data) {
@@ -176,7 +177,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		
 		$this->assertEquals(0, count($createdSkills));
 		$this->assertEquals(array(), $createdSkills);
-		$this->assertEquals(array(), $x->get_all_character_skills($this->dbObj));
+		$this->assertEquals(array(), $x->get_all_character_skills($this->dbObj, $this->char->id));
 	}
 	//--------------------------------------------------------------------------
 	
@@ -231,7 +232,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		$a->characterId = $x->characterId;
 		$a->create_character_defaults($this->dbObj);
 		
-		$cache = $a->get_all_character_abilities($this->dbObj);
+		$cache = $a->get_all_character_abilities($this->dbObj, $this->char->id);
 		
 		$createData = array(
 			'character_id'		=> $x->characterId,

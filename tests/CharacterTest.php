@@ -31,8 +31,6 @@ class CharacterTest extends testDbAbstract {
 		
 		$x = new csbt_character($new->characterId, 1, $this->dbObj);
 		
-		$data = $x->data;
-		
 		$this->assertEquals($new->characterId, $x->characterId);
 		$this->assertTrue(is_array($new->data));
 		$this->assertEquals($new->data, $x->data);
