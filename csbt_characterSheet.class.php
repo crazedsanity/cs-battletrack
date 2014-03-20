@@ -180,6 +180,7 @@ class csbt_characterSheet {
 			$weight = csbt_gear::calculate_weight($this->_gear);
 		}
 		
+		//TODO: this accounts for ALL weapons + armor, whether it is_worn/in_use or not; see #41
 		if($includeWornItems === true) {
 			if(is_array($this->_weapons) && count($this->_weapons) > 0) {
 				$weight += csbt_gear::calculate_weight($this->_weapons);
@@ -246,6 +247,89 @@ class csbt_characterSheet {
 		    $autoSkills[] = array("Use Rope",			"dex");
 		}
 		return($autoSkills);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_strength_stats() {
+		if(is_array($this->_abilities) && isset($this->_abilities['str'])) {
+			
+			$maxLoad = $this->get_max_load($this->_abilities['str']['ability_score']);
+			$minLoad = (int)floor($maxLoad /3);
+			$medLoad = (int)floor($minLoad * 2);
+			
+			$stats = array(
+				'light'				=> $minLoad,
+				'medium'			=> $medLoad,
+				'heavy'				=> $maxLoad,
+				'lift_over_head'	=> $maxLoad,
+				'lift_off_ground'	=> (int)floor($maxLoad *2),
+				'push_pull_drag'	=> (int)floor($maxLoad *5),
+			);
+		}
+		else {
+			throw new ErrorException(__METHOD__ .": required stat (str) missing");
+		}
+		
+		return $stats;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public static function get_max_load($strScore) {
+		if(is_numeric($strScore) && $strScore > 0) {
+			//for the most part, the formulas for calculating max load was pulled from http://www.superdan.net/download/mathformulas.rtf
+			// For tremendous strength, clues to the formula were pulled from d20srd.org (http://www.d20srd.org/srd/carryingCapacity.htm) and
+			// from http://www.superdan.net/download/superabilities.rtf
+			
+			$roundingSteps = array(
+				1	=> 5,
+				2	=> 10,
+				3	=> 20,
+				4	=> 40,
+			);
+			
+			$useRoundingStep = ceil(($strScore -10)/5);
+			
+			if(isset($roundingSteps[$useRoundingStep])) {
+				$roundingTo = $roundingSteps[$useRoundingStep];
+			}
+			else {
+				//is this right?  Didn't find anything...
+				$roundingTo = 100;
+			}
+			$firstNum = $strScore -10;
+			$secondNum = pow(1.1487, $firstNum);
+			$almostDone = (int)($secondNum * 100);
+			$retval = round($almostDone/$roundingTo)*$roundingTo;
+			
+			if($strScore <= 10) {
+				$retval = $strScore * 10;
+			}
+			elseif($strScore > 29) {
+				$exp = ($strScore /10)-2;
+				if($exp < 1) {
+					$exp = 1;
+				}
+				$exp = floor($exp);
+				
+				$lastNum = substr($strScore, -1);
+				$useScore = 20 + $lastNum;
+				
+				$multiplyThis = self::get_max_load($useScore);
+				
+				$retval = ($multiplyThis * pow(4, $exp));
+			}
+		}
+		else {
+			throw new InvalidArgumentException(__METHOD__ .": invalid strength score (". $strScore .")");
+		}
+		
+		return $retval;
 	}
 	//==========================================================================
 }
