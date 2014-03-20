@@ -17,8 +17,8 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_all_character_saves(cs_phpDB $dbObj) {
-		if(!is_null($this->characterId) && $this->characterId > 0 && !is_null($this->id) && $this->id > 0) { 
+	public static function get_all_character_saves(cs_phpDB $dbObj, $characterId) {
+		if(!is_null($characterId) && $characterId > 0) { 
 			$sql = "SELECT cs.*, ca.* FROM csbt_character_save_table AS cs 
 					INNER JOIN csbt_character_ability_table AS ca 
 						ON (cs.character_id=ca.character_id 
@@ -28,17 +28,17 @@ class csbt_save extends csbt_data {
 					WHERE 
 						cs.character_id=:id";
 			$params = array(
-				'id' => $this->characterId,
+				'id' => $characterId,
 			);
 			
 			$sql .= " ORDER BY save_name";
 			
 			try {
 				$dbObj->run_query($sql, $params);
-				$retval = $dbObj->farray_fieldnames($this->pkeyField);
+				$retval = $dbObj->farray_fieldnames(self::pkeyField);
 				foreach($retval as $i=>$data) {
-					$data['ability_mod'] = $this->calculate_ability_modifier($data['ability_score']);
-					$data['total_mod'] = $this->calculate_total_save_modifier($data);
+					$data['ability_mod'] = self::calculate_ability_modifier($data['ability_score']);
+					$data['total_mod'] = self::calculate_total_save_modifier($data);
 					$retval[$i] = $data;
 				}
 			} catch (LogicException $le) {
@@ -60,27 +60,32 @@ class csbt_save extends csbt_data {
 	public function create_character_defaults(cs_phpDB $dbObj) {
 		$result = 0;
 		
-		$defaults = array(
-			'fort'		=> 'con',
-			'reflex'	=> 'dex',
-			'will'		=> 'wis',
-		);
-		$x = new csbt_ability();
-		$abilityList = $x->get_all_abilities($dbObj);
-		
-		foreach($defaults as $k=>$v) {
-			if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
-				$createData = array(
-					'character_id'	=> $this->characterId,
-					'save_name'		=> $k,
-					'ability_id'	=> $abilityList[$v]
-				);
-				$this->create($dbObj, $createData);
-				$result++;
+		if(!is_null($this->characterId) && is_numeric($this->characterId) && $this->characterId > 0) {
+			$defaults = array(
+				'fort'		=> 'con',
+				'reflex'	=> 'dex',
+				'will'		=> 'wis',
+			);
+			$x = new csbt_ability();
+			$abilityList = $x->get_all_abilities($dbObj);
+
+			foreach($defaults as $k=>$v) {
+				if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
+					$createData = array(
+						'character_id'	=> $this->characterId,
+						'save_name'		=> $k,
+						'ability_id'	=> $abilityList[$v]
+					);
+					$this->create($dbObj, $createData);
+					$result++;
+				}
+				else {
+					throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
+				}
 			}
-			else {
-				throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
-			}
+		}
+		else {
+			throw new ErrorException(__METHOD__ .": missing characterId (". cs_global::debug_var_dump($this->characterId) .")");
 		}
 		
 		return $result;

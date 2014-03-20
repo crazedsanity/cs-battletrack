@@ -22,7 +22,7 @@ class SavesTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function tearDown() {
-//		parent::tearDown();
+		parent::tearDown();
 	}//end tearDown()
 	//--------------------------------------------------------------------------
 	
@@ -69,7 +69,7 @@ class SavesTest extends testDbAbstract {
 		$y->create_character_defaults($this->dbObj);
 		
 		$numCreated = $x->create_character_defaults($this->dbObj);
-		$list = $x->get_all_character_saves($this->dbObj);
+		$list = $x->get_all_character_saves($this->dbObj, $x->characterId);
 		
 		$this->assertEquals($numCreated, count($list), cs_global::debug_print($list));
 		
@@ -92,7 +92,7 @@ class SavesTest extends testDbAbstract {
 		$y->create_character_defaults($this->dbObj);
 		
 		$numCreated = $x->create_character_defaults($this->dbObj);
-		$list = $x->get_all_character_saves($this->dbObj);
+		$list = $x->get_all_character_saves($this->dbObj, $x->characterId);
 		
 		$this->assertEquals($numCreated, count($list));
 		
@@ -152,12 +152,12 @@ class SavesTest extends testDbAbstract {
 		$this->assertTrue(is_numeric($numCreated));
 		$this->assertTrue($numCreated > 0);
 		
-		$allSaves = $x->get_all_character_saves($this->dbObj);
+		$allSaves = $x->get_all_character_saves($this->dbObj, $x->characterId);
 		$numLeft = count($allSaves);
 		
 		foreach($allSaves as $k=>$data) {
 			
-			$this->assertEquals($numLeft, count($x->get_all_character_saves($this->dbObj)));
+			$this->assertEquals($numLeft, count($x->get_all_character_saves($this->dbObj, $x->characterId)));
 			
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(isset($data['character_save_id']));
@@ -169,7 +169,7 @@ class SavesTest extends testDbAbstract {
 		}
 		
 		$this->assertEquals(0, $numLeft);
-		$this->assertEquals(array(), $x->get_all_character_saves($this->dbObj));
+		$this->assertEquals(array(), $x->get_all_character_saves($this->dbObj, $x->characterId));
 	}
 	//--------------------------------------------------------------------------
 }

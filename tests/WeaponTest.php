@@ -21,7 +21,7 @@ class WeaponTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function tearDown() {
-//		parent::tearDown();
+		parent::tearDown();
 	}//end tearDown()
 	//--------------------------------------------------------------------------
 	

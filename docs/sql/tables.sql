@@ -96,6 +96,9 @@ CREATE TABLE csbt_character_ability_table (
 	ability_score integer NOT NULL DEFAULT 10,
 	temporary_score integer DEFAULT NULL
 );
+ALTER TABLE csbt_character_ability_table ADD CONSTRAINT
+	csbt_character_ability_table_character_id_ability_id_uix
+	UNIQUE (character_id, ability_id);
 
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
@@ -165,6 +168,9 @@ CREATE TABLE csbt_character_save_table (
 	misc_mod integer NOT NULL DEFAULT 0,
 	temp_mod integer NOT NULL DEFAULT 0
 );
+ALTER TABLE csbt_character_save_table ADD CONSTRAINT 
+	csbt_character_save_table_character_id_save_name_uix 
+	UNIQUE (character_id, save_name);
 
 
 CREATE TABLE csbt_map_table (

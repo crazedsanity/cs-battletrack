@@ -13,4 +13,24 @@ class csbt_armor extends csbt_data {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 	}
 	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public static function get_all(cs_phpDB $dbObj, $characterId) {
+		
+		$retval = array();
+		
+		$sql = "SELECT * FROM ". self::tableName ." WHERE character_id=:id";
+		$params = array('id'=>$characterId);
+		
+		$rows = $dbObj->run_query($sql, $params);
+		
+		if($rows > 0) {
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
+		}
+		
+		return $retval;
+	}
+	//==========================================================================
 }
