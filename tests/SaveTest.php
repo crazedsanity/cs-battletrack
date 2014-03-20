@@ -66,10 +66,10 @@ class SavesTest extends testDbAbstract {
 		$y->characterId = $this->id;
 		$x->characterId = $this->id;
 		
-		$y->create_character_defaults($this->dbObj);
+		$y->create_defaults($this->dbObj);
 		
 		$numCreated = $x->create_character_defaults($this->dbObj);
-		$list = $x->get_all_character_saves($this->dbObj, $x->characterId);
+		$list = $x->get_all($this->dbObj, $x->characterId);
 		
 		$this->assertEquals($numCreated, count($list), cs_global::debug_print($list));
 		
@@ -89,10 +89,10 @@ class SavesTest extends testDbAbstract {
 		
 		$y = new csbt_ability();
 		$y->characterId = $this->id;
-		$y->create_character_defaults($this->dbObj);
+		$y->create_defaults($this->dbObj);
 		
 		$numCreated = $x->create_character_defaults($this->dbObj);
-		$list = $x->get_all_character_saves($this->dbObj, $x->characterId);
+		$list = $x->get_all($this->dbObj, $x->characterId);
 		
 		$this->assertEquals($numCreated, count($list));
 		
@@ -146,18 +146,18 @@ class SavesTest extends testDbAbstract {
 		$y = new csbt_ability();
 		$y->characterId = $this->id;
 		
-		$y->create_character_defaults($this->dbObj);
+		$y->create_defaults($this->dbObj);
 		$numCreated = $x->create_character_defaults($this->dbObj);
 		
 		$this->assertTrue(is_numeric($numCreated));
 		$this->assertTrue($numCreated > 0);
 		
-		$allSaves = $x->get_all_character_saves($this->dbObj, $x->characterId);
+		$allSaves = $x->get_all($this->dbObj, $x->characterId);
 		$numLeft = count($allSaves);
 		
 		foreach($allSaves as $k=>$data) {
 			
-			$this->assertEquals($numLeft, count($x->get_all_character_saves($this->dbObj, $x->characterId)));
+			$this->assertEquals($numLeft, count($x->get_all($this->dbObj, $x->characterId)));
 			
 			$this->assertTrue(is_array($data));
 			$this->assertTrue(isset($data['character_save_id']));
@@ -169,7 +169,7 @@ class SavesTest extends testDbAbstract {
 		}
 		
 		$this->assertEquals(0, $numLeft);
-		$this->assertEquals(array(), $x->get_all_character_saves($this->dbObj, $x->characterId));
+		$this->assertEquals(array(), $x->get_all($this->dbObj, $x->characterId));
 	}
 	//--------------------------------------------------------------------------
 }

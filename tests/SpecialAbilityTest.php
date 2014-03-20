@@ -121,7 +121,7 @@ class SpecialAbilityTest extends testDbAbstract {
 			$created[$id] = $data;
 		}
 		
-		$allRecs = $x->get_all($this->dbObj);
+		$allRecs = $x->get_all($this->dbObj, $x->characterId);
 		
 		$this->assertEquals($i, count($allRecs));
 		$this->assertEquals(count($created), count($allRecs));

@@ -79,7 +79,7 @@ class WeaponTest extends testDbAbstract {
 			}
 		}
 		
-		$allWeapons = $x->get_all_character_weapons($this->dbObj);
+		$allWeapons = $x->get_all($this->dbObj, $x->characterId);
 		$this->assertTrue(is_array($allWeapons));
 		$this->assertEquals(count($testData), count($allWeapons), cs_global::debug_print($allWeapons));
 		$this->assertTrue(isset($allWeapons[$id]));
@@ -87,8 +87,8 @@ class WeaponTest extends testDbAbstract {
 		$this->assertEquals($data, $allWeapons[$id]);
 		
 		
-		$testUsedWpns = $x->get_all_character_weapons($this->dbObj, true);
-		$testNotUsedWpns = $x->get_all_character_weapons($this->dbObj, false);
+		$testUsedWpns = $x->get_all($this->dbObj, $x->characterId, true);
+		$testNotUsedWpns = $x->get_all($this->dbObj, $x->characterId, false);
 		
 		$this->assertNotEquals($testNotUsedWpns, $testUsedWpns);
 		
@@ -134,7 +134,7 @@ class WeaponTest extends testDbAbstract {
 			$createdList[$id] = $data;
 		}
 		
-		$allWpns = $x->get_all_character_weapons($this->dbObj);
+		$allWpns = $x->get_all($this->dbObj, $x->characterId);
 		
 		$this->assertTrue(is_array($allWpns));
 		$this->assertEquals(count($createdList), count($allWpns));
@@ -157,7 +157,7 @@ class WeaponTest extends testDbAbstract {
 			$this->assertEquals(1, $x->delete($this->dbObj));
 		}
 		
-		$this->assertEquals(array(), $x->get_all_character_weapons($this->dbObj));
+		$this->assertEquals(array(), $x->get_all($this->dbObj, $x->characterId));
 	}
 	//--------------------------------------------------------------------------
 }

@@ -137,8 +137,7 @@ class csbt_data {
 			$this->_data = $x->load();
 		}
 		else {
-			$boolVal = is_numeric($this->id);
-			throw new ErrorException(__METHOD__ .": required ID not set (". $this->id ." [$boolVal][type=(". gettype($this->id) .")])... ");
+			throw new ErrorException(__METHOD__ .": required ID not set (". $this->id ."[type=(". gettype($this->id) .")])... ");
 		}
 		
 		return $this->_data;

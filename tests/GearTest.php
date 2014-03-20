@@ -204,7 +204,7 @@ class GearTest extends testDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_get_all_character_gear() {
+	public function test_get_all() {
 		$x = new csbt_gear();
 		$x->characterId = $this->id;
 		
@@ -225,7 +225,7 @@ class GearTest extends testDbAbstract {
 		}
 		$this->assertEquals(count($createThis), count($list));
 		
-		$allGear = $x->get_all_character_gear($this->dbObj, $x->characterId);
+		$allGear = $x->get_all($this->dbObj, $x->characterId);
 		
 		$this->assertTrue(is_array($allGear));
 		$this->assertTrue(count($allGear) > 0);
