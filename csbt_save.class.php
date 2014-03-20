@@ -17,7 +17,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_character_saves(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(cs_phpDB $dbObj, $characterId) {
 		if(!is_null($characterId) && $characterId > 0) { 
 			$sql = "SELECT cs.*, ca.* FROM csbt_character_save_table AS cs 
 					INNER JOIN csbt_character_ability_table AS ca 

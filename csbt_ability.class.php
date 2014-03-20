@@ -55,7 +55,7 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_character_abilities(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(cs_phpDB $dbObj, $characterId) {
 		if(!is_null($characterId) && $characterId > 0) {
 
 			$sql = "SELECT ca.*, a.ability_name FROM csbt_character_ability_table "
@@ -80,7 +80,7 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public function create_character_defaults(cs_phpDB $db, $minScore = 6, $maxScore = 18) {
+	public function create_defaults(cs_phpDB $db, $minScore = 6, $maxScore = 18) {
 		$retval = 0;
 		if (!is_null($this->characterId) && $this->characterId > 0) {
 			if (!is_numeric($minScore) || $minScore < 1) {

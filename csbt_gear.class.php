@@ -17,7 +17,7 @@ class csbt_gear extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_character_gear(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(cs_phpDB $dbObj, $characterId) {
 		$sql = "SELECT * FROM " . self::tableName . " WHERE character_id=:id";
 		$params = array('id' => $characterId);
 		

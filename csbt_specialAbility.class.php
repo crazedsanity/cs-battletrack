@@ -17,9 +17,9 @@ class csbt_specialAbility extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_all(cs_phpDb $dbObj) {
+	public static function get_all(cs_phpDb $dbObj, $characterId) {
 		$sql = 'SELECT * FROM '. self::tableName .' WHERE character_id=:id';
-		$params = array('id'=>$this->characterId);
+		$params = array('id'=>$characterId);
 		
 		try {
 			$dbObj->run_query($sql, $params);

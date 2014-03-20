@@ -18,7 +18,7 @@ class csbt_skill extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_all_character_skills(cs_phpDB $dbObj) {
+	public static function get_all(cs_phpDB $dbObj, $characterId) {
 		$sql = 'SELECT 
 					cs.*, a.ability_name, ca.ability_score, 
 					ca.temporary_score 
@@ -32,7 +32,7 @@ class csbt_skill extends csbt_data {
 				ORDER BY cs.skill_name';
 		
 		$params = array(
-			'id'	=> $this->characterId,
+			'id'	=> $characterId,
 		);
 		
 		try {

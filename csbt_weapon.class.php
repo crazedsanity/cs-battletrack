@@ -25,11 +25,11 @@ class csbt_weapon extends csbt_data {
 	 * @return type
 	 * @throws ErrorException
 	 */
-	public function get_all_character_weapons(cs_phpDB $dbObj, $onlyInUse=null) {
+	public static function get_all(cs_phpDB $dbObj, $characterId, $onlyInUse=null) {
 		$sql = 'SELECT * FROM '. self::tableName .' WHERE ';//'character_id=:id';
 		
 		$params = array(
-			'character_id'	=> $this->characterId,
+			'character_id'	=> $characterId,
 		);
 		
 		if(!is_null($onlyInUse) && is_bool($onlyInUse)) {

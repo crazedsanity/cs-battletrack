@@ -48,6 +48,7 @@ class csbt_character extends csbt_data {
 		else {
 			throw new InvalidArgumentException();
 		}
+		$this->id = $this->characterId;
 	}//end __construct()
 	//==========================================================================
 	
@@ -66,7 +67,7 @@ class csbt_character extends csbt_data {
 	public function get_total_weight(cs_phpDB $dbObj) {
 		$weight = 0;
 		
-		$allGear = csbt_gear::get_all_character_gear($dbObj, $this->characterId);
+		$allGear = csbt_gear::get_all($dbObj, $this->characterId);
 		
 		if(is_array($allGear) && count($allGear) > 0) {
 			foreach($allGear as $k=>$data) {

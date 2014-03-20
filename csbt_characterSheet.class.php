@@ -16,7 +16,10 @@ class csbt_characterSheet {
 	protected $_abilities = array();
 	protected $_armor = array();
 	protected $_gear = array();
+	protected $_saves = array();
 	protected $_skills = array();
+	protected $_specialAbilities = array();
+	protected $_weapons = array();
 	
 	//==========================================================================
 	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid, $createOrLoad=true) {
@@ -26,6 +29,7 @@ class csbt_characterSheet {
 		
 		$this->_char = new csbt_character($characterIdOrName, $ownerUid, $this->dbObj);
 		$this->characterId = $this->_char->characterId;
+		$this->id = $this->characterId;
 		
 		
 		if($createOrLoad === true) {
@@ -53,6 +57,31 @@ class csbt_characterSheet {
 			case 'char':
 				$retval = $this->_char;
 				break;
+			
+			case 'abilities':
+				$retval = $this->_abilities;
+				break;
+			
+			case 'armor':
+				$retval = $this->_armor;
+				break;
+			
+			case 'gear':
+				$retval = $this->_gear;
+				break;
+			
+			case 'saves':
+				$retval = $this->_saves;
+				break;
+			
+			case 'weapons':
+				$retval = $this->_weapons;
+				break;
+			
+			case 'specialAbilities':
+			case 'specialabilities':
+				$retval = $this->_specialAbilities;
+				break;
 		}
 		
 		return $retval;
@@ -66,18 +95,12 @@ class csbt_characterSheet {
 		$abilities = new csbt_ability();
 		$abilities->characterId = $this->characterId;
 		
-		$retval = array();
+		$abilities->create_defaults($this->dbObj);
 		
-		$abilities->create_character_defaults($this->dbObj);
-		$this->_abilities = $abilities->get_all_character_abilities($this->dbObj, $this->characterId);
-		
-		$retval['abilities'] = $this->_abilities;
 		
 		$abilityCache = $abilities->get_all_abilities($this->dbObj);
-		
 		$skills = new csbt_skill();
 		$skills->characterId = $this->characterId;
-		
 		foreach($this->get_default_skill_list() as $k=>$v) {
 			$xData = array(
 				'character_id'	=> $this->characterId,
@@ -85,20 +108,13 @@ class csbt_characterSheet {
 				'ability_id'	=> $abilityCache[$v[1]]
 			);
 			$skills->create($this->dbObj, $xData);
-			$data = $skills->load($this->dbObj);
-			$retval['skills'][$skills->id] = $data;
-			$this->_skills[$skills->id] = new csbt_skill($data);
 		}
 		
 		$saves = new csbt_save();
 		$saves->characterId = $this->characterId;
 		$saves->create_character_defaults($this->dbObj);
 		
-		$allCharSaves = $saves->get_all_character_saves($this->dbObj, $this->characterId);
-		$retval['saves'] = $allCharSaves;
-		
-		
-		return $retval;
+		return $this->load();
 	}
 	//==========================================================================
 	
@@ -106,23 +122,39 @@ class csbt_characterSheet {
 	
 	//==========================================================================
 	public function load() {
+		$retval = array();
+		
 		if(is_numeric($this->characterId) && $this->characterId > 0) {
-			$this->_char = new csbt_character($this->dbObj, $this->characterId, $this->ownerUid);
-			$this->_char->load();
+			$this->_char = new csbt_character($this->characterId, $this->ownerUid, $this->dbObj);
+			$this->_char->load($this->dbObj);
 			
-			//TODO: load abilities...
+			$this->_abilities = csbt_ability::get_all($this->dbObj, $this->characterId);
+			$retval['abilities'] = $this->_abilities;
 			
+			$this->_armor = csbt_armor::get_all($this->dbObj, $this->characterId);
+			$retval['armor'] = $this->_armor;
 			
-			//TODO: load armor...
-			//TODO: load gear...
-			//TODO: load saves...
-			//TODO: load skills...
-			//TODO: load special abilities...
+			$this->_gear = csbt_gear::get_all($this->dbObj, $this->characterId);
+			$retval['gear'] = $this->_gear;
+			
+			$this->_saves = csbt_save::get_all($this->dbObj, $this->characterId);
+			$retval['saves'] = $this->_saves;
+			
+			$this->_skills = csbt_skill::get_all($this->dbObj, $this->characterId);
+			$retval['skills'] = $this->_skills;
+			
+			$this->_specialAbilities = csbt_specialAbility::get_all($this->dbObj, $this->characterId);
+			$retval['specialAbilities'] = $this->_specialAbilities;
+			
 			//TODO: load weapons...
+			$this->_weapons = csbt_weapon::get_all($this->dbObj, $this->characterId);
+			$retval['weapons'] = $this->_weapons;
 		}
 		else {
 			throw new ErrorException(__METHOD__ .": invalid character id");
 		}
+		
+		return $retval;
 	}
 	//==========================================================================
 	
