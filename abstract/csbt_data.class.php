@@ -235,5 +235,29 @@ class csbt_data {
 		return($mod);
 	}
 	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public static function calculate_weight(array $itemList) {
+		$totalWeight = 0;
+		if(is_array($itemList) && count($itemList)) {
+			foreach($itemList as $k=>$v) {
+				$qty = 1;
+				if(isset($v['weight']) && is_numeric($v['weight'])) {
+					if(isset($v['quantity']) && is_numeric($v['quantity']) && $v['quantity'] > 0) {
+						$qty = $v['quantity'];
+					}
+					$totalWeight += round(($qty * $v['weight']),1);
+				}
+ 			}
+		}
+		else {
+			throw new InvalidArgumentException(__METHOD__ .": no data to process");
+		}
+		
+		return $totalWeight;
+	}
+	//==========================================================================
 }
 

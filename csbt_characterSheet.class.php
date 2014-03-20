@@ -82,6 +82,12 @@ class csbt_characterSheet {
 			case 'specialabilities':
 				$retval = $this->_specialAbilities;
 				break;
+			
+			case 'character_id':
+			case 'characterid':
+			case 'characterId':
+				$retval = $this->characterId;
+				break;
 		}
 		
 		return $retval;
@@ -170,8 +176,17 @@ class csbt_characterSheet {
 	//==========================================================================
 	public function get_total_weight($includeWornItems=false) {
 		$weight = 0;
-		foreach($this->_gear as $obj) {
-			$weight += $obj->get_total_weight();
+		if(is_array($this->_gear) && count($this->_gear) > 0) {
+			$weight = csbt_gear::calculate_weight($this->_gear);
+		}
+		
+		if($includeWornItems === true) {
+			if(is_array($this->_weapons) && count($this->_weapons) > 0) {
+				$weight += csbt_gear::calculate_weight($this->_weapons);
+			}
+			if(is_array($this->_armor) && count($this->_armor) > 0) {
+				$weight += csbt_gear::calculate_weight($this->_armor);
+			}
 		}
 		
 		return $weight;
