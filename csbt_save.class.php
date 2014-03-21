@@ -23,7 +23,7 @@ class csbt_save extends csbt_data {
 					INNER JOIN csbt_character_ability_table AS ca 
 						ON (cs.character_id=ca.character_id 
 						AND cs.ability_id=ca.ability_id) 
-					INNER JOIN csbt_character_ability_table AS a 
+					INNER JOIN csbt_ability_table AS a 
 						ON (cs.ability_id=a.ability_id) 
 					WHERE 
 						cs.character_id=:id";
