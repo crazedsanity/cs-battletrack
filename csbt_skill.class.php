@@ -38,6 +38,11 @@ class csbt_skill extends csbt_data {
 		try {
 			$dbObj->run_query($sql, $params);
 			$retval = $dbObj->farray_fieldnames(self::pkeyField);
+			
+			foreach($retval as $id=>$data) {
+				$retval[$id]['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
+				$retval[$id]['skill_mod'] = self::calculate_skill_modifier($data);
+			}
 		}
 		catch(Exception $e) {
 			throw new ErrorException(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());

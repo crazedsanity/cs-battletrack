@@ -15,6 +15,3 @@ elseif(isset($_GET['id'])) {
 	$charId = $idObfuscator->decode($_GET['id']);
 }
 
-$playerUid = $_SESSION['auth']['userInfo']['uid'];
-$userChar = new csbt_userCharacterList($page->db, $playerUid);
-?>

@@ -5,6 +5,7 @@
 
 
 
+$userChar = new csbt_userCharacterList($page->db, $playerUid);
 $charData = $userChar->get_character_list();
 
 $page->rip_all_block_rows();

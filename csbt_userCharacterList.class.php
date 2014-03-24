@@ -4,6 +4,7 @@
  */
 
 
+cs_debug_backtrace(1);
 class csbt_userCharacterList extends csbt_tableHandler {
 	
 	private $uid;

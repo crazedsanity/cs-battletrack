@@ -7,10 +7,13 @@ class csbt_armor extends csbt_data {
 	const tableSeq  = 'csbt_character_armor_table_character_armor_id_seq';
 	const pkeyField = 'character_armor_id';
 	
+	const sheetIdPrefix = 'characterArmor';
+	
 	public $booleanFields = array('is_worn');
 	//==========================================================================
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
+		$this->_sheetIdPrefix = self::sheetIdPrefix;
 	}
 	//==========================================================================
 	

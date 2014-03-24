@@ -1,6 +1,5 @@
 <?php
 
-
 class csbt_campaignCharacterList extends csbt_basicRecord {
 	
 	private $campaignId;

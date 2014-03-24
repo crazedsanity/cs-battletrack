@@ -5,6 +5,7 @@ class csbt_data {
 	protected $_dbTable;
 	protected $_dbPkey;
 	protected $_dbSeq;
+	protected $_sheetIdPrefix;
 	
 	protected $_data = array();
 	protected $id;
@@ -257,6 +258,31 @@ class csbt_data {
 		}
 		
 		return $totalWeight;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_sheet_data(cs_phpDb $dbObj, $characterId) {
+		$retval = array();
+		if(!is_null($this->_sheetIdPrefix)) {
+			$myData = $this->get_all($dbObj, $characterId);
+			foreach($myData as $id=>$data) {
+				$tData = array();
+				foreach($data as $k=>$v) {
+					$myId = $this->_sheetIdPrefix .'__'. $k;
+
+					$tData[$myId] = $v;
+				}
+				$retval[$id] = $tData;
+			}
+		}
+		else {
+			throw new LogicException(__METHOD__ .": missing required sheetIdPrefix");
+		}
+		
+		return $retval;
 	}
 	//==========================================================================
 }

@@ -11,6 +11,7 @@ class csbt_characterSheet {
 	public $dbObj;
 	public $gfObj;
 	
+	protected $version;
 	
 	protected $_char = "TeST";
 	protected $_abilities = array();
@@ -22,6 +23,13 @@ class csbt_characterSheet {
 	protected $_weapons = array();
 	
 	//==========================================================================
+	/**
+	 * 
+	 * @param cs_phpDB $db
+	 * @param type $characterIdOrName
+	 * @param type $ownerUid
+	 * @param type $createOrLoad
+	 */
 	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid, $createOrLoad=true) {
 		$this->dbObj = $db;
 		
@@ -40,6 +48,9 @@ class csbt_characterSheet {
 				$this->load();
 			}
 		}
+		
+		$this->version = new cs_version();
+		$this->version->set_version_file_location(dirname(__FILE__) .'/VERSION');
 	}
 	//==========================================================================
 	
@@ -87,6 +98,10 @@ class csbt_characterSheet {
 			case 'characterid':
 			case 'characterId':
 				$retval = $this->characterId;
+				break;
+			
+			case 'character_name':
+				$retval == $this->_char->character_name;
 				break;
 		}
 		
@@ -261,9 +276,9 @@ class csbt_characterSheet {
 			$medLoad = (int)floor($minLoad * 2);
 			
 			$stats = array(
-				'light'				=> $minLoad,
-				'medium'			=> $medLoad,
-				'heavy'				=> $maxLoad,
+				'load_light'		=> $minLoad,
+				'load_medium'		=> $medLoad,
+				'load_heavy'		=> $maxLoad,
 				'lift_over_head'	=> $maxLoad,
 				'lift_off_ground'	=> (int)floor($maxLoad *2),
 				'push_pull_drag'	=> (int)floor($maxLoad *5),
@@ -330,6 +345,339 @@ class csbt_characterSheet {
 		}
 		
 		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function create_sheet_id($prefix, $name) {
+		return $prefix .'__'. $name;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_misc_data() {
+		$retval = array();
+		
+		$mainCharData = $this->_char->data;
+		
+		$cName = "";
+		$cDesc = "";
+		
+		if(is_numeric($this->_char->campaign_id)) {
+			$campaign = new csbt_campaign();
+			$campaign->id = $this->_char->campaign_id;
+			$campaign->load($this->dbObj);
+			
+			$cName = $campaign->campaign_name;
+			$cDesc = $campaign->description;
+		}
+		
+		$retval[$this->create_sheet_id('main', 'campaign_name')] = $cName;
+		$retval[$this->create_sheet_id('main', 'campaign_description')] = $cDesc;
+		
+		$bonus = $this->get_total_ac_bonus('full');
+		$retval[$this->create_sheet_id('main', 'total_ac')] = 10 + $bonus;
+		$retval[$this->create_sheet_id('main', 'total_ac_bonus')] = $bonus;
+		
+		$retval[$this->create_sheet_id('generated', 'ac_touch')] = 10 + $this->get_total_ac_bonus('touch');
+		$retval[$this->create_sheet_id('generated', 'ac_flatfooted')] = 10 + $this->get_total_ac_bonus('flat');
+		
+		$retval[$this->create_sheet_id('main', 'initiative_bonus')] = $this->get_initiative_bonus();
+		$retval[$this->create_sheet_id('main', 'melee_total')] = $this->get_attack_bonus('melee');
+		$retval[$this->create_sheet_id('main', 'ranged_total')] = $this->get_attack_bonus('ranged');
+		$retval[$this->create_sheet_id('main', 'skills_max_cc')] = floor($mainCharData['skills_max'] / 2);
+		
+		$retval[$this->create_sheet_id('generated', 'campaign_name')] = $cName;
+		$retval[$this->create_sheet_id('generated', 'campaign_description')] = $cDesc;
+		
+		
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_attack_bonus($type='melee') {
+		$atkBonus = 0;
+		
+		if($type == 'melee' || $type == 'ranged') {
+			$data = $this->_char->data;
+			$addThese = array($type .'_misc', $type .'_size', $type .'_temp', 'base_attack_bonus');
+//cs_global::debug_print(__METHOD__ .": data::: ". cs_global::debug_print($data,0),1);
+			
+			foreach($addThese as $colName) {
+				if(isset($data[$colName]) && is_numeric($data[$colName])) {
+					$atkBonus += $data[$colName];
+//cs_global::debug_print(__METHOD__ .": type=(". $type ."), added ". $colName ." (". $data[$colName] ."), current=(". $atkBonus .")",1);
+				}
+				else {
+					throw new ErrorException(__METHOD__ .": cannot calculate attack bonus for ". $type ." without ". $colName);
+				}
+			}
+			
+			$abilityName = 'str';
+			if ($type == 'ranged') {
+				$abilityName = 'dex';
+			}
+			$atkBonus += csbt_ability::calculate_ability_modifier($this->_abilities[$abilityName]['ability_score']);
+		}
+		else {
+			throw new ErrorException(__METHOD__ .": invalid type (". $type .")");
+		}
+		
+		return $atkBonus;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_initiative_bonus() {
+		$c = $this->_char->data;
+		$bonus = 0;
+		
+		$bonus += $c['initiative_misc'];
+		$bonus += csbt_ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
+		
+		return $bonus;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_total_ac_bonus($type=null) {
+		$totalAc = 0;
+		
+		if(is_array($this->_armor)) {
+			foreach($this->_armor as $v) {
+				$totalAc += $v['ac_bonus'];
+			}
+		}
+		
+		$c = $this->_char->data;
+		if(!is_null($type)) {
+			if(is_numeric($c['ac_size'])) {
+				$totalAc += $c['ac_size'];
+			}
+			
+			if(is_numeric($c['ac_misc'])) {
+				$totalAc += $c['ac_misc'];
+			}
+			
+			if(is_numeric($c['ac_natural']) || preg_match('/^flat/i', $type)) {
+				$totalAc += $c['ac_natural'];
+			}
+			
+			if(is_null($type) || !preg_match('/^flat/i', $type)) {
+				$totalAc += csbt_ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
+			}
+		}
+		
+		return $totalAc;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_sheet_data() {
+		//NOTE: there's a lot of unset() and renames that are present simply for comparing old functionality to new.
+		
+		if(!is_array($this->_abilities)) {
+			$this->load();
+		}
+		
+		$retval = array();
+		
+		foreach($this->_char->data as $idx=>$v) {
+			$sheetId = $this->create_sheet_id('main', $idx);
+			$retval[$sheetId] = $v;
+		}
+		
+		$retval = array_merge($retval, $this->get_misc_data());
+		
+		
+		// Skills...
+		{
+			$retval['skills'] = array();
+			$mySkills = csbt_skill::get_all($this->dbObj, $this->characterId);
+			foreach($mySkills as $id=>$data) {
+				$data['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
+				$addSkills = array();
+
+				$addSkills[$this->create_sheet_id('skills', 'is_class_skill_checked')] = $data['is_class_skill'];
+				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = $data['is_class_skill'];
+
+
+				unset($data['character_skill_id'], $data['ability_id'], $data['character_id'], $data['ability_score']);
+
+				foreach($data as $k=>$v) {
+					$addSkills[$this->create_sheet_id('skills', $k)] = $v;
+				}
+				ksort($addSkills);
+
+				$retval['skills'][$id] = $addSkills;
+			}
+		}
+		
+		// Saves...
+		{
+			$allSaves = csbt_save::get_all($this->dbObj, $this->characterId);
+			$retval['saves'] = array();
+			foreach($allSaves as $id=>$data) {
+				$mySaves = array();
+
+
+				unset(
+						$data['ability_id'], $data['character_ability_id'], 
+						$data['ability_id'], $data['character_id'],
+						$data['character_save_id'], $data['temporary_score']
+				);
+
+				$data['total'] = $data['total_mod'];
+				unset($data['total_mod']);
+
+				foreach($data as $k=>$v) {
+					$mySaves[$this->create_sheet_id('saves', $k)] = $v;
+				}
+				$displayName = strtoupper($data['save_name']);
+				if($displayName == 'FORT') {
+					$displayName = 'FORTITUDE';
+				}
+				$mySaves[$this->create_sheet_id('saves', 'display_name')] = $displayName;
+				ksort($mySaves);
+
+				$retval['saves'][$id] = $mySaves;
+			}
+		}
+		
+		// abilities...
+		{
+			foreach($this->_abilities as $k=>$v) {
+				$prefix = $this->create_sheet_id('characterAbility', $k);
+				foreach($v as $x=>$y) {
+					switch($x) {
+						case 'ability_score':
+							$retval[$prefix .'_score'] = $y;
+							$retval[$prefix .'_modifier'] = csbt_ability::calculate_ability_modifier($y);
+							break;
+
+						case 'temporary_score':
+							$retval[$prefix .'_temp'] = $y;
+							$retval[$prefix .'_temp_mod'] = csbt_ability::calculate_ability_modifier($y);
+							break;
+
+					}
+				}
+			}
+		}
+		
+		$armor = new csbt_armor;
+		$retval['characterArmor'] = $armor->get_sheet_data($this->dbObj, $this->characterId);
+		
+		$wpn = new csbt_weapon;
+		$retval['characterWeapon'] = $wpn->get_sheet_data($this->dbObj, $this->characterId);
+		
+		
+		foreach($this->get_strength_stats() as $k=>$v) {
+			$retval[$this->create_sheet_id('generated', $k)] = $v;
+		}
+		
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function build_sheet(cs_genericPage $page) {
+		$data = $this->get_sheet_data();
+		
+		$blockRows = $page->rip_all_block_rows('content');
+		$parsedSlots = array();
+		
+		foreach($page->templateRows as $n=>$garbage) {
+			if(preg_match('/slot/i', $n)) {
+				$parsedSlots[$n] = 0;
+			}
+		}
+		
+		$abilityList = csbt_ability::get_all_abilities($this->dbObj);
+		
+		foreach($data as $name=>$val) {
+			if(is_array($val)) {
+				$blockRowName = $name . 'Slot';
+				if($name == 'saves') {
+					// changed name of the saves row so it doesn't get an extra row automatically...
+					$blockRowName = 'characterSaveRow';
+				}
+				if(!isset($page->templateRows[$blockRowName])) {
+					throw new ErrorException(__METHOD__ .": failed to parse data for (". $name ."), missing block row '". $blockRowName ."'");
+				}
+				
+				$parsedRows = '';
+				$rowsParsed = 0;
+				
+				foreach($val as $id=>$subArray) {
+					if(is_array($subArray)) {
+						if($name == 'skills') {
+							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, $id, $subArray['skills__ability_name']);
+						}
+						
+						$myBlockRow = $page->templateRows[$blockRowName];
+						
+						$subArray[$name .'_id'] = $id;
+						
+						$parsedRows .= cs_global::mini_parser($myBlockRow, $subArray, '{', '}');
+						$rowsParsed++;
+						$parsedSlots[$blockRowName] = $rowsParsed;
+					}
+					else {
+						$page->add_template_var($id, $subArray);
+					}
+				}
+				if($rowsParsed > 0) {
+					$page->add_template_var($blockRowName, $parsedRows);
+				}
+			}
+			else {
+				$page->add_template_var($name, $val);
+			}
+		}
+		
+		$page->add_template_var('CSBT_project_name', $this->version->get_project());
+		$page->add_template_var('CSBT_version', $this->version->get_version());
+	}
+	//==========================================================================
+	
+	
+	//==========================================================================
+	private function create_ability_select(cs_genericPage $page, array $abilityList, $skillId = null, $selectThis = null) {
+		$abilityOptionList = cs_global::array_as_option_list($abilityList, $selectThis);
+		if (is_null($skillId)) {
+			$skillId = 'new';
+		}
+		$optionListRepArr = array(
+			'skills__selectAbility__extra' => '',
+			'skill_id' => $skillId,
+			'optionList' => $abilityOptionList
+		);
+		
+		if (is_numeric($skillId)) {
+			
+		} else {
+			$optionListRepArr['skills__selectAbility__extra'] = 'class="newRecord"';
+			$optionListRepArr['skillNum'] = 'new';
+			$optionListRepArr['skill_id'] = 'new';
+		}
+		$retval = cs_global::mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
+		return($retval);
 	}
 	//==========================================================================
 }
