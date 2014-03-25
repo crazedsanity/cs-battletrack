@@ -27,7 +27,7 @@ class csbt_character extends csbt_data {
 	 * @param cs_phpDB $dbObj
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($characterIdOrName, $ownerUid, cs_phpDB $dbObj=null) {
+	public function __construct($characterIdOrName, $ownerUid=null, cs_phpDB $dbObj=null) {
 		parent::__construct(null, self::tableName, self::seqName, self::pkeyField);
 		$this->ownerUid = $ownerUid;
 		

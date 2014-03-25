@@ -11,7 +11,6 @@ $charData = $userChar->get_character_list();
 $page->rip_all_block_rows();
 $outerTemplate = 'campaignListing';
 $rowName = 'characterList';
-$idObfuscator = new cs_idObfuscator();
 if(isset($page->templateRows[$rowName])) {
 	if(is_array($charData)) {
 		

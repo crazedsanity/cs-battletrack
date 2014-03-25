@@ -2,27 +2,12 @@
 
 class csbt_characterSearch extends csbt_character {
 	
-	protected $characterId;
-	
-	protected $dbObj;
-	
-	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $uid=null) {
-		$this->dbObj = $dbObj;
-		
-		#$this->logger->logCategory = "Character Search";
-		
-		$this->uid = $uid;
-		
-		$this->gfObj = new cs_globalFunctions();
-		
-	}//end __construct()
-	//-------------------------------------------------------------------------
+	public $characterId;
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public function search(array $criteria) {
+	public static function search(cs_phpDb $dbObj, array $criteria) {
 		if(is_array($criteria) && count($criteria)) {
 			$retval = array();
 			
@@ -52,10 +37,10 @@ class csbt_characterSearch extends csbt_character {
 			}
 //			if(!isset($criteria['campaign']))
 			try {
-				$numRows = $this->dbObj->run_query($sql, $criteria);
+				$numRows = $dbObj->run_query($sql, $criteria);
 
 				if($numRows > 0) {
-					$retval = $this->dbObj->farray_fieldnames(csbt_character::pkeyField);
+					$retval = $dbObj->farray_fieldnames(csbt_character::pkeyField);
 				}
 			}
 			catch(Exception $e) {

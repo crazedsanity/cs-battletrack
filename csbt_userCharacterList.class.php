@@ -4,16 +4,9 @@
  */
 
 
-cs_debug_backtrace(1);
-class csbt_userCharacterList extends csbt_tableHandler {
+class csbt_userCharacterList extends csbt_basicRecord {
 	
 	private $uid;
-	
-	
-	protected $cleanStringArr = array(
-			'uid'					=> 'int',
-			'character_name'		=> 'sql'
-		);
 	
 	const tableName= 'csbt_character_table';
 	const seqName =  'csbt_character_table_character_id_seq';
@@ -22,7 +15,7 @@ class csbt_userCharacterList extends csbt_tableHandler {
 	//-------------------------------------------------------------------------
 	public function __construct(cs_phpDB $dbObj, $uid) {
 		$this->dbObj = $dbObj;
-		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField, $this->cleanStringArr, null);
+		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField);
 		
 		if(is_numeric($uid) && $uid > 0) {
 			$this->uid = $uid;
@@ -32,14 +25,6 @@ class csbt_userCharacterList extends csbt_tableHandler {
 		}
 		
 	}//end __construct()
-	//-------------------------------------------------------------------------
-	
-	
-	
-	//-------------------------------------------------------------------------
-	public function __get($internalVar) {
-		return($this->$internalVar);
-	}//end __get()
 	//-------------------------------------------------------------------------
 	
 	

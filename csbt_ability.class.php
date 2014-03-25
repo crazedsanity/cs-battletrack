@@ -7,9 +7,12 @@ class csbt_ability extends csbt_data {
 	const tableSeq  = 'csbt_character_ability_table_character_ability_id_seq';
 	const pkeyField = 'character_ability_id';
 	
+	const sheetIdPrefix = 'characterAbility';
+	
 	//==========================================================================
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
+		$this->_sheetIdPrefix = self::sheetIdPrefix;
 	}
 	//==========================================================================
 	

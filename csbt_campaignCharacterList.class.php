@@ -37,17 +37,17 @@ class csbt_campaignCharacterList extends csbt_basicRecord {
 	
 	
 	//-------------------------------------------------------------------------
-	public function get_character_list() {
+	public static function get_character_list(cs_phpDb $dbObj, $campaignId) {
 		$characterList = array();
 		try {
 //			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
 			
-			$sql = "SELECT character_id FROM csbt_character_table WHERE campaign_id=:id";
+			$sql = "SELECT * FROM csbt_character_table WHERE campaign_id=:id";
 			
-			$numrows = $this->dbObj->run_query($sql, array('id'=>$this->campaignId));
+			$numrows = $dbObj->run_query($sql, array('id'=>$campaignId));
 			
 			if($numrows > 0) {
-				$characterList = $this->dbObj->farray_fieldnames('character_id');
+				$characterList = $dbObj->farray_fieldnames('character_id');
 			}
 		}
 		catch(exception $e) {

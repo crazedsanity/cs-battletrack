@@ -30,7 +30,7 @@ class csbt_characterSheet {
 	 * @param type $ownerUid
 	 * @param type $createOrLoad
 	 */
-	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid, $createOrLoad=true) {
+	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid=null, $createOrLoad=true) {
 		$this->dbObj = $db;
 		
 		$this->ownerUid = $ownerUid;
@@ -101,7 +101,7 @@ class csbt_characterSheet {
 				break;
 			
 			case 'character_name':
-				$retval == $this->_char->character_name;
+				$retval = $this->_char->character_name;
 				break;
 		}
 		
@@ -192,16 +192,16 @@ class csbt_characterSheet {
 	public function get_total_weight($includeWornItems=false) {
 		$weight = 0;
 		if(is_array($this->_gear) && count($this->_gear) > 0) {
-			$weight = csbt_gear::calculate_weight($this->_gear);
+			$weight = csbt_gear::calculate_list_weight($this->_gear);
 		}
 		
 		//TODO: this accounts for ALL weapons + armor, whether it is_worn/in_use or not; see #41
 		if($includeWornItems === true) {
 			if(is_array($this->_weapons) && count($this->_weapons) > 0) {
-				$weight += csbt_gear::calculate_weight($this->_weapons);
+				$weight += csbt_gear::calculate_list_weight($this->_weapons);
 			}
 			if(is_array($this->_armor) && count($this->_armor) > 0) {
-				$weight += csbt_gear::calculate_weight($this->_armor);
+				$weight += csbt_gear::calculate_list_weight($this->_armor);
 			}
 		}
 		
@@ -379,9 +379,8 @@ class csbt_characterSheet {
 		$retval[$this->create_sheet_id('main', 'campaign_name')] = $cName;
 		$retval[$this->create_sheet_id('main', 'campaign_description')] = $cDesc;
 		
-		$bonus = $this->get_total_ac_bonus('full');
-		$retval[$this->create_sheet_id('main', 'total_ac')] = 10 + $bonus;
-		$retval[$this->create_sheet_id('main', 'total_ac_bonus')] = $bonus;
+		$retval[$this->create_sheet_id('main', 'total_ac')] = 10 + $this->get_total_ac_bonus('full');
+		$retval[$this->create_sheet_id('main', 'total_ac_bonus')] = $this->get_total_ac_bonus(null);
 		
 		$retval[$this->create_sheet_id('generated', 'ac_touch')] = 10 + $this->get_total_ac_bonus('touch');
 		$retval[$this->create_sheet_id('generated', 'ac_flatfooted')] = 10 + $this->get_total_ac_bonus('flat');
@@ -582,7 +581,15 @@ class csbt_characterSheet {
 		$retval['characterArmor'] = $armor->get_sheet_data($this->dbObj, $this->characterId);
 		
 		$wpn = new csbt_weapon;
-		$retval['characterWeapon'] = $wpn->get_sheet_data($this->dbObj, $this->characterId);
+		$retval[$wpn::sheetIdPrefix] = $wpn->get_sheet_data($this->dbObj, $this->characterId);
+		
+		$specialAbilities = new csbt_specialAbility();
+		$retval[$specialAbilities::sheetIdPrefix] = $specialAbilities->get_sheet_data($this->dbObj, $this->characterId);
+		
+		$gear = new csbt_gear();
+		$retval[$gear::sheetIdPrefix] = $gear->get_sheet_data($this->dbObj, $this->characterId);
+		
+		$retval[$gear::sheetIdPrefix .'__total_weight__generated'] = csbt_gear::calculate_list_weight($gear->get_all($this->dbObj, $this->characterId));
 		
 		
 		foreach($this->get_strength_stats() as $k=>$v) {
@@ -678,6 +685,45 @@ class csbt_characterSheet {
 		}
 		$retval = cs_global::mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
 		return($retval);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function handle_update($name, $value) {
+		
+		//TODO: the $name should really be in the form of sheetIdPrefix__field_name__ID (where ID is optional & depends on context)
+//cs_global::debug_print(__METHOD__ .": arguments::: ". cs_global::debug_print(func_get_args(),0),1);
+//exit;
+		$bits = preg_split('/__/', $name);
+		$prefix = $bits[0];
+		$realName = $bits[1];
+		switch($prefix) {
+			case csbt_ability::sheetIdPrefix:
+				
+				$allAbilities = csbt_ability::get_all($this->dbObj, $this->characterId);
+				
+				$updateBits = preg_split('/_/', $realName);
+				$ability = $updateBits[1];
+				
+				if(isset($allAbilities[$ability])) {
+					
+					$obj = new csbt_ability($allAbilities[$ability]);
+					
+					
+//					$obj->id = $this->characterId;
+//					$obj->update($realName, $value);
+//					$obj->save($this->dbObj);
+					
+				}
+				
+				break;
+			
+			default:
+				throw new InvalidArgumentException(__METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")");
+		}
+		
 	}
 	//==========================================================================
 }

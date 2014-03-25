@@ -34,7 +34,7 @@ if(count($sectionArr) >= 5) {
 		case "addPlayer":
 			$tCharId = $sectionArr[5];
 				$charObj = new csbt_characterSheet($page->db, $tCharId, $_SESSION['uid']);
-				$sheetData = $charObj->get_sheet_data();
+				$sheetData = $charObj->load($page->db);
 				if(isset($sheetData['campaign_id']) && !is_numeric($sheetData['campaign_id'])) {
 					$cObj = new csbt_campaign();
 				}
@@ -44,12 +44,12 @@ if(count($sectionArr) >= 5) {
 			break;
 			
 		case "charSearch":
-			$searchObj = new csbt_characterSearch($page->db);
+//			$searchObj = new csbt_characterSearch($page->db);
 			try {
 				$searchCrit = array(
 					'character_name'	=> $_GET['term']
 				);
-				$res = $searchObj->search($searchCrit);
+				$res = csbt_characterSearch::search($page->db, $searchCrit); //$searchObj->search($searchCrit);
 				if(is_array($res) && count($res)) {
 					$xmlData = array();
 					foreach($res as $id=>$cData) {

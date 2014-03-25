@@ -93,7 +93,7 @@ class CharacterSheetTest extends testDbAbstract {
 			$itemList[$id] = $xData;
 		}
 		
-		$this->assertEquals($manualWeight, csbt_gear::calculate_weight($itemList));
+		$this->assertEquals($manualWeight, csbt_gear::calculate_list_weight($itemList));
 		
 		//now, at first, this should be 0 because we haven't re-loaded the sheet.
 		$this->assertEquals(0, $x->get_total_weight(false));

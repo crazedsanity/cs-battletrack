@@ -129,12 +129,17 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function load(cs_phpDB $db) {
-		if(is_numeric($this->id)) {
+	public function load(cs_phpDB $db, $id=null) {
+		if(is_numeric($this->id) || is_numeric($id)) {
 			//__construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array())
 			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
 			$x->booleanFields = $this->booleanFields;
-			$x->id = $this->id;
+			if(!is_null($id) && is_numeric($id)) {
+				$x->id = $id;
+			}
+			else {
+				$x->id = $this->id;
+			}
 			$this->_data = $x->load();
 		}
 		else {
@@ -240,21 +245,30 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public static function calculate_weight(array $itemList) {
+	public static function calculate_list_weight($itemList) {
 		$totalWeight = 0;
 		if(is_array($itemList) && count($itemList)) {
 			foreach($itemList as $k=>$v) {
-				$qty = 1;
-				if(isset($v['weight']) && is_numeric($v['weight'])) {
-					if(isset($v['quantity']) && is_numeric($v['quantity']) && $v['quantity'] > 0) {
-						$qty = $v['quantity'];
-					}
-					$totalWeight += round(($qty * $v['weight']),1);
-				}
+				$totalWeight += self::calculate_weight($v);
  			}
 		}
-		else {
-			throw new InvalidArgumentException(__METHOD__ .": no data to process");
+		
+		return $totalWeight;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public static function calculate_weight(array $itemData) {
+		$totalWeight = 0;
+		
+		$qty = 1;
+		if (isset($itemData['weight']) && is_numeric($itemData['weight'])) {
+			if (isset($itemData['quantity']) && is_numeric($itemData['quantity']) && $itemData['quantity'] > 0) {
+				$qty = $itemData['quantity'];
+			}
+			$totalWeight += round(($qty * $itemData['weight']), 1);
 		}
 		
 		return $totalWeight;
@@ -268,20 +282,36 @@ class csbt_data {
 		$retval = array();
 		if(!is_null($this->_sheetIdPrefix)) {
 			$myData = $this->get_all($dbObj, $characterId);
-			foreach($myData as $id=>$data) {
-				$tData = array();
-				foreach($data as $k=>$v) {
-					$myId = $this->_sheetIdPrefix .'__'. $k;
-
-					$tData[$myId] = $v;
-				}
-				$retval[$id] = $tData;
-			}
+			$retval = $this->_get_sheet_data($myData);
 		}
 		else {
 			throw new LogicException(__METHOD__ .": missing required sheetIdPrefix");
 		}
 		
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	/**
+	 * Allows for pre-processing of data.
+	 * 
+	 * @param array $myData		see self::get_all()
+	 * @return type
+	 */
+	protected function _get_sheet_data(array $myData) {
+		$retval = array();
+		foreach ($myData as $id => $data) {
+			$tData = array();
+			foreach ($data as $k => $v) {
+				$myId = $this->_sheetIdPrefix . '__' . $k;
+
+				$tData[$myId] = $v;
+			}
+			$retval[$id] = $tData;
+		}
 		return $retval;
 	}
 	//==========================================================================

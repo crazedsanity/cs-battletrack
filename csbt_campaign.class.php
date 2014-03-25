@@ -12,5 +12,55 @@ class csbt_campaign extends csbt_data	 {
 	}
 	//==========================================================================
 	
+	
+	
+	//==========================================================================
+	public static function get_all(cs_phpDb $dbObj, $ownerUid) {
+		$retval = array();
+		
+		$sql = "SELECT * FROM ". self::tableName ." WHERE owner_uid=:id ORDER BY campaign_name";
+		$params = array('id'=>$ownerUid);
+		
+		$rows = $dbObj->run_query($sql, $params);
+		
+		if($rows > 0) {
+			$retval = $dbObj->farray_fieldnames(self::pkeyField);
+			
+			//
+			foreach(array_keys($retval) as $id) {
+				$retval[$id]['playerList'] = csbt_campaignCharacterList::get_character_list($dbObj, $id);
+			}
+		}
+		
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_player_data($campaignId) {
+		$obj = new csbt_campaignCharacterList();
+		
+		return $obj->get_character_list();
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public static function add_player(cs_phpDb $dbObj, $campaignId, $playerId) {
+		
+		if(is_numeric($campaignId) && is_numeric($playerId)) {
+			$playerObj = new csbt_character($playerId);
+
+			$playerObj->update('campaign_id', $campaignId);
+			$playerObj->save($dbObj);
+		}
+		else {
+			throw new ErrorException(__METHOD__ .": invalid campaign ID");
+		}
+	}
+	//==========================================================================
 }
 
