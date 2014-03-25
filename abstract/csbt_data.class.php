@@ -135,11 +135,9 @@ class csbt_data {
 			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
 			$x->booleanFields = $this->booleanFields;
 			if(!is_null($id) && is_numeric($id)) {
-				$x->id = $id;
+				$this->id = $id;
 			}
-			else {
-				$x->id = $this->id;
-			}
+			$x->id = $this->id;
 			$this->_data = $x->load();
 		}
 		else {

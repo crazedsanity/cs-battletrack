@@ -14,7 +14,12 @@
             <tr class="slot {addClassName}">
               <td><input class="left nameField freestyle {addClassName}" title="Armor (or protective item)'s name" id="characterArmor__armor_name__{characterArmor_id}" value="{characterArmor__armor_name}"></td>
               <td><input title="Type of armor (light, medium, heavy)" id="characterArmor__armor_type__{characterArmor_id}" class="freestyle" value="{characterArmor__armor_type}"></td>
-              <td><input title="AC Bonus" id="characterArmor__ac_bonus__{characterArmor_id}" value="{characterArmor__ac_bonus}"></td>
+              <td>
+				  <input title="AC Bonus" 
+						 id="characterArmor__ac_bonus__{characterArmor_id}" 
+						 value="{characterArmor__ac_bonus}"
+						 class="main__total_ac_bonus">
+			  </td>
               <td><input title="Armor check penalty" id="characterArmor__check_penalty__{characterArmor_id}" value="{characterArmor__check_penalty}"></td>
               <td><input title="Maximum dexterity bonus" id="characterArmor__max_dex__{characterArmor_id}" value="{characterArmor__max_dex}"></td>
             </tr>

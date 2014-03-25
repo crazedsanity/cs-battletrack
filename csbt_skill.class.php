@@ -6,6 +6,7 @@ class csbt_skill extends csbt_data {
 	const tableName = 'csbt_character_skill_table';
 	const tableSeq  = 'csbt_character_skill_table_character_skill_id_seq';
 	const pkeyField = 'character_skill_id';
+	const sheetIdPrefix = 'skills';
 	
 	public $booleanFields = array('is_class_skill');
 	
@@ -18,7 +19,7 @@ class csbt_skill extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(cs_phpDB $dbObj, $characterId, $basedOnAbilityId=null) {
 		$sql = 'SELECT 
 					cs.*, a.ability_name, ca.ability_score, 
 					ca.temporary_score 
@@ -28,12 +29,17 @@ class csbt_skill extends csbt_data {
 					INNER JOIN csbt_character_ability_table AS ca 
 						ON (cs.character_id=ca.character_id AND a.ability_id=ca.ability_id) 
 				WHERE 
-					cs.character_id=:id
-				ORDER BY cs.skill_name';
+					cs.character_id=:id';
 		
 		$params = array(
 			'id'	=> $characterId,
 		);
+		if(!is_null($basedOnAbilityId) && is_numeric($basedOnAbilityId)) {
+			$sql .= ' AND cs.ability_id=:aid ';
+			$params['aid'] = $basedOnAbilityId;
+		}
+		
+		$sql .= ' ORDER BY cs.skill_name';
 		
 		try {
 			$dbObj->run_query($sql, $params);
@@ -41,7 +47,7 @@ class csbt_skill extends csbt_data {
 			
 			foreach($retval as $id=>$data) {
 				$retval[$id]['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
-				$retval[$id]['skill_mod'] = self::calculate_skill_modifier($data);
+				$retval[$id]['skill_mod'] = self::calculate_skill_modifier($retval[$id]);
 			}
 		}
 		catch(Exception $e) {

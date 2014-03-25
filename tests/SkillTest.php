@@ -21,6 +21,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		
 		
 		// list of default skills...
+		$this->autoSkills = array();
 		{
 		    $this->autoSkills[] = array("Appraise",			"int");
 		    $this->autoSkills[] = array("Balance",			"dex");
@@ -256,6 +257,66 @@ class testOfCSBattleTrack extends testDbAbstract {
 			$this->assertEquals($v, $myData[$k], "Value mismatch for key '". $k ."'... (". $v ." != ". $myData[$k] .")");
 		}
 		$this->assertTrue(is_bool($myData['is_class_skill']));
+	}
+	//--------------------------------------------------------------------------
+	
+	
+	
+	//--------------------------------------------------------------------------
+	public function test_get_all() {
+		$x = new csbt_skill();
+		$x->characterId = $this->char->characterId;
+		
+		$a = new csbt_ability();
+		$a->characterId = $this->char->characterId;
+		$a->create_defaults($this->dbObj);
+		
+		$cache = $a->get_all($this->dbObj, $this->char->id);
+		
+		$byAbility = array(
+			'str'	=> array(),
+			'con'	=> array(),
+			'dex'	=> array(),
+			'int'	=> array(),
+			'wis'	=> array(),
+			'cha'	=> array()
+		);
+		
+		$this->assertEquals(6, count($byAbility));
+		
+		foreach($this->autoSkills as $k=>$theData) {
+			$name = $theData[0];
+			$ability = $theData[1];
+			$insertData = array(
+				'character_id'	=> $x->characterId,
+				'ability_id'	=> $cache[$ability]['ability_id'],
+				'skill_name'	=> $name,
+			);
+			$id = $x->create($this->dbObj, $insertData);
+			
+			$this->assertTrue(isset($byAbility[$ability]));
+			$this->assertFalse(isset($byAbility[$ability][$id]));
+			
+			$byAbility[$ability][$id] = $insertData;
+		}
+		
+		$this->assertEquals(6, count($byAbility));
+		
+		foreach($byAbility as $ability=>$data) {
+			
+			$aId = $cache[$ability]['ability_id'];
+			$testData = $x->get_all($this->dbObj, $x->characterId, $aId);
+			
+			$this->assertTrue(is_array($testData));
+			
+			foreach($testData as $k=>$v) {
+				$this->assertTrue(is_array($v));
+				$this->assertTrue(isset($v['ability_id']));
+				$this->assertEquals($aId, $v['ability_id']);
+			}
+			$this->assertEquals(count($data), count($testData), "getting skills based on ability id (". $ability ."/". $aId .") failed...");
+			
+		}
 	}
 	//--------------------------------------------------------------------------
 }

@@ -68,7 +68,6 @@ function markUpdatedInput(object, newVal, forceChange) {
 			$(object).text(newVal);
 		}
 		else {
-				console.log("SETTING xxvalue in ("+ myId +")... ");
 			$(object).val(newVal);
 		}
 		$(object).data("last_value", newVal);

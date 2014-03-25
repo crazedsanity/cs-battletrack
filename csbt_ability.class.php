@@ -35,14 +35,19 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_abilities(cs_phpDB $dbObj) {
+	public static function get_all_abilities(cs_phpDB $dbObj, $byId=false) {
 		$sql = "SELECT * FROM csbt_ability_table";
 		
 		try {
 			$numrows = $dbObj->run_query($sql);
 			
 			if($numrows > 0) {
-				$data = $dbObj->farray_nvp('ability_name', 'ability_id');
+				if($byId) {
+					$data = $dbObj->farray_nvp('ability_id', 'ability_name');
+				}
+				else {
+					$data = $dbObj->farray_nvp('ability_name', 'ability_id');
+				}
 			}
 			else {
 				throw new LogicException(__METHOD__ .": no data available");
@@ -61,9 +66,11 @@ class csbt_ability extends csbt_data {
 	public static function get_all(cs_phpDB $dbObj, $characterId) {
 		if(!is_null($characterId) && $characterId > 0) {
 
-			$sql = "SELECT ca.*, a.ability_name FROM csbt_character_ability_table "
+			$sql = "SELECT ca.*, a.ability_name, a.display_name "
+					. "FROM csbt_character_ability_table "
 					. "AS ca INNER JOIN csbt_ability_table AS a USING (ability_id) "
-					. "WHERE ca.character_id=:id";
+					. "WHERE ca.character_id=:id "
+					. "ORDER BY a.display_order";
 			$params = array('id'=>$characterId);
 			try {
 				$dbObj->run_query($sql, $params);
@@ -106,6 +113,24 @@ class csbt_ability extends csbt_data {
 		} else {
 			throw new ErrorException(__METHOD__ . ": characterId required");
 		}
+		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function get_sheet_data(cs_phpDB $dbObj, $characterId) {
+		$myData = self::get_all($dbObj, $characterId);
+		if(is_array($myData) && count($myData)) {
+			foreach($myData as $id=>$data) {
+				$myData[$id]['ability_modifier'] = self::calculate_ability_modifier($data['ability_score']);
+				$myData[$id]['temporary_modifier'] = self::calculate_ability_modifier($data['temporary_score']);
+			}
+		}
+		
+		$retval = parent::_get_sheet_data($myData);
+		
 		return $retval;
 	}
 	//==========================================================================

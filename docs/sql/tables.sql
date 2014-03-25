@@ -77,14 +77,16 @@ CREATE TABLE csbt_character_attribute_table (
 
 CREATE TABLE csbt_ability_table (
 	ability_id serial NOT NULL PRIMARY KEY,
-	ability_name varchar(3) NOT NULL UNIQUE
+	ability_name varchar(3) NOT NULL UNIQUE,
+	display_order serial NOT NULL UNIQUE,
+	display_name text NOT NULL UNIQUE
 );
-INSERT INTO csbt_ability_table (ability_name) VALUES ('str');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('con');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('dex');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('int');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('wis');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('cha');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('str', 1, 'Strength');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('con', 3, 'Constitution');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('dex', 2, 'Dexterity');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('int', 4, 'Intelligence');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('wis', 5, 'Wisdom');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('cha', 6, 'Charisma');
 
 -- 
 -- Each character should have 6 records (str, con, dex, int, wis, cha), and should be UNIQUE.
