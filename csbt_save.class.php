@@ -6,7 +6,7 @@ class csbt_save extends csbt_data {
 	const tableName = 'csbt_character_save_table';
 	const tableSeq  = 'csbt_character_save_table_character_save_id_seq';
 	const pkeyField = 'character_save_id';
-	
+	const sheetIdPrefix = 'saves';
 	
 	//==========================================================================
 	public function __construct(array $initialData=array()) {
@@ -17,7 +17,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(cs_phpDB $dbObj, $characterId, $byAbilityId=null) {
 		if(!is_null($characterId) && $characterId > 0) { 
 			$sql = "SELECT cs.*, ca.* FROM csbt_character_save_table AS cs 
 					INNER JOIN csbt_character_ability_table AS ca 
@@ -30,6 +30,11 @@ class csbt_save extends csbt_data {
 			$params = array(
 				'id' => $characterId,
 			);
+			
+			if(!is_null($byAbilityId) && is_numeric($byAbilityId)) {
+				$sql .= " AND ca.ability_id=:aid";
+				$params['aid'] = $byAbilityId;
+			}
 			
 			$sql .= " ORDER BY save_name";
 			

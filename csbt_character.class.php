@@ -17,6 +17,7 @@ class csbt_character extends csbt_data {
 	const tableName= 'csbt_character_table';
 	const seqName =  'csbt_character_table_character_id_seq';
 	const pkeyField = 'character_id';
+	const sheetIdPrefix = 'main';
 	
 	public $gear = array();
 	//==========================================================================

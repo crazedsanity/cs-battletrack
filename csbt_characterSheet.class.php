@@ -351,8 +351,12 @@ class csbt_characterSheet {
 	
 	
 	//==========================================================================
-	public function create_sheet_id($prefix, $name) {
-		return $prefix .'__'. $name;
+	public function create_sheet_id($prefix, $name, $suffix=null) {
+		$retval = $prefix .'__'. $name;
+		if(!is_null($suffix)) {
+			$retval .= '__'. $suffix;
+		}
+		return $retval;
 	}
 	//==========================================================================
 	
@@ -511,7 +515,7 @@ class csbt_characterSheet {
 				$addSkills = array();
 
 				$addSkills[$this->create_sheet_id('skills', 'is_class_skill_checked')] = $data['is_class_skill'];
-				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = $data['is_class_skill'];
+				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = cs_global::interpret_bool($data['is_class_skill'], array(0=>"", 1=>"checked"));
 
 
 				unset($data['character_skill_id'], $data['ability_id'], $data['character_id'], $data['ability_score']);
@@ -556,25 +560,11 @@ class csbt_characterSheet {
 			}
 		}
 		
-		// abilities...
-		{
-			foreach($this->_abilities as $k=>$v) {
-				$prefix = $this->create_sheet_id('characterAbility', $k);
-				foreach($v as $x=>$y) {
-					switch($x) {
-						case 'ability_score':
-							$retval[$prefix .'_score'] = $y;
-							$retval[$prefix .'_modifier'] = csbt_ability::calculate_ability_modifier($y);
-							break;
-
-						case 'temporary_score':
-							$retval[$prefix .'_temp'] = $y;
-							$retval[$prefix .'_temp_mod'] = csbt_ability::calculate_ability_modifier($y);
-							break;
-
-					}
-				}
-			}
+		$ab = new csbt_ability();
+		$retval[csbt_ability::sheetIdPrefix] = $ab->get_sheet_data($this->dbObj, $this->characterId);
+		foreach($this->_abilities as $k=>$data) {
+			$retval[csbt_ability::sheetIdPrefix .'__'. $k .'_score'] = $data['ability_score'];
+			$retval[csbt_ability::sheetIdPrefix .'__'. $k .'_modifier'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
 		}
 		
 		$armor = new csbt_armor;
@@ -696,34 +686,112 @@ class csbt_characterSheet {
 		//TODO: the $name should really be in the form of sheetIdPrefix__field_name__ID (where ID is optional & depends on context)
 //cs_global::debug_print(__METHOD__ .": arguments::: ". cs_global::debug_print(func_get_args(),0),1);
 //exit;
+		$changesByKey = array();
+		$result = 0;
+		
 		$bits = preg_split('/__/', $name);
 		$prefix = $bits[0];
 		$realName = $bits[1];
+		
+		$id=null;
+		if(isset($bits[2])) {
+			$id = $bits[2];
+		}
+		$debug = "realName=(". $realName ."), id=(". $id .")";
 		switch($prefix) {
 			case csbt_ability::sheetIdPrefix:
 				
-				$allAbilities = csbt_ability::get_all($this->dbObj, $this->characterId);
-				
-				$updateBits = preg_split('/_/', $realName);
-				$ability = $updateBits[1];
-				
-				if(isset($allAbilities[$ability])) {
+				if(is_numeric($id)) {
 					
-					$obj = new csbt_ability($allAbilities[$ability]);
+					$allAbilities = csbt_ability::get_all_abilities($this->dbObj, true);
 					
+					$obj = new csbt_ability();
+					$obj->load($this->dbObj, $id);
 					
-//					$obj->id = $this->characterId;
-//					$obj->update($realName, $value);
-//					$obj->save($this->dbObj);
+					if(!is_null($value) && strlen($value) == 0) {
+						$value = null;
+					}
 					
+					$obj->update($realName, $value);
+					$result = $obj->save($this->dbObj);
+					$obj->load($this->dbObj);
+					$this->load();
+					
+					$abilityName = $allAbilities[$obj->ability_id];
+					
+					//TODO: update the "changes by key"
+					{
+						$changesByKey[$name] = $value;
+						if(preg_match('/temp/', $realName)) {
+							//update temporary modifier
+							$changesByKey[$this->create_sheet_id($prefix, $abilityName .'_temporary_modifier')] = $obj->get_temp_modifier();
+						}
+						elseif(preg_match('/^ability/', $realName) || preg_match('/^score$/', $realName)) {
+							//update (standard) modifier
+							$changesByKey[$this->create_sheet_id($prefix, $abilityName .'_modifier')] = $obj->get_modifier();
+							
+							//Updating skill info is NEW.
+							$depSkills = csbt_skill::get_all($this->dbObj, $this->characterId, $obj->ability_id);
+							foreach($depSkills as $k=>$v) {
+								$changesByKey[$this->create_sheet_id(csbt_skill::sheetIdPrefix, 'ability_mod', $k)] = $obj->get_modifier();
+								$changesByKey[$this->create_sheet_id(csbt_skill::sheetIdPrefix, 'skill_mod', $k)] = csbt_skill::calculate_skill_modifier($v);
+							}
+							
+							//TODO: update dependent saves
+							$saveList = csbt_save::get_all($this->dbObj, $this->characterId, $obj->ability_id);
+							foreach($saveList as $k=>$v) {
+								$changesByKey[$this->create_sheet_id(csbt_save::sheetIdPrefix, 'ability_mod', $k)] = $v['ability_mod'];
+								$changesByKey[$this->create_sheet_id(csbt_save::sheetIdPrefix, 'total', $k)] = $v['total_mod'];
+							}
+							
+							//TODO: update misc fields...
+							switch($abilityName) {
+								case 'str':
+									$miscUpdates = $this->get_strength_stats();
+									foreach($miscUpdates as $k=>$v) {
+										$changesByKey[$this->create_sheet_id('generated', $k)] = $v;
+									}
+									break;
+							}
+						}
+						else {
+							throw new InvalidArgumentException(__METHOD__ .": invalid field (". $realName .")");
+						}
+					}
 				}
 				
 				break;
 			
+			case csbt_character::sheetIdPrefix:
+				$char = new csbt_character($this->characterId, $this->ownerUid, $this->dbObj);
+				$char->update($realName, $value);
+				$char->save($this->dbObj);
+				
+				foreach($char->data as $idx=>$v) {
+					$sheetId = $this->create_sheet_id($char::sheetIdPrefix, $idx);
+					$changesByKey[$sheetId] = $v;
+				}
+				
+//				$changesByKey = $this->get_misc_data(); //$char->get_sheet_data($this->dbObj, $this->characterId);
+				break;
+				
 			default:
 				throw new InvalidArgumentException(__METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")");
 		}
 		
+		//TODO: only update this as necessary... or have the highlighting code only show data that actually changed
+		$mData = $this->get_misc_data();
+		foreach($mData as $k=>$v) {
+			$changesByKey[$k] = $v;
+		}
+		
+		$retval = array(
+			'debug'			=> $debug,
+			'result'		=> $result,
+			'changesbykey'	=> $changesByKey,
+		);
+		
+		return $retval;
 	}
 	//==========================================================================
 }
