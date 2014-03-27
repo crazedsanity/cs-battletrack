@@ -13,6 +13,7 @@ class csbt_skill extends csbt_data {
 	//==========================================================================
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
+		$this->_sheetIdPrefix = self::sheetIdPrefix;
 	}
 	//==========================================================================
 	
@@ -54,6 +55,17 @@ class csbt_skill extends csbt_data {
 			throw new ErrorException(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
 		}
 		return($retval);
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function _get_record_extras(array $recordData) {
+		
+		$recordData['ability_mod'] = csbt_ability::calculate_ability_modifier($recordData['ability_score']);
+		$recordData['skill_mod'] = self::calculate_skill_modifier($recordData);
+		return $recordData;
 	}
 	//==========================================================================
 }

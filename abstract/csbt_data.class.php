@@ -276,10 +276,15 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function get_sheet_data(cs_phpDb $dbObj, $characterId) {
+	public function get_sheet_data(cs_phpDb $dbObj, $characterId, $recordId=null) {
 		$retval = array();
 		if(!is_null($this->_sheetIdPrefix)) {
-			$myData = $this->get_all($dbObj, $characterId);
+			if(!is_null($recordId) && is_numeric($recordId)) {
+				$myData = $this->load($dbObj, $recordId);
+			}
+			else {
+				$myData = $this->get_all($dbObj, $characterId);
+			}
 			$retval = $this->_get_sheet_data($myData);
 		}
 		else {
@@ -303,14 +308,37 @@ class csbt_data {
 		$retval = array();
 		foreach ($myData as $id => $data) {
 			$tData = array();
-			foreach ($data as $k => $v) {
-				$myId = $this->_sheetIdPrefix . '__' . $k;
+			if(is_array($data)) {
+				$data = $this->_get_record_extras($data);
+				foreach ($data as $k => $v) {
+					$myId = $this->_sheetIdPrefix . '__' . $k;
 
-				$tData[$myId] = $v;
+					$tData[$myId] = $v;
+				}
+			}
+			else {
+				$id = $this->_sheetIdPrefix .'__'. $id;
+				$tData = $this->_get_record_extras($data);
 			}
 			$retval[$id] = $tData;
 		}
 		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	/**
+	 * If an extending class has extra attributes to add, it should simply 
+	 * override this method.  Calls to get_sheet_data() will then automatically 
+	 * get those extra indexes for single and multiple records.
+	 * 
+	 * @param array $recordData
+	 * @return array
+	 */
+	public function _get_record_extras(array $recordData) {
+		return $recordData;
 	}
 	//==========================================================================
 }

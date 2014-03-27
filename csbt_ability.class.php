@@ -120,18 +120,11 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_sheet_data(cs_phpDB $dbObj, $characterId) {
-		$myData = self::get_all($dbObj, $characterId);
-		if(is_array($myData) && count($myData)) {
-			foreach($myData as $id=>$data) {
-				$myData[$id]['ability_modifier'] = self::calculate_ability_modifier($data['ability_score']);
-				$myData[$id]['temporary_modifier'] = self::calculate_ability_modifier($data['temporary_score']);
-			}
-		}
+	public function _get_record_extras(array $myData) {
+		$myData['ability_modifier'] = self::calculate_ability_modifier($myData['ability_score']);
+		$myData['temporary_modifier'] = self::calculate_ability_modifier($myData['temporary_score']);	
 		
-		$retval = parent::_get_sheet_data($myData);
-		
-		return $retval;
+		return $myData;
 	}
 	//==========================================================================
 }

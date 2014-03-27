@@ -38,18 +38,9 @@ class csbt_gear extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_sheet_data(cs_phpDb $dbObj, $characterId) {
-		
-		$myData = self::get_all($dbObj, $characterId);
-		if(is_array($myData) && count($myData)) {
-			foreach($myData as $id=>$data) {
-				$myData[$id]['total_weight'] = self::calculate_weight($data);
-			}
-		}
-		
-		$retval = parent::_get_sheet_data($myData);
-		
-		return $retval;
+	public function _get_record_extras(array $recordData) {
+		$recordData['total_weight'] = self::calculate_weight($recordData);
+		return $recordData;
 	}
 	//==========================================================================
 }

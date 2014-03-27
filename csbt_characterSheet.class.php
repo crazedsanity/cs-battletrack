@@ -514,8 +514,8 @@ class csbt_characterSheet {
 				$data['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
 				$addSkills = array();
 
-				$addSkills[$this->create_sheet_id('skills', 'is_class_skill_checked')] = $data['is_class_skill'];
-				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = cs_global::interpret_bool($data['is_class_skill'], array(0=>"", 1=>"checked"));
+				$addSkills[$this->create_sheet_id('skills', 'is_class_skill_checked')] = cs_global::interpret_bool($data['is_class_skill'], array('', 'checked="checked"'));
+				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = cs_global::interpret_bool($data['is_class_skill'], array("", "checked"));
 
 
 				unset($data['character_skill_id'], $data['ability_id'], $data['character_id'], $data['ability_score']);
@@ -760,29 +760,81 @@ class csbt_characterSheet {
 					}
 				}
 				
+				$mData = $this->get_misc_data();
+				foreach($mData as $k=>$v) {
+					$changesByKey[$k] = $v;
+				}
+				
 				break;
 			
 			case csbt_character::sheetIdPrefix:
 				$char = new csbt_character($this->characterId, $this->ownerUid, $this->dbObj);
-				$char->update($realName, $value);
-				$char->save($this->dbObj);
+				$char->load($this->dbObj);
+				if($realName == 'xp_change') {
+					$xpCurrent = $char->xp_current;
+//					if(is_numeric($xpCurrent)) {
+					$debug .= " XP_CURRENT=(". $char->xp_current .")";
+						$char->update('xp_current', ($xpCurrent + $value));
+						$changesByKey[$name] = "";
+//					}
+				}
+				else {
+					$char->update($realName, $value);
+				}
+				$result = $char->save($this->dbObj);
 				
+				$char->load($this->dbObj);
 				foreach($char->data as $idx=>$v) {
 					$sheetId = $this->create_sheet_id($char::sheetIdPrefix, $idx);
 					$changesByKey[$sheetId] = $v;
 				}
-				
-//				$changesByKey = $this->get_misc_data(); //$char->get_sheet_data($this->dbObj, $this->characterId);
 				break;
 				
+			case csbt_save::sheetIdPrefix:
+				$x = new csbt_save();
+				$x->id = $id;
+				$x->update($realName, $value);
+				$result = $x->save($this->dbObj);
+				
+				//TODO: fix so there is no need to manually add the ID to the end of the key
+				$_sheetData = $x->get_sheet_data($this->dbObj, $this->characterId);
+				foreach($_sheetData[$id] as $k=>$v) {
+					$changesByKey[$k . '__'. $id] = $v;
+				}
+//				$changesByKey = $_sheetData[$id];
+				break;
+			
+			case csbt_skill::sheetIdPrefix:
+				$x = new csbt_skill();
+				$x->id = $id;
+				
+				if($realName == 'is_class_skill') {
+					$value = cs_global::interpret_bool($value, array(false, true));
+				}
+				
+				$x->update($realName, $value);
+				
+				$result = $x->save($this->dbObj);
+				$x->load($this->dbObj);
+				
+				$_mySkills = $x->get_sheet_data($this->dbObj, $this->characterId);
+				foreach($_mySkills[$id] as $k=>$v) {
+					$changesByKey[$k .'__'. $id] = $v;
+				}
+				break;
+			
+			case csbt_weapon::sheetIdPrefix:
+				$x = new csbt_weapon();
+				$x->id = $id;
+				
+				$x->update($realName, $value);
+				$result = $x->save($this->dbObj);
+				
+				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				break;
+			
 			default:
 				throw new InvalidArgumentException(__METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")");
-		}
-		
-		//TODO: only update this as necessary... or have the highlighting code only show data that actually changed
-		$mData = $this->get_misc_data();
-		foreach($mData as $k=>$v) {
-			$changesByKey[$k] = $v;
 		}
 		
 		$retval = array(
