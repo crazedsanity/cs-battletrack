@@ -229,11 +229,6 @@ function showNewRecordDialog(pDialogId) {
 		title: theTitle,
 		position: 'top'
 	});
-	//$(".ui-dialog").find("input:visible").val('');
-	
-	$("div.ui-dialog button.submit").click(function() {
-		submitNewRecordDialog(this);
-	});
 }
 
 var xButton = null;
