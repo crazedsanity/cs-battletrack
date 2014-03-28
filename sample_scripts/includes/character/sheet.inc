@@ -15,6 +15,7 @@ foreach($page->templateVars as $k=>$v) {
 if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
+//cs_global::debug_print($data,1);
 
 	
 	if(!isset($contentTemplate)) {
