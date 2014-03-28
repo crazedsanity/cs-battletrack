@@ -38,7 +38,7 @@ class csbt_gear extends csbt_data {
 	
 	
 	//==========================================================================
-	public function _get_record_extras(array $recordData) {
+	public static function _get_record_extras(array $recordData) {
 		$recordData['total_weight'] = self::calculate_weight($recordData);
 		return $recordData;
 	}

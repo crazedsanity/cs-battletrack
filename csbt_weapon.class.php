@@ -6,7 +6,6 @@ class csbt_weapon extends csbt_data {
 	const tableName = 'csbt_character_weapon_table';
 	const tableSeq  = 'csbt_character_weapon_table_character_weapon_id_seq';
 	const pkeyField = 'character_weapon_id';
-	
 	const sheetIdPrefix = 'characterWeapon';
 	
 	public $booleanFields = array('in_use');
@@ -14,6 +13,7 @@ class csbt_weapon extends csbt_data {
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 		$this->_sheetIdPrefix = self::sheetIdPrefix;
+		$this->_useSheetIdSuffix = true;
 	}
 	//==========================================================================
 	

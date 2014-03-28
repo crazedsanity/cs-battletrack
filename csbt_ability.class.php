@@ -120,7 +120,7 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public function _get_record_extras(array $myData) {
+	public static function _get_record_extras(array $myData) {
 		$myData['ability_modifier'] = self::calculate_ability_modifier($myData['ability_score']);
 		$myData['temporary_modifier'] = self::calculate_ability_modifier($myData['temporary_score']);	
 		

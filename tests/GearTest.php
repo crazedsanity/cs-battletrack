@@ -233,6 +233,10 @@ class GearTest extends testDbAbstract {
 		foreach($allGear as $k=>$v) {
 			$this->assertTrue(isset($list[$k]));
 			$this->assertEquals($v, $list[$k]);
+			
+			$loadedThis = $x->load($this->dbObj, $k);
+			
+			$this->assertEquals($v, $loadedThis);
 		}
 	}
 	//--------------------------------------------------------------------------

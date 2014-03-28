@@ -6,6 +6,7 @@ class csbt_data {
 	protected $_dbPkey;
 	protected $_dbSeq;
 	protected $_sheetIdPrefix;
+	protected $_useSheetIdSuffix=false;
 	
 	protected $_data = array();
 	protected $id;
@@ -285,7 +286,7 @@ class csbt_data {
 			else {
 				$myData = $this->get_all($dbObj, $characterId);
 			}
-			$retval = $this->_get_sheet_data($myData);
+			$retval = $this->_get_sheet_data($myData, is_numeric($recordId));
 		}
 		else {
 			throw new LogicException(__METHOD__ .": missing required sheetIdPrefix");
@@ -304,23 +305,29 @@ class csbt_data {
 	 * @param array $myData		see self::get_all()
 	 * @return type
 	 */
-	protected function _get_sheet_data(array $myData) {
+	protected function _get_sheet_data(array $myData, $isSingleRecord=false) {
 		$retval = array();
-		foreach ($myData as $id => $data) {
-			$tData = array();
-			if(is_array($data)) {
+		
+		if($isSingleRecord) {
+			$data = $this->_get_record_extras($myData);
+			foreach($data as $k=>$v) {
+				$myId = $this->_sheetIdPrefix . '__' . $k;
+				if($this->_useSheetIdSuffix) {
+					$myId .= '__'. $this->id;
+				}
+				$retval[$myId] = $v;
+			}
+		}
+		else {
+			foreach ($myData as $id => $data) {
+				$tData = array();
 				$data = $this->_get_record_extras($data);
 				foreach ($data as $k => $v) {
 					$myId = $this->_sheetIdPrefix . '__' . $k;
-
 					$tData[$myId] = $v;
 				}
+				$retval[$id] = $tData;
 			}
-			else {
-				$id = $this->_sheetIdPrefix .'__'. $id;
-				$tData = $this->_get_record_extras($data);
-			}
-			$retval[$id] = $tData;
 		}
 		return $retval;
 	}
@@ -337,7 +344,7 @@ class csbt_data {
 	 * @param array $recordData
 	 * @return array
 	 */
-	public function _get_record_extras(array $recordData) {
+	public static function _get_record_extras(array $recordData) {
 		return $recordData;
 	}
 	//==========================================================================

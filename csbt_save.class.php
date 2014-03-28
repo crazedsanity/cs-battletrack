@@ -42,11 +42,6 @@ class csbt_save extends csbt_data {
 			try {
 				$dbObj->run_query($sql, $params);
 				$retval = $dbObj->farray_fieldnames(self::pkeyField);
-				foreach($retval as $i=>$data) {
-					$data['ability_mod'] = self::calculate_ability_modifier($data['ability_score']);
-					$data['total_mod'] = self::calculate_total_save_modifier($data);
-					$retval[$i] = $data;
-				}
 			} catch (LogicException $le) {
 				throw new ErrorException(__METHOD__ .": failed to derive save modifier... DETAILS: ". $le->getMessage());
 			} catch (Exception $e) {
@@ -101,7 +96,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public function _get_record_extras(array $recordData) {
+	public static function _get_record_extras(array $recordData) {
 		$recordData['ability_mod'] = self::calculate_ability_modifier($recordData['ability_score']);
 		$recordData['total'] = self::calculate_total_save_modifier($recordData);
 		return $recordData;

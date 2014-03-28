@@ -14,6 +14,7 @@ class csbt_skill extends csbt_data {
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 		$this->_sheetIdPrefix = self::sheetIdPrefix;
+		$this->_useSheetIdSuffix = true;
 	}
 	//==========================================================================
 	
@@ -45,11 +46,6 @@ class csbt_skill extends csbt_data {
 		try {
 			$dbObj->run_query($sql, $params);
 			$retval = $dbObj->farray_fieldnames(self::pkeyField);
-			
-			foreach($retval as $id=>$data) {
-				$retval[$id]['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
-				$retval[$id]['skill_mod'] = self::calculate_skill_modifier($retval[$id]);
-			}
 		}
 		catch(Exception $e) {
 			throw new ErrorException(__METHOD__ .":: failed to retrieve character skills, DETAILS::: ". $e->getMessage());
@@ -61,10 +57,13 @@ class csbt_skill extends csbt_data {
 	
 	
 	//==========================================================================
-	public function _get_record_extras(array $recordData) {
+	public static function _get_record_extras(array $recordData) {
 		
 		$recordData['ability_mod'] = csbt_ability::calculate_ability_modifier($recordData['ability_score']);
 		$recordData['skill_mod'] = self::calculate_skill_modifier($recordData);
+		$recordData['is_class_skill_checked'] = cs_global::interpret_bool($recordData['is_class_skill'], array('', 'checked="checked"'));
+		$recordData['is_checked_checkbox'] = cs_global::interpret_bool($recordData['is_class_skill'], array("", "checked"));
+		
 		return $recordData;
 	}
 	//==========================================================================

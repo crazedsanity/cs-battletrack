@@ -74,7 +74,8 @@ class SavesTest extends testDbAbstract {
 		$this->assertEquals($numCreated, count($list), cs_global::debug_print($list));
 		
 		foreach($list as $k=>$data) {
-			$this->assertEquals($data['total_mod'], $x->calculate_total_save_modifier($data));
+			$data = $x->_get_record_extras($data);
+			$this->assertEquals($data['total'], $x->calculate_total_save_modifier($data));
 			
 		}
 	}

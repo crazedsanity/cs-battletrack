@@ -506,28 +506,8 @@ class csbt_characterSheet {
 		$retval = array_merge($retval, $this->get_misc_data());
 		
 		
-		// Skills...
-		{
-			$retval['skills'] = array();
-			$mySkills = csbt_skill::get_all($this->dbObj, $this->characterId);
-			foreach($mySkills as $id=>$data) {
-				$data['ability_mod'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
-				$addSkills = array();
-
-				$addSkills[$this->create_sheet_id('skills', 'is_class_skill_checked')] = cs_global::interpret_bool($data['is_class_skill'], array('', 'checked="checked"'));
-				$addSkills[$this->create_sheet_id('skills', 'is_checked_checkbox')] = cs_global::interpret_bool($data['is_class_skill'], array("", "checked"));
-
-
-				unset($data['character_skill_id'], $data['ability_id'], $data['character_id'], $data['ability_score']);
-
-				foreach($data as $k=>$v) {
-					$addSkills[$this->create_sheet_id('skills', $k)] = $v;
-				}
-				ksort($addSkills);
-
-				$retval['skills'][$id] = $addSkills;
-			}
-		}
+		$sk = new csbt_skill();
+		$retval[csbt_skill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
 		
 		// Saves...
 		{
@@ -543,7 +523,6 @@ class csbt_characterSheet {
 						$data['character_save_id'], $data['temporary_score']
 				);
 
-				$data['total'] = $data['total_mod'];
 				unset($data['total_mod']);
 
 				foreach($data as $k=>$v) {
@@ -719,7 +698,6 @@ class csbt_characterSheet {
 					
 					$abilityName = $allAbilities[$obj->ability_id];
 					
-					//TODO: update the "changes by key"
 					{
 						$changesByKey[$name] = $value;
 						if(preg_match('/temp/', $realName)) {
@@ -813,23 +791,17 @@ class csbt_characterSheet {
 				}
 				
 				$x->update($realName, $value);
-				
 				$result = $x->save($this->dbObj);
 				$x->load($this->dbObj);
 				
-				$_mySkills = $x->get_sheet_data($this->dbObj, $this->characterId);
-				foreach($_mySkills[$id] as $k=>$v) {
-					$changesByKey[$k .'__'. $id] = $v;
-				}
+				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
 				break;
 			
 			case csbt_weapon::sheetIdPrefix:
 				$x = new csbt_weapon();
 				$x->id = $id;
-				
 				$x->update($realName, $value);
 				$result = $x->save($this->dbObj);
-				
 				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
 				break;
 			
