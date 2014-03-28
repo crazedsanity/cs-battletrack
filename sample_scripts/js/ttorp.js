@@ -161,6 +161,8 @@ function callback_showUpdatedInput(xmlObj) {
 		forceNameChange = $(xmlObj).find('id_was').text();
 	}
 	
+	//TODO: see issue #42 (https://github.com/crazedsanity/cs-battletrack/issues/42)
+	
 	if($(xmlObj).find('changesbykey').text()) {
 		
 		for (var iNode = 0; iNode < xmlObj.childNodes.length; iNode++) {
@@ -409,9 +411,6 @@ function switchToInput(target) {
 		$(theInput).addClass("temp").focus();
 		
 		bindInputMarking();
-	}
-	else {
-		console.log("switchToInput("+ $(target).attr("id") +"): nope!");
 	}
 }
 

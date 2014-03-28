@@ -14,6 +14,7 @@ class csbt_specialAbility extends csbt_data {
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 		$this->_sheetIdPrefix = self::sheetIdPrefix;
+		$this->_useSheetIdSuffix = true;
 	}
 	//==========================================================================
 	

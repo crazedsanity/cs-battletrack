@@ -779,7 +779,6 @@ class csbt_characterSheet {
 				foreach($_sheetData[$id] as $k=>$v) {
 					$changesByKey[$k . '__'. $id] = $v;
 				}
-//				$changesByKey = $_sheetData[$id];
 				break;
 			
 			case csbt_skill::sheetIdPrefix:
@@ -804,6 +803,22 @@ class csbt_characterSheet {
 				$result = $x->save($this->dbObj);
 				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
 				break;
+
+			case csbt_specialAbility::sheetIdPrefix:
+				$x = new csbt_specialAbility();
+				$x->id = $id;
+				$x->update($realName, $value);
+				$result = $x->save($this->dbObj);
+				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				break;
+			
+			case csbt_gear::sheetIdPrefix:
+				$x = new csbt_gear();
+				$x->id = $id;
+				$x->update($realName, $value);
+				$result = $x->save($this->dbObj);
+				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				break;
 			
 			default:
 				throw new InvalidArgumentException(__METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")");
@@ -816,6 +831,48 @@ class csbt_characterSheet {
 		);
 		
 		return $retval;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function handle_new_record($type, $name, array $extraData=null) {
+		if(is_null($extraData) || !is_array($extraData)) {
+			$extraData = array();
+		}
+		$extraData['character_id'] = $this->characterId;
+		switch($type) {
+			case csbt_weapon::sheetIdPrefix:
+				$x = new csbt_weapon();
+				$extraData['weapon_name'] = $name;
+				
+				$result = $x->create($this->dbObj, $extraData);
+				break;
+				
+			case csbt_armor::sheetIdPrefix:
+				$x = new csbt_armor();
+				$extraData['armor_name'] = $name;
+				$result = $x->create($this->dbObj, $extraData);
+				break;
+			
+			case csbt_specialAbility::sheetIdPrefix:
+				$x = new csbt_specialAbility();
+				$extraData['special_ability_name'] = $name;
+				$result = $x->create($this->dbObj, $extraData);
+				break;
+			
+			case csbt_gear::sheetIdPrefix:
+				$x = new csbt_gear();
+				$extraData['gear_name'] = $name;
+				$result = $x->create($this->dbObj, $extraData);
+				break;
+			
+			default:
+				throw new InvalidArgumentException(__METHOD__ .": invalid type (". $type .")");
+		}
+		
+		return $result;
 	}
 	//==========================================================================
 }
