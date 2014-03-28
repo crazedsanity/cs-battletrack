@@ -1,12 +1,18 @@
 <?php
 
-$campaign = new csbt_campaign($page->db, $_SESSION['uid'], null);
+$campaign = new csbt_campaign(null, $page->db);
 if($_POST) {
 	$urlAppend = "invalid";
 	switch($_POST['action']) {
 		case 'newCampaign':
 			try {
-				$res = $campaign->create_campaign($_POST['name'], $_POST['description']);
+//				$res = $campaign->create_campaign($_POST['name'], $_POST['description']);
+				$createData = array(
+					'owner_uid'		=> $_SESSION['uid'],
+					'campaign_name'	=> $_POST['name'],
+					'description'	=> $_POST['description'],
+				);
+				$res = $campaign->create($page->db, $createData);
 			}
 			catch(Exception $ex) {
 				$res = $ex->getMessage();
@@ -16,8 +22,7 @@ if($_POST) {
 
 		case 'addPlayer':
 			try {
-				$campaign->get_campaign($_POST['campaignId']);
-				$res = $campaign->add_player($_POST['playerId']);
+				$res = csbt_campaign::add_player($page->db, $_POST['campaignId'], $_POST['playerId']);
 				$urlAppend = $res;
 			}
 			catch(Exception $e) {
@@ -37,16 +42,16 @@ if($_POST) {
 	exit;
 }
 else {
-	$campaignList = $campaign->get_campaigns();
+	$campaignList = $campaign->get_all($page->db, $_SESSION['uid']);
 
 
 	$x = $page->rip_all_block_rows();
 	$rowName = 'noCampaignRow';
 	$finalRow = $page->templateRows[$rowName];
-	$idObfuscator = new cs_idObfuscator();
 	if(is_array($campaignList) && count($campaignList)) {
 		$rowName = 'campaignRow';
 		$finalRow = "";
+		$idObfuscator = new cs_idObfuscator();
 		foreach($campaignList as $cId=>$cInfo) {
 			if(is_array($cInfo)) {
 				$playerList = $cInfo['playerList'];

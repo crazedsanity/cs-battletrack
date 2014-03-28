@@ -1,0 +1,22 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+install:
+    - composer install
+
+script: phpunit --coverage-text
+
+services:
+    postgresql
+
+before_script:
+  - composer install
+  - psql -c 'create database _unittest_' -U postgres
+
+notifications:
+  email:
+    - github@crazedsanity.com

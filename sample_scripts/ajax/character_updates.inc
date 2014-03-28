@@ -60,7 +60,10 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 				$_POST['value'] = preg_replace('/"/', "''", $_POST['value']);
 				$returned = $char->handle_update($_POST['name'], $_POST['value']);
 		}
-		unset($returned['error']);
+		if(is_array($returned) && isset($returned['error'])) {
+			//TODO: why...?
+			unset($returned['error']);
+		}
 		if(is_array($returned)) {
 			foreach($returned as $i=>$v) {
 				$xmlData[$i] = $v;

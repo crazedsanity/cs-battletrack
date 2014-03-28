@@ -68,7 +68,6 @@ function markUpdatedInput(object, newVal, forceChange) {
 			$(object).text(newVal);
 		}
 		else {
-				console.log("SETTING xxvalue in ("+ myId +")... ");
 			$(object).val(newVal);
 		}
 		$(object).data("last_value", newVal);
@@ -162,6 +161,8 @@ function callback_showUpdatedInput(xmlObj) {
 		forceNameChange = $(xmlObj).find('id_was').text();
 	}
 	
+	//TODO: see issue #42 (https://github.com/crazedsanity/cs-battletrack/issues/42)
+	
 	if($(xmlObj).find('changesbykey').text()) {
 		
 		for (var iNode = 0; iNode < xmlObj.childNodes.length; iNode++) {
@@ -227,11 +228,6 @@ function showNewRecordDialog(pDialogId) {
 		modal: true,
 		title: theTitle,
 		position: 'top'
-	});
-	//$(".ui-dialog").find("input:visible").val('');
-	
-	$("div.ui-dialog button.submit").click(function() {
-		submitNewRecordDialog(this);
 	});
 }
 
@@ -410,9 +406,6 @@ function switchToInput(target) {
 		$(theInput).addClass("temp").focus();
 		
 		bindInputMarking();
-	}
-	else {
-		console.log("switchToInput("+ $(target).attr("id") +"): nope!");
 	}
 }
 

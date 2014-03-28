@@ -15,19 +15,20 @@ foreach($page->templateVars as $k=>$v) {
 if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
+//cs_global::debug_print($data,1);
+
 	
 	if(!isset($contentTemplate)) {
 		$contentTemplate = null;
 	}
 	$char->build_sheet($page, $contentTemplate);
-	$page->add_template_var('html_title', $char->get_character_name() ." - TTORP [CrazedSanity.com]");
+	$page->add_template_var('html_title', $char->character_name ." - TTORP [CrazedSanity.com]");
 }
 else {
 	$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
 	$charId = $char->characterId;
 	
 	
-	$obfuscator = new cs_IdObfuscator();
 	$newId = $obfuscator->encode($charId);
 	
 	$page->conditional_header("?id=". $newId);

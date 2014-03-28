@@ -19,17 +19,52 @@
                     <td class="tag"><span class="help" title="{saves__save_name} (based on {saves__ability_name} -- record ID #{saves_id})">{saves__display_name}</span></td>
                     <td>
                     </td>
-                    <td class="unit"><input title="Total fortitude save" id="saves__total__{saves_id}" class="derived" value="{saves__total}" type="text" readonly="readonly"></td>
+                    <td class="unit">
+						<input title="Total fortitude save" 
+							   id="saves__total__{saves_id}" 
+							   class="derived" 
+							   value="{saves__total}" 
+							   type="text" 
+							   readonly="readonly">
+					</td>
                     <td class="char"><span class="dark">=</span></td>
-                    <td class="unit"><input title="{saves__save_name} base save -- USE HIGHEST FROM CHOSEN CLASSES" id="saves__base_mod__{saves_id}" value="{saves__base_mod}" type="text"></td>
+                    <td class="unit">
+						<input title="{saves__save_name} base save -- USE HIGHEST FROM CHOSEN CLASSES" 
+							   id="saves__base_mod__{saves_id}" 
+							   value="{saves__base_mod}" 
+							   type="text"></td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Ability modifier ({saves__ability_name})" id="saves__ability_mod__{saves_id}" class="derived hl--characterAbility__{saves__ability_name}_score" value="{saves__ability_mod}" type="text" readonly="readonly" class="hl--characterAbility__{saves__ability_name}_modifier"></td>
+                    <td class="unit">
+						<input title="Ability modifier ({saves__ability_name})" 
+							   id="saves__ability_mod__{saves_id}" 
+							   class="derived hl--characterAbility__{saves__ability_name}_score" 
+							   value="{saves__ability_mod}" 
+							   type="text" 
+							   readonly="readonly" 
+							   class="hl--characterAbility__{saves__ability_name}_modifier">
+					</td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Magic modifier" id="saves__magic_mod__{saves_id}" value="{saves__magic_mod}" type="text"></td>
+                    <td class="unit">
+						<input title="Magic modifier" 
+							   id="saves__magic_mod__{saves_id}" 
+							   value="{saves__magic_mod}" 
+							   type="text">
+					</td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Misc. modifier" id="saves__misc_mod__{saves_id}" value="{saves__misc_mod}" type="text"></td>
+                    <td class="unit">
+						<input title="Misc. modifier" 
+							   id="saves__misc_mod__{saves_id}" 
+							   value="{saves__misc_mod}" 
+							   type="text">
+					</td>
                     <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input class="temp" title="Temporary modifier" id="saves__temp_mod__{saves_id}" value="{saves__temp_mod}" type="text"></td>
+                    <td class="unit">
+						<input class="temp" 
+							   title="Temporary modifier" 
+							   id="saves__temp_mod__{saves_id}" 
+							   value="{saves__temp_mod}" 
+							   type="text">
+					</td>
                   </tr>
 				  <!-- END characterSaveRow -->
                 </tbody></table>

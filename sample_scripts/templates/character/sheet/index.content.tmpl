@@ -102,7 +102,7 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 		<input name="character_id" value="{main__character_id}" class="hidden" />
 		<input name="tableName" value="specialAbility" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
-		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return false;">Create It!</button>
+		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__gear" class="form">
 		<div class="hidden title">Add Some Gear</div>
@@ -112,7 +112,7 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 		<input name="character_id" value="{main__character_id}" class="hidden" />
 		<input name="tableName" value="gear" class="hidden" />
 		<input name="type" value="newRecord" class="hidden" />
-		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return false;">Create It!</button>
+		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__characterWeapon" class="form">
 		<div class="hidden title">Create a New Weapon</div>
@@ -122,7 +122,7 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 			<input name="nameField" value="characterWeapon__weapon_name__new" class="hidden" />
 			<input name="tableName" value="characterWeapon" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return false;">Create It!</button>
+			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__characterArmor" class="form">
 		<div class="hidden title">Create New Armor</div>
@@ -132,6 +132,6 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 			<input name="nameField" value="characterArmor__armor_name__new" class="hidden" />
 			<input name="tableName" value="characterArmor" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return false;">Create It!</button>
+			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 </div>

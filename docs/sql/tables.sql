@@ -1,9 +1,4 @@
---
--- SVN INFORMATION:::
--- SVN Signature::::::::: $Id:tables.sql 23 2008-04-18 04:25:47Z crazedsanity $
--- Last Committted Date:: $Date:2008-04-17 23:25:47 -0500 (Thu, 17 Apr 2008) $
--- Last Committed Path::: $HeadURL:https://cs-battletrack.svn.sourceforge.net/svnroot/cs-battletrack/trunk/docs/sql/tables.sql $
---  
+
 
 --
 -- Contains a list of campaigns.
@@ -82,14 +77,16 @@ CREATE TABLE csbt_character_attribute_table (
 
 CREATE TABLE csbt_ability_table (
 	ability_id serial NOT NULL PRIMARY KEY,
-	ability_name varchar(3) NOT NULL UNIQUE
+	ability_name varchar(3) NOT NULL UNIQUE,
+	display_order serial NOT NULL UNIQUE,
+	display_name text NOT NULL UNIQUE
 );
-INSERT INTO csbt_ability_table (ability_name) VALUES ('str');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('con');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('dex');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('int');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('wis');
-INSERT INTO csbt_ability_table (ability_name) VALUES ('cha');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('str', 1, 'Strength');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('con', 3, 'Constitution');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('dex', 2, 'Dexterity');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('int', 4, 'Intelligence');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('wis', 5, 'Wisdom');
+INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('cha', 6, 'Charisma');
 
 -- 
 -- Each character should have 6 records (str, con, dex, int, wis, cha), and should be UNIQUE.
@@ -101,6 +98,9 @@ CREATE TABLE csbt_character_ability_table (
 	ability_score integer NOT NULL DEFAULT 10,
 	temporary_score integer DEFAULT NULL
 );
+ALTER TABLE csbt_character_ability_table ADD CONSTRAINT
+	csbt_character_ability_table_character_id_ability_id_uix
+	UNIQUE (character_id, ability_id);
 
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
@@ -170,6 +170,9 @@ CREATE TABLE csbt_character_save_table (
 	misc_mod integer NOT NULL DEFAULT 0,
 	temp_mod integer NOT NULL DEFAULT 0
 );
+ALTER TABLE csbt_character_save_table ADD CONSTRAINT 
+	csbt_character_save_table_character_id_save_name_uix 
+	UNIQUE (character_id, save_name);
 
 
 CREATE TABLE csbt_map_table (
