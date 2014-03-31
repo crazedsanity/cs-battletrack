@@ -635,7 +635,7 @@ class csbt_characterSheet {
 	//==========================================================================
 	public function handle_update($name, $value) {
 		$changesByKey = array();
-		$result = 0;
+		$result = "not set";
 		
 		$bits = preg_split('/__/', $name);
 		$prefix = $bits[0];
@@ -655,15 +655,11 @@ class csbt_characterSheet {
 					$allAbilities = csbt_ability::get_all_abilities($this->dbObj, true);
 					
 					$obj = new csbt_ability();
-//					$obj->load($this->dbObj, $recordId);
-//					
 					if(!is_null($value) && strlen($value) == 0) {
-//						$value = null;
 						$fieldsToUpdate[$realName] = null;
 					}
-//					
+					$changesByKey = $obj->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 					
-					$obj->load($this->dbObj);
 					$this->load();
 					
 					$abilityName = $allAbilities[$obj->ability_id];
@@ -685,7 +681,6 @@ class csbt_characterSheet {
 								$changesByKey[$this->create_sheet_id(csbt_skill::sheetIdPrefix, 'skill_mod', $k)] = csbt_skill::calculate_skill_modifier($v);
 							}
 							
-							//TODO: update dependent saves
 							$saveList = csbt_save::get_all($this->dbObj, $this->characterId, $obj->ability_id);
 							foreach($saveList as $k=>$v) {
 								$changesByKey[$this->create_sheet_id(csbt_save::sheetIdPrefix, 'ability_mod', $k)] = $v['ability_mod'];
