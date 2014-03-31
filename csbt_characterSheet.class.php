@@ -509,35 +509,8 @@ class csbt_characterSheet {
 		$sk = new csbt_skill();
 		$retval[csbt_skill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
 		
-		// Saves...
-		{
-			$allSaves = csbt_save::get_all($this->dbObj, $this->characterId);
-			$retval['saves'] = array();
-			foreach($allSaves as $id=>$data) {
-				$mySaves = array();
-
-
-				unset(
-						$data['ability_id'], $data['character_ability_id'], 
-						$data['ability_id'], $data['character_id'],
-						$data['character_save_id'], $data['temporary_score']
-				);
-
-				unset($data['total_mod']);
-
-				foreach($data as $k=>$v) {
-					$mySaves[$this->create_sheet_id('saves', $k)] = $v;
-				}
-				$displayName = strtoupper($data['save_name']);
-				if($displayName == 'FORT') {
-					$displayName = 'FORTITUDE';
-				}
-				$mySaves[$this->create_sheet_id('saves', 'display_name')] = $displayName;
-				ksort($mySaves);
-
-				$retval['saves'][$id] = $mySaves;
-			}
-		}
+		$_saves = new csbt_save();
+		$retval[$_saves::sheetIdPrefix] = $_saves->get_sheet_data($this->dbObj, $this->characterId);
 		
 		$ab = new csbt_ability();
 		$retval[csbt_ability::sheetIdPrefix] = $ab->get_sheet_data($this->dbObj, $this->characterId);
@@ -661,10 +634,6 @@ class csbt_characterSheet {
 	
 	//==========================================================================
 	public function handle_update($name, $value) {
-		
-		//TODO: the $name should really be in the form of sheetIdPrefix__field_name__ID (where ID is optional & depends on context)
-//cs_global::debug_print(__METHOD__ .": arguments::: ". cs_global::debug_print(func_get_args(),0),1);
-//exit;
 		$changesByKey = array();
 		$result = 0;
 		
@@ -672,27 +641,28 @@ class csbt_characterSheet {
 		$prefix = $bits[0];
 		$realName = $bits[1];
 		
-		$id=null;
+		$recordId=null;
 		if(isset($bits[2])) {
-			$id = $bits[2];
+			$recordId = $bits[2];
 		}
-		$debug = "realName=(". $realName ."), id=(". $id .")";
+		$fieldsToUpdate = array($realName=>$value);
+		$debug = "realName=(". $realName ."), id=(". $recordId .")";
 		switch($prefix) {
 			case csbt_ability::sheetIdPrefix:
 				
-				if(is_numeric($id)) {
+				if(is_numeric($recordId)) {
 					
 					$allAbilities = csbt_ability::get_all_abilities($this->dbObj, true);
 					
 					$obj = new csbt_ability();
-					$obj->load($this->dbObj, $id);
-					
+//					$obj->load($this->dbObj, $recordId);
+//					
 					if(!is_null($value) && strlen($value) == 0) {
-						$value = null;
+//						$value = null;
+						$fieldsToUpdate[$realName] = null;
 					}
+//					
 					
-					$obj->update($realName, $value);
-					$result = $obj->save($this->dbObj);
 					$obj->load($this->dbObj);
 					$this->load();
 					
@@ -750,74 +720,34 @@ class csbt_characterSheet {
 				$char->load($this->dbObj);
 				if($realName == 'xp_change') {
 					$xpCurrent = $char->xp_current;
-//					if(is_numeric($xpCurrent)) {
-					$debug .= " XP_CURRENT=(". $char->xp_current .")";
-						$char->update('xp_current', ($xpCurrent + $value));
-						$changesByKey[$name] = "";
-//					}
+					$fieldsToUpdate = array('xp_current', ($xpCurrent + $value));
 				}
-				else {
-					$char->update($realName, $value);
-				}
-				$result = $char->save($this->dbObj);
-				
-				$char->load($this->dbObj);
-				foreach($char->data as $idx=>$v) {
-					$sheetId = $this->create_sheet_id($char::sheetIdPrefix, $idx);
-					$changesByKey[$sheetId] = $v;
-				}
+				$changesByKey = $char->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 				
 			case csbt_save::sheetIdPrefix:
 				$x = new csbt_save();
-				$x->id = $id;
-				$x->update($realName, $value);
-				$result = $x->save($this->dbObj);
-				
-				//TODO: fix so there is no need to manually add the ID to the end of the key
-				$_sheetData = $x->get_sheet_data($this->dbObj, $this->characterId);
-				foreach($_sheetData[$id] as $k=>$v) {
-					$changesByKey[$k . '__'. $id] = $v;
-				}
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
 			case csbt_skill::sheetIdPrefix:
 				$x = new csbt_skill();
-				$x->id = $id;
-				
-				if($realName == 'is_class_skill') {
-					$value = cs_global::interpret_bool($value, array(false, true));
-				}
-				
-				$x->update($realName, $value);
-				$result = $x->save($this->dbObj);
-				$x->load($this->dbObj);
-				
-				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
 			case csbt_weapon::sheetIdPrefix:
 				$x = new csbt_weapon();
-				$x->id = $id;
-				$x->update($realName, $value);
-				$result = $x->save($this->dbObj);
-				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 
 			case csbt_specialAbility::sheetIdPrefix:
 				$x = new csbt_specialAbility();
-				$x->id = $id;
-				$x->update($realName, $value);
-				$result = $x->save($this->dbObj);
-				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
 			case csbt_gear::sheetIdPrefix:
 				$x = new csbt_gear();
-				$x->id = $id;
-				$x->update($realName, $value);
-				$result = $x->save($this->dbObj);
-				$changesByKey = $x->get_sheet_data($this->dbObj, $this->characterId, $id);
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
 			default:

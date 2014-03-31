@@ -59,7 +59,9 @@ class csbt_skill extends csbt_data {
 	//==========================================================================
 	public static function _get_record_extras(array $recordData) {
 		
-		$recordData['ability_mod'] = csbt_ability::calculate_ability_modifier($recordData['ability_score']);
+		if(isset($recordData['ability_score'])) {
+			$recordData['ability_mod'] = csbt_ability::calculate_ability_modifier($recordData['ability_score']);
+		}
 		$recordData['skill_mod'] = self::calculate_skill_modifier($recordData);
 		$recordData['is_class_skill_checked'] = cs_global::interpret_bool($recordData['is_class_skill'], array('', 'checked="checked"'));
 		$recordData['is_checked_checkbox'] = cs_global::interpret_bool($recordData['is_class_skill'], array("", "checked"));

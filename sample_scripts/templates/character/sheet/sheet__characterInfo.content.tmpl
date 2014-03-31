@@ -72,7 +72,8 @@
 				   class="derived" 
 				   value="{generated__campaign_name}" 
 				   type="text" 
-				   disabled="disabled">
+				   disabled="disabled"
+				   readonly="readonly">
 			<br>Campaign
 		</td>
 		<td colspan="2">
@@ -97,7 +98,7 @@
 		<td class="unit">
 			<input title="Size" 
 				   id="main__size" 
-				   class="freestyle" 
+				   class="freestyle nullable" 
 				   value="{main__size}" 
 				   type="text">
 			<br>Size
@@ -105,14 +106,50 @@
 		<td class="unit">
 			<input title="Age" 
 				   id="main__character_age" 
+				   class="nullable"
 				   value="{main__character_age}" 
 				   type="text">
 			<br>Age
 		</td>
-		<td class="unit"><input title="Gender" id="main__gender" class="freestyle" value="{main__gender}" type="text"><br>Gender</td>
-		<td class="unit"><input title="Height" id="main__height" class="freestyle" value="{main__height}" type="text"><br>Height</td>
-		<td class="unit"><input title="Weight" id="main__weight" value="{main__weight}" type="text"><br>Weight</td>
-		<td class="unit"><input title="Eye color" id="main__eye_color" class="freestyle" value="{main__eye_color}" type="text"><br>Eyes</td>
-		<td class="unit"><input title="Hair color" id="main__hair_color" class="freestyle" value="{main__hair_color}" type="text"><br>Hair</td>
+		<td class="unit">
+			<input 
+				title="Gender" 
+				id="main__gender" 
+				class="freestyle nullable" 
+				value="{main__gender}" 
+				type="text">
+			<br>Gender
+		</td>
+		<td class="unit">
+			<input title="Height" 
+				   id="main__height" 
+				   class="freestyle nullable" 
+				   value="{main__height}" 
+				   type="text">
+			<br>Height
+		</td>
+		<td class="unit">
+			<input title="Weight" 
+				   id="main__weight" 
+				   value="{main__weight}" 
+				   type="text">
+			<br>Weight
+		</td>
+		<td class="unit">
+			<input title="Eye color" 
+				   id="main__eye_color" 
+				   class="freestyle nullable" 
+				   value="{main__eye_color}" 
+				   type="text">
+			<br>Eyes
+		</td>
+		<td class="unit">
+			<input title="Hair color" 
+				   id="main__hair_color" 
+				   class="freestyle nullable" 
+				   value="{main__hair_color}" 
+				   type="text">
+			<br>Hair
+		</td>
 	</tr>
 </tbody></table>

@@ -12,6 +12,7 @@ class csbt_save extends csbt_data {
 	public function __construct(array $initialData=array()) {
 		parent::__construct($initialData, self::tableName, self::tableSeq, self::pkeyField);
 		$this->_sheetIdPrefix = self::sheetIdPrefix;
+		$this->_useSheetIdSuffix = true;
 	}
 	//==========================================================================
 	
@@ -97,10 +98,17 @@ class csbt_save extends csbt_data {
 	
 	//==========================================================================
 	public static function _get_record_extras(array $recordData) {
-		$recordData['ability_mod'] = self::calculate_ability_modifier($recordData['ability_score']);
+		if(isset($recordData['ability_score'])) {
+			$recordData['ability_mod'] = self::calculate_ability_modifier($recordData['ability_score']);
+		}
 		$recordData['total'] = self::calculate_total_save_modifier($recordData);
+		
+		$displayName = strtoupper($recordData['save_name']);
+		if($displayName == 'FORT') {
+			$displayName = 'FORTITUDE';
+		}
+		$recordData['display_name'] = $displayName;
 		return $recordData;
 	}
 	//==========================================================================
-
 }

@@ -310,6 +310,7 @@ class csbt_data {
 		
 		if($isSingleRecord) {
 			$data = $this->_get_record_extras($myData);
+
 			foreach($data as $k=>$v) {
 				$myId = $this->_sheetIdPrefix . '__' . $k;
 				if($this->_useSheetIdSuffix) {
@@ -346,6 +347,29 @@ class csbt_data {
 	 */
 	public static function _get_record_extras(array $recordData) {
 		return $recordData;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function update_and_get_changes(cs_phpDb $dbObj, array $updateFields, $recordId) {
+		$originalData = $this->_get_sheet_data($this->load($dbObj, $recordId), true);
+		foreach($updateFields as $k=>$v) {
+			$this->update($k, $v);
+		}
+		$this->save($dbObj);
+		$newData = $this->_get_sheet_data($this->load($dbObj), true); //$this->_get_record_extras($this->load($dbObj));
+		
+		
+		$unchangedData = array_intersect_assoc($newData, $originalData);
+		
+		$changesByKey = $newData;
+		foreach($unchangedData as $k=>$v) {
+			unset($changesByKey[$k]);
+		}
+		
+		return $changesByKey;
 	}
 	//==========================================================================
 }

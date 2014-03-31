@@ -50,6 +50,7 @@ class csbt_character extends csbt_data {
 			throw new InvalidArgumentException();
 		}
 		$this->id = $this->characterId;
+		$this->_sheetIdPrefix = self::sheetIdPrefix;
 	}//end __construct()
 	//==========================================================================
 	
