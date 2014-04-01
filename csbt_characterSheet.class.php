@@ -411,12 +411,10 @@ class csbt_characterSheet {
 		if($type == 'melee' || $type == 'ranged') {
 			$data = $this->_char->data;
 			$addThese = array($type .'_misc', $type .'_size', $type .'_temp', 'base_attack_bonus');
-//cs_global::debug_print(__METHOD__ .": data::: ". cs_global::debug_print($data,0),1);
 			
 			foreach($addThese as $colName) {
 				if(isset($data[$colName]) && is_numeric($data[$colName])) {
 					$atkBonus += $data[$colName];
-//cs_global::debug_print(__METHOD__ .": type=(". $type ."), added ". $colName ." (". $data[$colName] ."), current=(". $atkBonus .")",1);
 				}
 				else {
 					throw new ErrorException(__METHOD__ .": cannot calculate attack bonus for ". $type ." without ". $colName);
@@ -718,6 +716,14 @@ class csbt_characterSheet {
 					$fieldsToUpdate = array('xp_current', ($xpCurrent + $value));
 				}
 				$changesByKey = $char->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
+				
+				$this->load();
+				if(preg_match('/^melee/', $realName)) {
+					$changesByKey[$this->create_sheet_id('main', 'melee_total')] = $this->get_attack_bonus('melee');
+				}
+				elseif(preg_match('/^ranged/', $realName)) {
+					$changesByKey[$this->create_sheet_id('main', 'ranged_total')] = $this->get_attack_bonus('ranged');
+				}
 				break;
 				
 			case csbt_save::sheetIdPrefix:
