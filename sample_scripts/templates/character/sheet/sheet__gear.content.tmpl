@@ -1,26 +1,61 @@
-                <table id="gear" cellspacing="0">
-                  <tbody><tr class="title">
-                    <td colspan="3">Gear</td>
-                  </tr>
-                  <tr class="header">
-                    <td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
-                    <td class="unit"><div id="sortGear_ByWeight" title="Weight">Weight<br>(lbs)</div></td>
-                    <td class="unit"><div id="sortGear_ByLoc" title="Location">Loc</div></td>
-                  </tr>
+<table id="gear" cellspacing="0">
+	<tbody><tr class="title">
+			<td colspan="4">Gear</td>
+		</tr>
+		<tr class="header">
+			<td></td>
+			<td class="name"><div id="sortGear_ByName" title="Item">Item</div></td>
+			<td class="unit"><div id="sortGear_ByWeight" title="Weight">Weight<br>(lbs)</div></td>
+			<td class="unit"><div id="sortGear_ByQuantity" title="Qty">Quantity</div>
+			<td class="unit"><div title="Line Weight">Line<br>Weight</div></td>
+			<td class="unit"><div id="sortGear_ByLoc" title="Location">Location</div></td>
+		</tr>
 
-				<!-- BEGIN gearSlot -->
-                  <tr class="slot data {addClassName}">
-                    <td><span class="name nameField freestyle" title="Item name/description (ID #{gear_id})" id="gear__gear_name__{gear_id}" class="freestyle">{gear__gear_name}</span></td>
-                    <td><span title="Item weight" id="gear__weight__{gear_id}">{gear__total_weight}</span></td>
-                    <td><span title="Location of item" id="gear__location__{gear_id}" class="freestyle">{gear__location}</span></td>
-                  </tr>
-				<!-- END gearSlot -->
-                  <tr class="footer">
-                    <td>Total Weight:</td>
-                    <td class="total">
-						<span id="gear__total_weight__generated" 
-							  title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
-                    <td>
-                  </td></tr>
-		
-                </tbody></table>
+		<!-- BEGIN gearSlot -->
+		<tr class="slot data {addClassName}">
+			<td class="char">
+				<a class="delete" 
+				   href="javascript:void(showDeleteRecordDialog('Gear', {gear_id}, '{gear_name}', 'gear'));">[X]</a>
+			</td>
+			<td>
+				<span class="name nameField freestyle" 
+					  title="Item name/description (ID #{gear_id})" 
+					  id="gear__gear_name__{gear_id}" 
+					  class="freestyle"
+					  >{gear__gear_name}</span>
+			</td>
+			<td>
+				<span title="Item weight" 
+					  id="gear__weight__{gear_id}"
+					  >{gear__weight}</span>
+			</td>
+			<td>
+				<span title="Item quantity"
+					  id="gear__quantity__{gear_id}"
+					  >{gear__quantity}</span>
+			</td>
+			<td>
+				<span title="Total weight of this item (weight x qty)"
+					  id="gear__total_weight__{gear_id}"
+					  >{gear__total_weight}</span>
+			</td>
+			<td>
+				<span title="Location of item" 
+					  id="gear__location__{gear_id}" 
+					  class="freestyle nullable"
+					  >{gear__location}</span>
+			</td>
+		</tr>
+		<!-- END gearSlot -->
+		<tr class="footer">
+			<td></td>
+			<td>Total Weight:</td>
+			<td class="total">
+				<span id="gear__total_weight__generated" 
+					  title="Includes only items in this list.">{gear__total_weight__generated}</span></td>
+			<td>
+			</td>
+		</tr>
+
+	</tbody>
+</table>

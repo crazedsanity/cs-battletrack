@@ -5,7 +5,10 @@
 			  <td title="Weapon ID #{characterWeapon_id}">&nbsp;</td>
 		  </tr>
             <tr class="slot header {addClassName}">
-              <td class="type wide" title="Armor ID #{characterArmor_id}">Armor/Protective Item</td>
+              <td class="type wide" title="Armor ID #{characterArmor_id}">
+				<a class="delete" 
+				   href="javascript:void(showDeleteRecordDialog('Armor', {characterArmor_id}, '{characterArmor__armor_name}', 'characterArmor'));">[X]</a>
+				Armor/Protective Item</td>
               <td class="small">Type</td>
               <td class="small">AC Bonus</td>
               <td class="small">Check Pen</td>

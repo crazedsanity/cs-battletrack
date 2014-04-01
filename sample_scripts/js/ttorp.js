@@ -81,7 +81,6 @@ function markUpdatedInput(object, newVal, forceChange) {
 			 * they are technically repeats of the original/master value.
 			//*/
 			if(myId != undefined && $("."+ myId).length >0) {
-				console.log("SETTING value in ("+ myId +")... ");
 				$("."+ myId).val(newVal).addClass("updatedInput");
 			}
 		}
@@ -223,7 +222,6 @@ function showNewRecordDialog(pDialogId) {
 	if($("#"+ pDialogId +" div.hidden.title").text() != undefined) {
 		theTitle = $("#"+ pDialogId +" div.hidden.title").text();
 	}
-	console.log("DialogID=("+ pDialogId +")");
 	$("#"+ pDialogId).dialog({
 		modal: true,
 		title: theTitle,
@@ -338,7 +336,6 @@ function swapCheckboxImg(pObj) {
 		xNewVal = "";
 		$(hiddenChk).removeAttr('checked');
 	}
-	console.log("ID=("+ $(hiddenChk).attr("id") +"), oldVal=("+ xOldVal +"), newVal=("+ xNewVal +")");
 	
 	ajax_processChange($(hiddenChk).attr("id"));
 }
@@ -411,6 +408,48 @@ function switchToInput(target) {
 
 function togglePrintable() {
 	return($(".templateSection").not("#main__content").toggle());
+}
+
+function showDeleteRecordDialog(pTitle, pId, pName, pReloadSection) {
+	theTitle = "Deleting " + pTitle + " (ID #" + pId + ")";
+	xDebug = this;
+	
+	$("#deleteRecordId").val(pId);
+	$("#deleteRecordDescription").html(pName);
+	$("#deleteRecord_reloadSection").val(pReloadSection);
+	$("#dialog__delete").dialog({
+		modal: true,
+		title: theTitle,
+		position: 'top'
+	});
+}
+
+function deleteRecord() {
+	$("#dialog__delete").dialog("close");
+	
+	var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet$/, "_updates");
+	var fetchUrl = window.location.href;
+	var sectionToReload = $("#deleteRecord_reloadSection").val();
+	var divToReloadInto = 'load__'+ sectionToReload;
+		
+	var myData = {
+		type:			'delete',
+		recordType:		$("#deleteRecord_reloadSection").val(),
+		character_id:	$("#form_character_id").val(),
+		recordId:		$("#deleteRecordId").val()
+	};
+	
+	$.ajax({
+		type: "POST",
+		url: submitUrl,
+		data: myData,
+		success: function(tData) {
+			$("#" + divToReloadInto).load(fetchUrl + " #" + sectionToReload, function() {
+				bindInputMarking(divToReloadInto);
+				bindInputSwitching();
+			});
+		}
+	});
 }
 
 

@@ -50,6 +50,10 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 				}
 				$xmlData['callback_success'] = 'callback_processNewRecord';
 				break;
+				
+			case 'delete':
+				$xmlData['delete_result'] = $char->handle_delete($_POST['recordType'], $_POST['recordId']);
+				break;
 
 			case 'update':
 			default:

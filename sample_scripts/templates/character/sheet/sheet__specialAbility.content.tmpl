@@ -1,19 +1,26 @@
-                <table id="specialAbility" border="0">
-					<thead>
-						<tr class="title">
-                    <td colspan="4">
-                    	Feats &amp; Special Abilities
-                    </td>
-                  </tr>
-					</thead>
-                  <tbody>
-                  <!-- BEGIN specialAbilitySlot -->
-                  <tr class="specialAbilitySlot slot data {addClassName}">
-                    <td>
-                      <span class="text nameField freestyle" title="This is a feat or a special ability (ID #{specialAbility_id})" 
-							id="specialAbility__special_ability_name__{specialAbility_id}">{specialAbility__special_ability_name}</span>
-                    </td>
+<table id="specialAbility" border="0">
+	<thead>
+		<tr class="title">
+			<td colspan="4">
+				Feats &amp; Special Abilities
+			</td>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN specialAbilitySlot -->
+		<tr class="specialAbilitySlot slot data {addClassName}">
+			<td style="width:3em;">
+				<a class="delete" 
+				   href="javascript:void(showDeleteRecordDialog('Feat/Special Ability', {specialAbility_id}, '{specialAbility__special_ability_name}', 'specialAbility'));">[X]</a>
+			</td>
+			<td>
+				<span class="text nameField freestyle" 
+					  title="This is a feat or a special ability (ID #{specialAbility_id})" 
+					  id="specialAbility__special_ability_name__{specialAbility_id}"
+					  >{specialAbility__special_ability_name}</span>
+			</td>
 
-                  </tr>
-                  <!-- END specialAbilitySlot -->
-                </tbody></table>
+		</tr>
+		<!-- END specialAbilitySlot -->
+	</tbody>
+</table>

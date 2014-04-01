@@ -743,6 +743,7 @@ class csbt_characterSheet {
 			case csbt_gear::sheetIdPrefix:
 				$x = new csbt_gear();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
+				$changesByKey[$x::sheetIdPrefix .'__total_weight__generated'] = csbt_gear::calculate_list_weight($x->get_all($this->dbObj, $this->characterId));
 				break;
 			
 			default:
@@ -798,6 +799,54 @@ class csbt_characterSheet {
 		}
 		
 		return $result;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
+	public function handle_delete($type, $recordId) {
+		$retval = "Invalid section... type=(". $type ."), recordId=(". $recordId .")";
+				
+		switch($type) {
+			case 'weapon':
+			case csbt_weapon::sheetIdPrefix:
+				$x = new csbt_weapon();
+				$x->load($this->dbObj, $recordId);
+				$retval = $x->delete($this->dbObj);
+				break;
+			
+			case 'armor':
+			case csbt_armor::sheetIdPrefix:
+				$x = new csbt_armor();
+				$x->load($this->dbObj, $recordId);
+				$retval = $x->delete($this->dbObj);
+				break;
+			
+			case 'skill':
+			case csbt_skill::sheetIdPrefix:
+				$x = new csbt_skill();
+				$x->load($this->dbObj, $recordId);
+				$retval = $x->delete($this->dbObj);
+				break;
+			
+			case 'feat':
+			case 'specialAbility':
+			case csbt_specialAbility::sheetIdPrefix:
+				$x = new csbt_specialAbility();
+				$x->load($this->dbObj, $recordId);
+				$retval = $x->delete($this->dbObj);
+				break;
+			
+			case 'gear':
+			case csbt_gear::sheetIdPrefix:
+				$x = new csbt_gear();
+				$x->load($this->dbObj, $recordId);
+				$retval = $x->delete($this->dbObj);
+				break;
+		}
+		
+		return $retval;
 	}
 	//==========================================================================
 }

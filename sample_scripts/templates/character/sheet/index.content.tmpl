@@ -64,7 +64,9 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 			<table id="skillsandgear">
 			<tr>
 				<td id="skillcontainer">
+					<div style="display:inline" id="load__skills">
 					{sheet__skills}
+					</div>
 				</td>
 				<td class="spacer"></td>
 
@@ -133,5 +135,11 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 			<input name="tableName" value="characterArmor" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
 			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
+	</div>
+	<div id='dialog__delete' class='form'>
+		<input id="deleteRecordId" value='' class='hidden'>
+		<span id='deleteRecordDescription'>??</span>
+		<input type="hidden" id="deleteRecord_reloadSection" value="">
+		<button  class='submit' id='deleteButton' value='' onclick='javascript:deleteRecord()'>Delete It!</button>
 	</div>
 </div>

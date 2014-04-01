@@ -722,3 +722,8 @@ table tbody tr.slot.data:nth-child(even) td
 {
 	background-color: #F2EFE9;
 }
+
+a.delete
+{
+	float:left;
+}

@@ -1,47 +1,93 @@
-                <table id="skills" cellpadding="0" cellspacing="0">
-                  <tbody><tr class="title">
-                    <td colspan="10">
-                      <div id="skillranks">
-                        <div>
-                          <input title="Maximum ranks for class skills" id="main__skills_max" value="{main__skills_max}" type="text">/
-                          <input title="Maximum ranks for cross-class (CC) skills" id="main__skills_max_cc" value="{main__skills_max_cc}" type="text" readonly="readonly">
-                        </div>
-                        Max Rank
-                      </div>
-                      Skills
-                    </td>
-                  </tr>
-                  <tr class="header">
-                    <td class="name"><div title="Sort by Skill Name">Skill Name</div></td>
-                    <td><div title="Ability">Key<br>Ab</div></td>
-                    <td><div title="Checkmark indicates it is a CLASS skill">CS</div></td>
-                    <td><div title="Sort by Skill Modifier">Skill<br>Mod</div></td>
-                    <td>
-                    </td><td><div id="skillSort_abmodifier" title="Ability Modifier">Ab<br>Mod</div></td>
-                    <td>
-                    </td><td><div id="skillSort_rank" title="Rank">Rank</div></td>
-                    <td>
-                    </td><td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
-                  </tr>
-                  <!-- BEGIN skillsSlot -->
-		          <tr class="skillslot slot data {addClassName}">
-                    <td class="name"><span class="text nameField freestyle" title="Name of skill (ID #{skills_id})" id="skills__skill_name__{skills_id}">{skills__skill_name}</span></td>
-                    <td class="unit"><span class="derived">{skills__ability_name}</span></td>
-                    <td class="char">
-                    	<img class="chk" title="Checkmark indicates it is a CLASS SKILL" border="0" src="/images/ttorp/checkbox{skills__is_checked_checkbox}.jpg" />
-                    	<input class="hidden chk" id="skills__is_class_skill__{skills_id}" type="checkbox" {skills__is_class_skill_checked}>
-                    </td>
-                    <td class="unit"><span class="text derived" id="skills__skill_mod__{skills_id}" title="Total skill modifier">{skills__skill_mod}</span></td>
-                    <td class="char">=</td>
-                    <td class="unit"><span class="text derived" title="Ability Modifier" id="skills__ability_mod__{skills_id}" class="derived">{skills__ability_mod}</span></td>
-                    <td class="char">+</td>
-                    <td class="unit"><span class="text" title="Ranks" id="skills__ranks__{skills_id}">{skills__ranks}</span></td>
-                    <td class="char">+</td>
-                    <td class="unit"><span class="text" title="Miscellaneous Modifier" id="skills__misc_mod__{skills_id}">{skills__misc_mod}</span></td>
-                  </tr>
-                  <!-- END skillsSlot -->
-                  <!-- BEGIN skills__selectAbility --><select id="skills__ability_id__%%skill_id%%" %%skills__selectAbility__extra%%>
-                  %%optionList%%
-                  </select><!-- END skills__selectAbility -->
-                  
-                </tbody></table>
+<table id="skills" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr class="title">
+			<td colspan="11">
+				<div id="skillranks">
+					<div>
+						<input title="Maximum ranks for class skills" 
+							   id="main__skills_max" value="{main__skills_max}" 
+							   type="text">/
+						<input title="Maximum ranks for cross-class (CC) skills" 
+							   id="main__skills_max_cc" 
+							   value="{main__skills_max_cc}" 
+							   type="text" 
+							   readonly="readonly">
+					</div>
+					Max Rank
+				</div>
+				Skills
+			</td>
+		</tr>
+		<tr class="header">
+			<td></td>
+			<td class="name"><div title="Sort by Skill Name">Skill Name</div></td>
+			<td><div title="Ability">Key<br>Ab</div></td>
+			<td><div title="Checkmark indicates it is a CLASS skill">CS</div></td>
+			<td><div title="Sort by Skill Modifier">Skill<br>Mod</div></td>
+			<td>
+			</td><td><div id="skillSort_abmodifier" title="Ability Modifier">Ab<br>Mod</div></td>
+			<td>
+			</td><td><div id="skillSort_rank" title="Rank">Rank</div></td>
+			<td>
+			</td>
+			<td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
+		</tr>
+		<!-- BEGIN skillsSlot -->
+		<tr class="skillslot slot data {addClassName}">
+			<td class="char">
+				<a class="delete" 
+				   href="javascript:void(showDeleteRecordDialog('Skill', {skills_id}, '{skills_skill_name}', 'skills'));">[X]</a>
+			</td>
+			<td class="name">
+				<span class="text nameField freestyle" 
+					  title="Name of skill (ID #{skills_id})" 
+					  id="skills__skill_name__{skills_id}"
+					  >{skills__skill_name}</span>
+			</td>
+			<td class="unit">
+				<span class="derived">{skills__ability_name}</span>
+			</td>
+			<td class="char">
+				<img class="chk" 
+					 title="Checkmark indicates it is a CLASS SKILL" 
+					 border="0" 
+					 src="/images/ttorp/checkbox{skills__is_checked_checkbox}.jpg" />
+				<input class="hidden chk" 
+					   id="skills__is_class_skill__{skills_id}" 
+					   type="checkbox" {skills__is_class_skill_checked}>
+			</td>
+			<td class="unit">
+				<span class="text derived" 
+					  id="skills__skill_mod__{skills_id}" 
+					  title="Total skill modifier"
+					  >{skills__skill_mod}</span></td>
+			<td class="char">=</td>
+			<td class="unit">
+				<span class="text derived" 
+					  title="Ability Modifier" 
+					  id="skills__ability_mod__{skills_id}" 
+					  class="derived"
+					  >{skills__ability_mod}</span>
+			</td>
+			<td class="char">+</td>
+			<td class="unit">
+				<span class="text" 
+					  title="Ranks" 
+					  id="skills__ranks__{skills_id}"
+					  >{skills__ranks}</span>
+			</td>
+			<td class="char">+</td>
+			<td class="unit">
+				<span class="text" 
+					  title="Miscellaneous Modifier" 
+					  id="skills__misc_mod__{skills_id}"
+					  >{skills__misc_mod}</span>
+			</td>
+		</tr>
+		<!-- END skillsSlot -->
+		<!-- BEGIN skills__selectAbility --><select id="skills__ability_id__%%skill_id%%" %%skills__selectAbility__extra%%>
+			%%optionList%%
+		</select><!-- END skills__selectAbility -->
+
+	</tbody>
+</table>
