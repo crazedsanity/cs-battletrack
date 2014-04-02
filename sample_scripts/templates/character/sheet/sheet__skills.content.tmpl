@@ -24,13 +24,14 @@
 			<td><div title="Ability">Key<br>Ab</div></td>
 			<td><div title="Checkmark indicates it is a CLASS skill">CS</div></td>
 			<td><div title="Sort by Skill Modifier">Skill<br>Mod</div></td>
+			<td></td>
+			<td><div id="skillSort_abmodifier" title="Ability Modifier">Ab<br>Mod</div></td>
+			<td></td>
+			<td><div id="skillSort_rank" title="Rank">Rank</div></td>
+			<td></td>
 			<td>
-			</td><td><div id="skillSort_abmodifier" title="Ability Modifier">Ab<br>Mod</div></td>
-			<td>
-			</td><td><div id="skillSort_rank" title="Rank">Rank</div></td>
-			<td>
+				<div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</div>
 			</td>
-			<td><div id="skillSort_misc" title="Miscellaneous Modifier">Misc<br>Mod</a></td>
 		</tr>
 		<!-- BEGIN skillsSlot -->
 		<tr class="skillslot slot data {addClassName}">
@@ -60,13 +61,13 @@
 				<span class="text derived" 
 					  id="skills__skill_mod__{skills_id}" 
 					  title="Total skill modifier"
-					  >{skills__skill_mod}</span></td>
+					  >{skills__skill_mod}</span>
+			</td>
 			<td class="char">=</td>
 			<td class="unit">
 				<span class="text derived" 
 					  title="Ability Modifier" 
 					  id="skills__ability_mod__{skills_id}" 
-					  class="derived"
 					  >{skills__ability_mod}</span>
 			</td>
 			<td class="char">+</td>
@@ -85,7 +86,10 @@
 			</td>
 		</tr>
 		<!-- END skillsSlot -->
-		<!-- BEGIN skills__selectAbility --><select name="skills__ability_id__%%skill_id%%" id="skills__ability_id__%%skill_id%%" %%skills__selectAbility__extra%%>
+		<!-- BEGIN skills__selectAbility -->
+		<select name="skills__ability_id__%%skill_id%%" 
+				id="skills__ability_id__%%skill_id%%" 
+				%%skills__selectAbility__extra%%>
 			%%optionList%%
 		</select><!-- END skills__selectAbility -->
 

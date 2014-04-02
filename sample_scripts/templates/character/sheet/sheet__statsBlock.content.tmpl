@@ -1,51 +1,57 @@
-          <table id="stats" cellspacing="0">
-            <tbody><tr>
-              <td rowspan="2" class="unit top">
-                
+<table id="stats" cellspacing="0">
+	<tbody>
+		<tr>
+			<td rowspan="2" class="unit top">
+
                 <table id="statblock">
-                  <tbody><tr>
-                    <td class="header">Ability</td>
-                    <td class="header">Score</td>
-                    <td class="header">Mod</td>
-                    <td class="header">Temp<br>Score</td>
-                    <td class="header">Temp<br>Mod</td>
-                  </tr>
-<!-- BEGIN characterAbilitySlot -->
-                  <tr>
-                    <td class="tag">
-						<span title="{characterAbility__display_name}" class="help">{characterAbility__ability_name}</span>
-					</td>
-                    <td>
-						<input title="{characterAbility__display_name}" 
-							   id="characterAbility__ability_score__{characterAbility__character_ability_id}" 
-							   value="{characterAbility__ability_score}" 
-							   class="mod" 
-							   type="text">
-					</td>
-                    <td>
-						<input title="{characterAbility__display_name} bonus" 
-							   id="characterAbility__{characterAbility__ability_name}_modifier" 
-							   value="{characterAbility__ability_modifier}" 
-							   class="mod derived" 
-							   type="text" 
-							   readonly="readonly">
-					</td>
-                    <td>
-						<input title="TEMPORARY {characterAbility__display_name} (total)" 
-							   id="characterAbility__temporary_score__{characterAbility__character_ability_id}" 
-							   value="{characterAbility__temporary_score}" 
-							   class="tempmod nullable" 
-							   type="text">
-					</td>
-                    <td>
-						<input title="TEMPORARY {characterAbility__display_name} bonus" 
-							   id="characterAbility__{characterAbility__ability_name}_temporary_modifier" 
-							   value="{characterAbility__temporary_modifier}" 
-							   class="tempmod derived" 
-							   type="text" 
-							   readonly="readonly">
-					</td>
-                  </tr>
-<!-- END characterAbilitySlot -->
-                </tbody>
+					<tbody>
+						<tr>
+							<td class="header">Ability</td>
+							<td class="header">Score</td>
+							<td class="header">Mod</td>
+							<td class="header">Temp<br>Score</td>
+							<td class="header">Temp<br>Mod</td>
+						</tr>
+						<!-- BEGIN characterAbilitySlot -->
+						<tr>
+							<td class="tag">
+								<span title="{characterAbility__display_name}" class="help">{characterAbility__ability_name}</span>
+							</td>
+							<td>
+								<input title="{characterAbility__display_name}" 
+									   id="characterAbility__ability_score__{characterAbility__character_ability_id}" 
+									   value="{characterAbility__ability_score}" 
+									   class="mod" 
+									   type="text">
+							</td>
+							<td>
+								<input title="{characterAbility__display_name} bonus" 
+									   id="characterAbility__{characterAbility__ability_name}_modifier" 
+									   value="{characterAbility__ability_modifier}" 
+									   class="mod derived" 
+									   type="text" 
+									   readonly="readonly">
+							</td>
+							<td>
+								<input title="TEMPORARY {characterAbility__display_name} (total)" 
+									   id="characterAbility__temporary_score__{characterAbility__character_ability_id}" 
+									   value="{characterAbility__temporary_score}" 
+									   class="tempmod nullable" 
+									   type="text">
+							</td>
+							<td>
+								<input title="TEMPORARY {characterAbility__display_name} bonus" 
+									   id="characterAbility__{characterAbility__ability_name}_temporary_modifier" 
+									   value="{characterAbility__temporary_modifier}" 
+									   class="tempmod derived" 
+									   type="text" 
+									   readonly="readonly">
+							</td>
+						</tr>
+						<!-- END characterAbilitySlot -->
+					</tbody>
 				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>

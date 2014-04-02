@@ -13,6 +13,8 @@ class csbt_data {
 	
 	public $booleanFields = array();
 	
+	public $version;
+	
 	//==========================================================================
 	public function __construct($initial, $table, $seq, $pkey, cs_phpDB $dbObj = null) {
 		$this->_dbTable = $table;
@@ -32,6 +34,9 @@ class csbt_data {
 				throw new LogicException(__METHOD__ .": invalid type for initial: ". gettype($initial));
 			}
 		}
+		
+		$this->version = new cs_version();
+		$this->version->set_version_file_location(dirname(__FILE__) .'/../VERSION');
 	}
 	//==========================================================================
 	

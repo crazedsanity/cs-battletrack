@@ -595,9 +595,6 @@ class csbt_characterSheet {
 				$page->add_template_var($name, $val);
 			}
 		}
-		
-		$page->add_template_var('CSBT_project_name', $this->version->get_project());
-		$page->add_template_var('CSBT_version', $this->version->get_version());
 	}
 	//==========================================================================
 	

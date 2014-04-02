@@ -8,145 +8,130 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 	<input type="hidden" name="character_id" id="form_character_id" value="{main__character_id}" />
 	<table id="maintable">
 		<tr>
-		<td id="main">
+			<td id="main">
+				{sheet__characterInfo}
+				<table id="stats" cellspacing="0">
+					<tr>
+						<td rowspan="2" class="unit top">
+							{sheet__statsBlock}
+							{sheet__actionPoints}
+						</td>
+						<td colspan="2" class="top">
+							{sheet__hp-ac-dr}
+						</td>
+					</tr>
+					<tr>
+						<td class="unit top">
+							{sheet__ac-TouchAndFF}
+							{sheet__initiative}
+							{sheet__speed}
+						</td>
+						<td rowspan="2">
+							{sheet__imageAndLoads}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{sheet__saves}
+						</td>
+					</tr>
+				</table>
 
-			{sheet__characterInfo}
-
-			<table id="stats" cellspacing="0">
-			<tr>
-				<td rowspan="2" class="unit top">
-				{sheet__statsBlock}
-				{sheet__actionPoints}
-				
-				</td>
-				<td colspan="2" class="top">
-				
-				{sheet__hp-ac-dr}
-
-				</td>
-			</tr>
-			<tr>
-				<td class="unit top">
-				{sheet__ac-TouchAndFF}
-				{sheet__initiative}
-				{sheet__speed}
-
-				</td>
-				<td rowspan="2">
-				
-				{sheet__imageAndLoads}
-				
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-				{sheet__saves}
-				</td>
-			</tr>
-			</table>
-
-			{sheet__attacks}
-
-			<!--
-			table.weapon are weapon slots.
-			-->
-			<div style="display:inline" class="weaponSlot" id="load__characterWeapon">
-			{sheet__weapons}
-			</div>
-			<button class="createRecord" onClick="showNewRecordDialog('dialog__characterWeapon');">Add A Weapon</button>
-			
-			<div id="load__characterArmor">
-			{sheet__armor}
-			</div>
-			<button class="createRecord" onClick="showNewRecordDialog('dialog__characterArmor');">Add Some Armor</button>
+				{sheet__attacks}
 
 
-			<table id="skillsandgear">
-			<tr>
-				<td id="skillcontainer">
-					<div style="display:inline" id="load__skills">
-					{sheet__skills}
-					</div>
-					<button class="createRecord" onClick="showNewRecordDialog('dialog__skills');">Add a Skill</button>
-				</td>
-				<td class="spacer"></td>
-
-				<td id="featsandgearcontainer">
-
-				<div id="load__specialAbility">
-					{sheet__specialAbility}
+				<div style="display:inline" class="weaponSlot" id="load__characterWeapon">
+					{sheet__weapons}
 				</div>
-				<button class="newRecord" onClick="showNewRecordDialog('dialog__specialAbility')">Add Feat/Special Ability</button>
-				
-				<div id="load__gear">
-					{sheet__gear}
+				<button class="createRecord" onClick="showNewRecordDialog('dialog__characterWeapon');">Add A Weapon</button>
+
+				<div id="load__characterArmor">
+					{sheet__armor}
 				</div>
-				<button class="newRecord" onClick="showNewRecordDialog('dialog__gear')">Add Gear</button>
+				<button class="createRecord" onClick="showNewRecordDialog('dialog__characterArmor');">Add Some Armor</button>
 
-				</td>
-			</tr>
-			</table>
 
-			{sheet__notes}
-			
+				<table id="skillsandgear">
+					<tr>
+						<td id="skillcontainer">
+							<div style="display:inline" id="load__skills">
+								{sheet__skills}
+							</div>
+							<button class="createRecord" onClick="showNewRecordDialog('dialog__skills');">Add a Skill</button>
+						</td>
+						<td class="spacer"></td>
 
-		</td>
-		
+						<td id="featsandgearcontainer">
+
+							<div id="load__specialAbility">
+								{sheet__specialAbility}
+							</div>
+							<button class="newRecord" onClick="showNewRecordDialog('dialog__specialAbility')">Add Feat/Special Ability</button>
+
+							<div id="load__gear">
+								{sheet__gear}
+							</div>
+							<button class="newRecord" onClick="showNewRecordDialog('dialog__gear')">Add Gear</button>
+						</td>
+					</tr>
+				</table>
+				{sheet__notes}
+			</td>
 		</tr>
 	</table>
 </form>
 
-<div class="dialog" class="hidden" style="display:none;">
+<div class="dialog hidden">
 	<div id="dialog__specialAbility" class="form">
 		<div class="hidden title">Create a New Feat/Special Ability</div>
 		New Special Ability/Feat: 
-		<input name="specialAbility__special_ability_name__new" type="text" class="freestyle" />
-		<input name="nameField" value="specialAbility__special_ability_name__new" class="hidden" />
-		<input name="character_id" value="{main__character_id}" class="hidden" />
-		<input name="tableName" value="specialAbility" class="hidden" />
-		<input name="type" value="newRecord" class="hidden" />
+		<input name="specialAbility__special_ability_name__new" type="text" class="freestyle">
+		<input name="nameField" value="specialAbility__special_ability_name__new" class="hidden">
+		<input name="character_id" value="{main__character_id}" class="hidden">
+		<input name="tableName" value="specialAbility" class="hidden">
+		<input name="type" value="newRecord" class="hidden">
 		<button value="Create New Feat/Special Ability" class="submit" id="__THEBUTTON__" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__gear" class="form">
 		<div class="hidden title">Add Some Gear</div>
 		New Gear: 
-		<input name="gear__gear_name__new" type="text" class="freestyle" />
-		<input name="nameField" value="gear__gear_name__new" class="hidden" />
-		<input name="character_id" value="{main__character_id}" class="hidden" />
-		<input name="tableName" value="gear" class="hidden" />
-		<input name="type" value="newRecord" class="hidden" />
+		<input name="gear__gear_name__new" type="text" class="freestyle">
+		<input name="nameField" value="gear__gear_name__new" class="hidden">
+		<input name="character_id" value="{main__character_id}" class="hidden">
+		<input name="tableName" value="gear" class="hidden">
+		<input name="type" value="newRecord" class="hidden">
 		<button value="Create New Gear" class="submit" id="gearSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__characterWeapon" class="form">
 		<div class="hidden title">Create a New Weapon</div>
 		Weapon's Name:
-			<input class="left nameField freestyle" title="Weapon's name" name="characterWeapon__weapon_name__new" value="">
-			<input name="character_id" value="{main__character_id}" class="hidden" />
-			<input name="nameField" value="characterWeapon__weapon_name__new" class="hidden" />
-			<input name="tableName" value="characterWeapon" class="hidden" />
-			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
+		<input class="left nameField freestyle" title="Weapon's name" name="characterWeapon__weapon_name__new" value="">
+		<input name="character_id" value="{main__character_id}" class="hidden">
+		<input name="nameField" value="characterWeapon__weapon_name__new" class="hidden">
+		<input name="tableName" value="characterWeapon" class="hidden">
+		<input name="type" value="newRecord" class="hidden">
+		<button value="Create New Weapon" class="submit" id="weaponSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__characterArmor" class="form">
 		<div class="hidden title">Create New Armor</div>
 		Armor Name:
-			<input class="left nameField freestyle" title="Armor's name" name="characterArmor__armor_name__new" value="">
-			<input name="character_id" value="{main__character_id}" class="hidden" />
-			<input name="nameField" value="characterArmor__armor_name__new" class="hidden" />
-			<input name="tableName" value="characterArmor" class="hidden" />
-			<input name="type" value="newRecord" class="hidden" />
-			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
+		<input class="left nameField freestyle" title="Armor's name" name="characterArmor__armor_name__new" value="">
+		<input name="character_id" value="{main__character_id}" class="hidden">
+		<input name="nameField" value="characterArmor__armor_name__new" class="hidden">
+		<input name="tableName" value="characterArmor" class="hidden">
+		<input name="type" value="newRecord" class="hidden">
+		<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id="dialog__skills" class="form">
 		<div class="hidden title">Create a New Skill</div>
 		Skill Name:
-			<input class="left nameField freestyle" title="Skill name" name="skills__skill_name__new" value="">
-			<input name="character_id" value="{main__character_id}" class="hidden" />
-			<input name="nameField" value="skills__skill_name__new" class="hidden" />
-			<input name="tableName" value="skills" class="hidden" />
-			<input name="type" value="newRecord" class="hidden" />
-			{skills__selectAbility}
-			<button value="Create New Skill" class="submit" id="skillSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
+		<input class="left nameField freestyle" title="Skill name" name="skills__skill_name__new" value="">
+		<input name="character_id" value="{main__character_id}" class="hidden">
+		<input name="nameField" value="skills__skill_name__new" class="hidden">
+		<input name="tableName" value="skills" class="hidden">
+		<input name="type" value="newRecord" class="hidden">
+		{skills__selectAbility}
+		<button value="Create New Skill" class="submit" id="skillSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id='dialog__delete' class='form'>
 		<input id="deleteRecordId" value='' class='hidden'>

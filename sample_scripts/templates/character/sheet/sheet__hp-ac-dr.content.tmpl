@@ -1,65 +1,121 @@
-                <table id="hp">
-                  <tbody>
-				  	<tr>
-                    <td></td>
-					<td class="header"><br>TOTAL</td>
-                    <td></td>
-					<td class="header" colspan="3">Current HP</td>
-                    <td></td>
-					<td class="header" colspan="3">Nonlethal Damage</td>
-                    <td></td>
-					<td class="header" colspan="3">Hit Dice</td>
-                    <td></td>
-					<td class="header" colspan="3"><span title="Damage Reduction" class="help">Damage Reduction</span></td>
-                  </tr>
-                  <tr>
-                    <td class="tag"><span title="Hit Points" class="help">HP</span></td>
-                    <td><input title="Total Hit Points" id="main__hit_points_max" value="{main__hit_points_max}" type="text"></td>
-                    <td></td>
-					<td colspan="3"><input title="Current hit points" id="main__hit_points_current" value="{main__hit_points_current}" type="text"></td>
-                    <td></td>
-					<td colspan="3"><input title="Nonlethal damage" id="main__nonlethal_damage" value="{main__nonlethal_damage}" type="text"></td>
-                    <td></td>
-					<td colspan="3" class="nowrap char basenum">d<input title="Hit dice for your CURRENT class (just the number, like '12' in 'd12')" id="main__hit_dice" value="{main__hit_dice}" type="text"></td>
-                    <td></td>
-					<td colspan="3"><input title="Damage Reduction" id="main__damage_reduction" class="freestyle nullable" value="{main__damage_reduction}" type="text"></td>
-                  </tr>
-                  <tr>
-                    <td class="tag"><span title="Armor Class" class="help">AC</span></td>
-                    <td class="unit"><input title="Total AC (Armor Class)" id="main__total_ac" value="{main__total_ac}" type="text" class="derived" readonly="readonly"></td>
-                    <td class="char">=</td>
-                    <td class="basenum"><span id="placeholder_ac_base">10</span></td>
-                    <td class="char">+</td>
-                    <td class="unit">
-						<input title="Bonus to AC from armor (add AC bonus from all worn protective items)" 
-							   id="main__total_ac_bonus" 
-							   value="{main__total_ac_bonus}" 
-							   class="derived hl--main__total_ac_bonus" 
-							   type="text" 
-							   readonly="readonly"></td>
-                    <td class="char">+</td>
-                    <td class="unit"><input title="Dexterity modifier" id="placeholder_ac_dex" class="derived hl--characterAbility__dex_modifier characterAbility__dex_modifier" value="{characterAbility__dex_modifier}" type="text" readonly="readonly"></td>
-                    <td class="char">+</td>
-                    <td class="unit"><input title="Size modifier for AC" id="main__ac_size" value="{main__ac_size}" type="text"></td>
-                    <td class="char">+</td>
-                    <td class="unit"><input title="Natural armor bonus" id="main__ac_natural" value="{main__ac_natural}" type="text"></td>
-                    <td class="char"><span class="dark">+</span></td>
-                    <td class="unit"><input title="Misc. modifier to AC" id="main__ac_misc" value="{main__ac_misc}" type="text"></td>
-                  </tr>
-                  <tr>
-                    <td>
-                    </td><td class="footer">TOTAL</td>
-                    <td>
-                    </td><td>
-                    </td><td>
-                    </td><td class="footer">Armor</td>
-                    <td>
-                    </td><td class="footer">Dex</td>
-                    <td>
-                    </td><td class="footer">Size</td>
-                    <td>
-                    </td><td class="footer">Natural</td>
-                    <td>
-                    </td><td class="footer">Misc</td>
-                  </tr>
-                </tbody></table>
+<table id="hp">
+	<tbody>
+		<tr>
+			<td></td>
+			<td class="header"><br>TOTAL</td>
+			<td></td>
+			<td class="header" colspan="3">Current HP</td>
+			<td></td>
+			<td class="header" colspan="3">Nonlethal Damage</td>
+			<td></td>
+			<td class="header" colspan="3">Hit Dice</td>
+			<td></td>
+			<td class="header" colspan="3"><span title="Damage Reduction" class="help">Damage Reduction</span></td>
+		</tr>
+		<tr>
+			<td class="tag"><span title="Hit Points" class="help">HP</span></td>
+			<td>
+				<input title="Total Hit Points" 
+					   id="main__hit_points_max" 
+					   value="{main__hit_points_max}" 
+					   type="text">
+			</td>
+			<td></td>
+			<td colspan="3">
+				<input title="Current hit points" 
+					   id="main__hit_points_current" 
+					   value="{main__hit_points_current}" 
+					   type="text">
+			</td>
+			<td></td>
+			<td colspan="3">
+				<input title="Nonlethal damage" 
+					   id="main__nonlethal_damage" 
+					   value="{main__nonlethal_damage}" 
+					   type="text">
+			</td>
+			<td></td>
+			<td colspan="3" class="nowrap char basenum">d
+				<input title="Hit dice for your CURRENT class (just the number, like '12' in 'd12')" 
+					   id="main__hit_dice" 
+					   value="{main__hit_dice}" 
+					   type="text">
+			</td>
+			<td></td>
+			<td colspan="3">
+				<input title="Damage Reduction" 
+					   id="main__damage_reduction"
+					   class="freestyle nullable" 
+					   value="{main__damage_reduction}"
+					   type="text">
+			</td>
+		</tr>
+		<tr>
+			<td class="tag"><span title="Armor Class" class="help">AC</span></td>
+			<td class="unit">
+				<input title="Total AC (Armor Class)" 
+					   id="main__total_ac" 
+					   value="{main__total_ac}" 
+					   type="text" 
+					   class="derived" 
+					   readonly="readonly">
+			</td>
+			<td class="char">=</td>
+			<td class="basenum"><span id="placeholder_ac_base">10</span></td>
+			<td class="char">+</td>
+			<td class="unit">
+				<input title="Bonus to AC from armor (add AC bonus from all worn protective items)" 
+					   id="main__total_ac_bonus" 
+					   value="{main__total_ac_bonus}" 
+					   class="derived hl--main__total_ac_bonus" 
+					   type="text" 
+					   readonly="readonly"></td>
+			<td class="char">+</td>
+			<td class="unit">
+				<input title="Dexterity modifier" 
+					   id="placeholder_ac_dex" 
+					   class="derived hl--characterAbility__dex_modifier characterAbility__dex_modifier" 
+					   value="{characterAbility__dex_modifier}" 
+					   type="text" 
+					   readonly="readonly">
+			</td>
+			<td class="char">+</td>
+			<td class="unit">
+				<input title="Size modifier for AC" 
+					   id="main__ac_size" 
+					   value="{main__ac_size}" 
+					   type="text">
+			</td>
+			<td class="char">+</td>
+			<td class="unit">
+				<input title="Natural armor bonus" 
+					   id="main__ac_natural" 
+					   value="{main__ac_natural}" 
+					   type="text">
+			</td>
+			<td class="char"><span class="dark">+</span></td>
+			<td class="unit">
+				<input title="Misc. modifier to AC" 
+					   id="main__ac_misc" 
+					   value="{main__ac_misc}" 
+					   type="text">
+			</td>
+		</tr>
+		<tr>
+			<td>
+			</td><td class="footer">TOTAL</td>
+			<td>
+			</td><td>
+			</td><td>
+			</td><td class="footer">Armor</td>
+			<td>
+			</td><td class="footer">Dex</td>
+			<td>
+			</td><td class="footer">Size</td>
+			<td>
+			</td><td class="footer">Natural</td>
+			<td>
+			</td><td class="footer">Misc</td>
+		</tr>
+	</tbody>
+</table>
