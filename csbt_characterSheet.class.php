@@ -555,8 +555,6 @@ class csbt_characterSheet {
 			}
 		}
 		
-		$abilityList = csbt_ability::get_all_abilities($this->dbObj);
-		
 		foreach($data as $name=>$val) {
 			if(is_array($val)) {
 				$blockRowName = $name . 'Slot';
@@ -574,7 +572,7 @@ class csbt_characterSheet {
 				foreach($val as $id=>$subArray) {
 					if(is_array($subArray)) {
 						if($name == 'skills') {
-							$subArray['abilityDropDown'] = $this->create_ability_select($page, $abilityList, $id, $subArray['skills__ability_name']);
+							$subArray['abilityDropDown'] = $this->create_ability_select($page, $id, $subArray['skills__ability_name']);
 						}
 						
 						$myBlockRow = $page->templateRows[$blockRowName];
@@ -605,7 +603,8 @@ class csbt_characterSheet {
 	
 	
 	//==========================================================================
-	private function create_ability_select(cs_genericPage $page, array $abilityList, $skillId = null, $selectThis = null) {
+	public function create_ability_select(cs_genericPage $page, $skillId = null, $selectThis = null) {
+		$abilityList = csbt_ability::get_all_abilities($this->dbObj, true);
 		$abilityOptionList = cs_global::array_as_option_list($abilityList, $selectThis);
 		if (is_null($skillId)) {
 			$skillId = 'new';
@@ -797,6 +796,12 @@ class csbt_characterSheet {
 			case csbt_gear::sheetIdPrefix:
 				$x = new csbt_gear();
 				$extraData['gear_name'] = $name;
+				$result = $x->create($this->dbObj, $extraData);
+				break;
+			
+			case csbt_skill::sheetIdPrefix:
+				$x = new csbt_skill();
+				$extraData['skill_name'] = $name;
 				$result = $x->create($this->dbObj, $extraData);
 				break;
 			

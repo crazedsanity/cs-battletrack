@@ -67,6 +67,7 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 					<div style="display:inline" id="load__skills">
 					{sheet__skills}
 					</div>
+					<button class="createRecord" onClick="showNewRecordDialog('dialog__skills');">Add a Skill</button>
 				</td>
 				<td class="spacer"></td>
 
@@ -135,6 +136,17 @@ Powered by {CSBT_project_name}, v{CSBT_version} -- <a href="javascript:void(togg
 			<input name="tableName" value="characterArmor" class="hidden" />
 			<input name="type" value="newRecord" class="hidden" />
 			<button value="Create New Armor" class="submit" id="armorSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
+	</div>
+	<div id="dialog__skills" class="form">
+		<div class="hidden title">Create a New Skill</div>
+		Skill Name:
+			<input class="left nameField freestyle" title="Skill name" name="skills__skill_name__new" value="">
+			<input name="character_id" value="{main__character_id}" class="hidden" />
+			<input name="nameField" value="skills__skill_name__new" class="hidden" />
+			<input name="tableName" value="skills" class="hidden" />
+			<input name="type" value="newRecord" class="hidden" />
+			{skills__selectAbility}
+			<button value="Create New Skill" class="submit" id="skillSubmitButton" onClick="return(submitNewRecordDialog(this));">Create It!</button>
 	</div>
 	<div id='dialog__delete' class='form'>
 		<input id="deleteRecordId" value='' class='hidden'>
