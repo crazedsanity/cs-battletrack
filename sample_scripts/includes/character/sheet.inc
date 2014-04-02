@@ -22,7 +22,7 @@ if(strlen($charId)) {
 		$contentTemplate = null;
 	}
 	$char->build_sheet($page, $contentTemplate);
-	$page->add_template_var('skills__selectAbility', $char->create_ability_select($page));
+	$page->add_template_var('addSkill__selectAbility', $char->create_ability_select($page));
 	$page->add_template_var('html_title', $char->character_name ." - TTORP [CrazedSanity.com]");
 }
 else {

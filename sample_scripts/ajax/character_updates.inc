@@ -29,12 +29,18 @@ if(count($_POST) && is_numeric($_POST['character_id'])) {
 					$recordType = $bits[0];
 					unset($_POST[$_POST['nameField']], $_POST['nameField']);
 				}
+				$removePrefix = null;
+				if(isset($_POST['tableName'])) {
+					$removePrefix = $_POST['tableName'];
+				}
 				foreach($_POST as $k=>$v) {
 					if(preg_match('/__new$/', $k)) {
 						$newKey = preg_replace('/__new$/', '', $k);
 						
-						//NOTE::: this potentially fixes an issue with POSTing via AJAX.
-						$newKey = preg_replace('/^characterWeapon__/', '', $newKey);
+//						$newKey = preg_replace('/^characterWeapon__/', '', $newKey);
+						if(!is_null($removePrefix)) {
+							$newKey = preg_replace('/^'. $removePrefix .'__/', '', $newKey);
+						}
 						
 						$v = preg_replace('/"/', "''", $v);
 						$extraData[$newKey] = $v;
