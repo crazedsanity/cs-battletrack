@@ -12,6 +12,8 @@ foreach($page->templateVars as $k=>$v) {
 	}
 }
 
+$obfuscator = new cs_idObfuscator();
+
 if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
@@ -28,6 +30,7 @@ if(strlen($charId)) {
 else {
 	$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
 	$charId = $char->characterId;
+	
 	
 	
 	$newId = $obfuscator->encode($charId);
