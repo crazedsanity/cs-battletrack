@@ -34,18 +34,19 @@ class SavesTest extends testDbAbstract {
 		$x->characterId = $this->id;
 		$y = new csbt_ability();
 		
-		$abilities = $y->get_all_abilities($this->dbObj);
-		$data = array(
-			'character_id'	=> $this->id,
-			'save_name'		=> 'test',
-			'ability_id'	=> $abilities['str'],
-			'base_mod'		=> 1,
-			'magic_mod'		=> 2,
-			'misc_mod'		=> 3,
-			'temp_mod'		=> 4,
-		);
-		$res = $x->create($this->dbObj, $data);
-		$this->assertTrue(is_numeric($res));
+		$allSaves = $x->get_all_saves($this->dbObj);
+		foreach($allSaves as $k=>$v) {
+			$data = array(
+				'character_id'	=> $this->id,
+				'save_id'		=> $v['save_id'],
+				'base_mod'		=> 1,
+				'magic_mod'		=> 2,
+				'misc_mod'		=> 3,
+				'temp_mod'		=> 4,
+			);
+			$res = $x->create($this->dbObj, $data);
+			$this->assertTrue(is_numeric($res));
+		}
 		
 		$storedData = $x->load($this->dbObj);
 		

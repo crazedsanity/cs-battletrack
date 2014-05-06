@@ -37,7 +37,7 @@ class csbt_save extends csbt_data {
 			);
 			
 			if(!is_null($byAbilityId) && is_numeric($byAbilityId)) {
-				$sql .= " AND ca.ability_id=:aid";
+				$sql .= " AND s.ability_id=:aid";
 				$params['aid'] = $byAbilityId;
 			}
 			
@@ -95,39 +95,15 @@ class csbt_save extends csbt_data {
 		$result = 0;
 		
 		if(!is_null($this->characterId) && is_numeric($this->characterId) && $this->characterId > 0) {
-//			$defaults = array(
-//				'fort'		=> 'con',
-//				'reflex'	=> 'dex',
-//				'will'		=> 'wis',
-//			);
-			
 			$allSaves = $this->get_all_saves($dbObj);
-			
 			foreach($allSaves as $k=>$v) {
 				$createData = array(
 					'character_id'	=> $this->characterId,
 					'save_id'		=> $v['save_id'],
 				);
 				$this->create($dbObj, $createData);
+				$result++;
 			}
-			
-//			$x = new csbt_ability();
-//			$abilityList = $x->get_all_abilities($dbObj);
-//
-//			foreach($defaults as $k=>$v) {
-//				if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
-//					$createData = array(
-//						'character_id'	=> $this->characterId,
-//						'save_name'		=> $k,
-//						'ability_id'	=> $abilityList[$v]
-//					);
-//					$this->create($dbObj, $createData);
-//					$result++;
-//				}
-//				else {
-//					throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
-//				}
-//			}
 		}
 		else {
 			throw new ErrorException(__METHOD__ .": missing characterId (". cs_global::debug_var_dump($this->characterId) .")");
