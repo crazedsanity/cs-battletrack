@@ -88,6 +88,8 @@ INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUE
 INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('wis', 5, 'Wisdom');
 INSERT INTO csbt_ability_table (ability_name, display_order, display_name) VALUES ('cha', 6, 'Charisma');
 
+
+
 -- 
 -- Each character should have 6 records (str, con, dex, int, wis, cha), and should be UNIQUE.
 -- 
@@ -101,6 +103,19 @@ CREATE TABLE csbt_character_ability_table (
 ALTER TABLE csbt_character_ability_table ADD CONSTRAINT
 	csbt_character_ability_table_character_id_ability_id_uix
 	UNIQUE (character_id, ability_id);
+
+
+CREATE TABLE csbt_save_table (
+		   save_id serial NOT NULL PRIMARY KEY,
+		   save_name text NOT NULL UNIQUE,
+		   ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id)
+);
+
+INSERT INTO csbt_save_table (save_name, ability_id) VALUES ('will', 5);
+INSERT INTO csbt_save_table (save_name, ability_id) VALUES ('reflex', 2);
+INSERT INTO csbt_save_table (save_name, ability_id) VALUES ('fort', 3);
+
+
 
 CREATE TABLE csbt_character_skill_table (
 	character_skill_id serial NOT NULL PRIMARY KEY,
@@ -163,16 +178,15 @@ CREATE TABLE csbt_character_gear_table (
 CREATE TABLE csbt_character_save_table (
 	character_save_id serial NOT NULL PRIMARY KEY,
 	character_id integer NOT NULL REFERENCES csbt_character_table(character_id),
-	save_name text NOT NULL,
-	ability_id integer NOT NULL REFERENCES csbt_ability_table(ability_id),
+	save_id integer NOT NULL REFERENCES csbt_save_table(save_id),
 	base_mod integer NOT NULL DEFAULT 0,
 	magic_mod integer NOT NULL DEFAULT 0,
 	misc_mod integer NOT NULL DEFAULT 0,
 	temp_mod integer NOT NULL DEFAULT 0
 );
 ALTER TABLE csbt_character_save_table ADD CONSTRAINT 
-	csbt_character_save_table_character_id_save_name_uix 
-	UNIQUE (character_id, save_name);
+	csbt_character_save_table_character_id_save_id_uix 
+	UNIQUE (character_id, save_id);
 
 
 CREATE TABLE csbt_map_table (
