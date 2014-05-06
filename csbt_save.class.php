@@ -21,14 +21,17 @@ class csbt_save extends csbt_data {
 	//==========================================================================
 	public static function get_all(cs_phpDB $dbObj, $characterId, $byAbilityId=null) {
 		if(!is_null($characterId) && $characterId > 0) { 
-			$sql = "SELECT cs.*, ca.* FROM csbt_character_save_table AS cs 
-					INNER JOIN csbt_character_ability_table AS ca 
-						ON (cs.character_id=ca.character_id 
-						AND cs.ability_id=ca.ability_id) 
-					INNER JOIN csbt_ability_table AS a 
-						ON (cs.ability_id=a.ability_id) 
-					WHERE 
-						cs.character_id=:id";
+			$sql = "SELECT 
+					cs.*, 
+					s.save_name, 
+					a.ability_name, 
+					a.display_name AS ability_display_name 
+				FROM 
+					csbt_character_save_table AS cs 
+					INNER JOIN csbt_save_table AS s ON (cs.save_id=s.save_id) 
+					INNER JOIN csbt_ability_table AS a ON (s.ability_id=a.ability_id)
+				WHERE 
+					cs.character_id=:id";
 			$params = array(
 				'id' => $characterId,
 			);
@@ -59,32 +62,72 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
+	public static function get_all_saves(cs_phpDB $dbObj, $byId=false) {
+		$sql = "SELECT s.*, a.* FROM csbt_save_table AS s 
+			INNER JOIN csbt_ability_table AS a ON (s.ability_id=a.ability_id)";
+		
+		try {
+			$numrows = $dbObj->run_query($sql);
+			
+			if($numrows > 0) {
+				if($byId) {
+					$data = $dbObj->farray_fieldnames('save_id');
+				}
+				else {
+					$data = $dbObj->farray_fieldnames('save_name');
+				}
+			}
+			else {
+				throw new LogicException(__METHOD__ .": no data available");
+			}
+		} catch (Exception $ex) {
+			throw new ErrorException(__METHOD__ .": failed to retrieve cache, DETAILS::: ". $ex->getMessage());
+		}
+		
+		return $data;
+	}
+	//==========================================================================
+	
+	
+	
+	//==========================================================================
 	public function create_character_defaults(cs_phpDB $dbObj) {
 		$result = 0;
 		
 		if(!is_null($this->characterId) && is_numeric($this->characterId) && $this->characterId > 0) {
-			$defaults = array(
-				'fort'		=> 'con',
-				'reflex'	=> 'dex',
-				'will'		=> 'wis',
-			);
-			$x = new csbt_ability();
-			$abilityList = $x->get_all_abilities($dbObj);
-
-			foreach($defaults as $k=>$v) {
-				if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
-					$createData = array(
-						'character_id'	=> $this->characterId,
-						'save_name'		=> $k,
-						'ability_id'	=> $abilityList[$v]
-					);
-					$this->create($dbObj, $createData);
-					$result++;
-				}
-				else {
-					throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
-				}
+//			$defaults = array(
+//				'fort'		=> 'con',
+//				'reflex'	=> 'dex',
+//				'will'		=> 'wis',
+//			);
+			
+			$allSaves = $this->get_all_saves($dbObj);
+			
+			foreach($allSaves as $k=>$v) {
+				$createData = array(
+					'character_id'	=> $this->characterId,
+					'save_id'		=> $v['save_id'],
+				);
+				$this->create($dbObj, $createData);
 			}
+			
+//			$x = new csbt_ability();
+//			$abilityList = $x->get_all_abilities($dbObj);
+//
+//			foreach($defaults as $k=>$v) {
+//				if(isset($abilityList[$v]) && is_numeric($abilityList[$v])) {
+//					$createData = array(
+//						'character_id'	=> $this->characterId,
+//						'save_name'		=> $k,
+//						'ability_id'	=> $abilityList[$v]
+//					);
+//					$this->create($dbObj, $createData);
+//					$result++;
+//				}
+//				else {
+//					throw new LogicException(__METHOD__ .": missing ability '". $v ."' for save (". $k .")");
+//				}
+//			}
 		}
 		else {
 			throw new ErrorException(__METHOD__ .": missing characterId (". cs_global::debug_var_dump($this->characterId) .")");

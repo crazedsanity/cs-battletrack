@@ -28,13 +28,29 @@ if(strlen($charId)) {
 	$page->add_template_var('html_title', $char->character_name ." - TTORP [CrazedSanity.com]");
 }
 else {
-	$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
-	$charId = $char->characterId;
 	
-	
-	
-	$newId = $obfuscator->encode($charId);
-	
-	$page->conditional_header("?id=". $newId);
+	try {
+		$page->db->beginTrans();
+		$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
+		$charId = $char->characterId;
+		$page->db->commitTrans();
+		
+		$newId = $obfuscator->encode($charId);
+		$page->conditional_header("?id=". $newId);
+	}
+	catch(Exception $ex) {
+		$page->db->rollbackTrans();
+		
+		cs_genericPage::set_message(
+				"Error Creating Character", 
+				"There was an error creating your character... ". $ex->getMessage(), 
+				null, 
+				"error"
+		);
+		
+		$uriBits = preg_split('~/sheet~', $_SERVER['REQUEST_URI']);
+		
+		$page->conditional_header($uriBits[0]);
+	}
 }
 

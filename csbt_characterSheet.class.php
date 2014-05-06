@@ -135,6 +135,9 @@ class csbt_characterSheet {
 		$saves->characterId = $this->characterId;
 		$saves->create_character_defaults($this->dbObj);
 		
+		$log = new cs_webdblogger($this->dbObj, "Character", false);
+		$log->log_by_class("loaded defaults", "create");
+		
 		return $this->load();
 	}
 	//==========================================================================
@@ -641,6 +644,10 @@ class csbt_characterSheet {
 		}
 		$fieldsToUpdate = array($realName=>$value);
 		$debug = "realName=(". $realName ."), id=(". $recordId .")";
+		
+		
+		$log = new cs_webdblogger($this->dbObj, "Character");
+		
 		switch($prefix) {
 			case csbt_ability::sheetIdPrefix:
 				
@@ -749,8 +756,13 @@ class csbt_characterSheet {
 				break;
 			
 			default:
-				throw new InvalidArgumentException(__METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")");
+				$details = __METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")";
+				$log->log_by_class($details, "exception in code");
+				
+				throw new InvalidArgumentException($details);
 		}
+		
+		$log->log_by_class("Updating characterId=". $this->characterId .", ". $name ."=(". $value .")", "update");
 		
 		$retval = array(
 			'debug'			=> $debug,
@@ -770,6 +782,9 @@ class csbt_characterSheet {
 			$extraData = array();
 		}
 		$extraData['character_id'] = $this->characterId;
+		
+		$log = new cs_webdblogger($this->dbObj, "Character");
+		
 		switch($type) {
 			case csbt_weapon::sheetIdPrefix:
 				$x = new csbt_weapon();
@@ -803,8 +818,16 @@ class csbt_characterSheet {
 				break;
 			
 			default:
-				throw new InvalidArgumentException(__METHOD__ .": invalid type (". $type .")");
+				$details = __METHOD__ .": invalid type (". $type .")";
+				$log->log_by_class($details, "exception in code");
+				throw new InvalidArgumentException($details);
 		}
+		
+		$details = "New record, type=(". $type ."), name=(". $name .")";
+		if(is_array($details) && count($extraData) > 0) {
+			$details .= implode(", ", $extraData);
+		}
+		$log->log_by_class($details, "create");
 		
 		return $result;
 	}
@@ -815,7 +838,9 @@ class csbt_characterSheet {
 	//==========================================================================
 	public function handle_delete($type, $recordId) {
 		$retval = "Invalid section... type=(". $type ."), recordId=(". $recordId .")";
-				
+		
+		$log = new cs_webdblogger($this->dbObj, "Character");
+		
 		switch($type) {
 			case 'weapon':
 			case csbt_weapon::sheetIdPrefix:
@@ -853,6 +878,8 @@ class csbt_characterSheet {
 				$retval = $x->delete($this->dbObj);
 				break;
 		}
+		
+		$log->log_by_class("type=(". $type ."), recordId=(". $recordId ."), result::: ". $retval, "delete");
 		
 		return $retval;
 	}
