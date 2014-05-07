@@ -743,6 +743,11 @@ class csbt_characterSheet {
 				$x = new csbt_weapon();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
+			
+			case csbt_armor::sheetIdPrefix:
+				$x = new csbt_armor();
+				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
+				break;
 
 			case csbt_specialAbility::sheetIdPrefix:
 				$x = new csbt_specialAbility();
