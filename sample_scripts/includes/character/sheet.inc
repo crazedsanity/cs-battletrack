@@ -18,6 +18,7 @@ if(strlen($charId)) {
 	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
 //cs_global::debug_print($data,1);
+//exit;
 
 	
 	if(!isset($contentTemplate)) {

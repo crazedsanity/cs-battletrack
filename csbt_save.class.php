@@ -25,11 +25,14 @@ class csbt_save extends csbt_data {
 					cs.*, 
 					s.save_name, 
 					a.ability_name, 
+					ca.ability_score,
 					a.display_name AS ability_display_name 
 				FROM 
 					csbt_character_save_table AS cs 
 					INNER JOIN csbt_save_table AS s ON (cs.save_id=s.save_id) 
 					INNER JOIN csbt_ability_table AS a ON (s.ability_id=a.ability_id)
+					INNER JOIN csbt_character_ability_table AS ca 
+						ON (ca.character_id=cs.character_id AND ca.ability_id=a.ability_id)
 				WHERE 
 					cs.character_id=:id";
 			$params = array(
