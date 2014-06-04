@@ -244,7 +244,7 @@ function submitNewRecordDialog(pButtonObj) {
 	if($('#'+ sectionToReload) && $("#" + divToReloadInto) && myData.length) {
 		
 		//change the URL we're using the proper AJAX one.
-		var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet$/, "_updates");
+		var submitUrl = "/ajax" + window.location.pathname.replace(/\/sheet/, "_updates");
 		var fetchUrl = window.location.href;
 		
 		if(myData.length > 0) {
