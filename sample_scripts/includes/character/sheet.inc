@@ -34,6 +34,11 @@ else {
 		$page->db->beginTrans();
 		$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
 		$charId = $char->characterId;
+		
+		if(isset($_GET['campaignId']) && is_numeric($_GET['campaignId'])) {
+			csbt_campaign::add_player($page->db, $_GET['campaignId'], $charId);
+		} 
+		
 		$page->db->commitTrans();
 		
 		$newId = $obfuscator->encode($charId);
