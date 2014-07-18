@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/crazedsanity/cs-battletrack.svg])(https://travis-ci.org/crazedsanity/cs-battletrack)
 
+Support TTORP development on GoFundMe: http://www.gofundme.com/bpoml0
+
 This is the home for TTORP.  Check it out... [ http://www.crazedsanity.com/blog/slaughter/ttorp ]
 
 Current Features:
