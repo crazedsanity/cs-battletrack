@@ -1,6 +1,6 @@
 # CS-BattleTrack (or "T.T.O.R.P.")
 
-[![Build Status](https://travis-ci.org/crazedsanity/cs-battletrack.svg])(https://travis-ci.org/crazedsanity/cs-battletrack)
+![Build Status](https://travis-ci.org/crazedsanity/cs-battletrack.svg)(https://travis-ci.org/crazedsanity/cs-battletrack)
 
 Support TTORP development on GoFundMe: http://www.gofundme.com/bpoml0
 
