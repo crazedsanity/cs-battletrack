@@ -6,7 +6,7 @@ Support TTORP development on GoFundMe: http://www.gofundme.com/bpoml0
 
 ## Web Application Code Moved
 
-The code for the web application is being moved to a private repository.  This will continue to be the location of the backend libraries, but the frontend code has been moved elsewhere... at least for now.
+The code for the web application is being moved to a private repository.  This will continue to be the location of the backend libraries, but the frontend code has been moved elsewhere... at least for now.  The issue tracker (bugs, enhancements, etc) will remain here as well.
 
 ## What is This?
 

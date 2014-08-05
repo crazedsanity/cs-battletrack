@@ -1,4 +1,0 @@
-#token_1, #token_2, .container { position: absolute; top: 0px;z-index:10; height: 50px; }
-#token_1 { background-color: #ff0000; width: 100px; left: -200px; }
-#token_2 { background-color: #000099; width: 100px; left: -200px; }
-.container { width: 640px; overflow: hidden; height: 50px; background-color:#000; color:#FFF; }
