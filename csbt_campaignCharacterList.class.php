@@ -42,7 +42,7 @@ class csbt_campaignCharacterList extends csbt_basicRecord {
 		try {
 //			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
 			
-			$sql = "SELECT * FROM csbt_character_table WHERE campaign_id=:id";
+			$sql = "SELECT * FROM csbt_character_table WHERE campaign_id=:id ORDER BY character_name";
 			
 			$numrows = $dbObj->run_query($sql, array('id'=>$campaignId));
 			
