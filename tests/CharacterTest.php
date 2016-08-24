@@ -1,16 +1,20 @@
 <?php
 
-class CharacterTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Character;
+use battletrack\character\Gear;
+
+class CharacterTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -27,9 +31,9 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_creation() {
-		$new = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$new = new Character(__METHOD__, 1, $this->dbObj);
 		
-		$x = new csbt_character($new->characterId, 1, $this->dbObj);
+		$x = new Character($new->characterId, 1, $this->dbObj);
 		
 		$this->assertEquals($new->characterId, $x->characterId);
 		$this->assertTrue(is_array($new->data));
@@ -41,7 +45,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_magicProperties() {
-		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x = new Character(__METHOD__, 1, $this->dbObj);
 		
 		$data = $x->data;
 		
@@ -59,7 +63,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_load() {
-		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x = new Character(__METHOD__, 1, $this->dbObj);
 		
 		$this->assertEquals(array(), $x->data);
 		
@@ -67,7 +71,7 @@ class CharacterTest extends testDbAbstract {
 		
 		$this->assertTrue($x->characterId > 0);
 		$this->assertTrue(is_array($x->data));
-		$this->assertTrue(count($x->data) > 0, "characterId=(". $x->characterId ."), DATA::: ". cs_global::debug_print($x->data));
+		$this->assertTrue(count($x->data) > 0, "characterId=(". $x->characterId ."), DATA::: ". ToolBox::debug_print($x->data));
 		
 		$data = $x->data;
 		
@@ -84,7 +88,7 @@ class CharacterTest extends testDbAbstract {
 		foreach($indexes as $expectedIdx) {
 			$this->assertTrue(
 					array_key_exists($expectedIdx, $data), 
-					"loaded data missing required index '". $expectedIdx ."'... ". cs_global::debug_print($data)
+					"loaded data missing required index '". $expectedIdx ."'... ". ToolBox::debug_print($data)
 				);
 		}
 	}
@@ -94,14 +98,14 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x = new Character(__METHOD__, 1, $this->dbObj);
 		$x->load($this->dbObj);
 		
 		$data = $x->data;
 		
 		$this->assertTrue(is_numeric($x->characterId));
 		$this->assertTrue(is_array($x->data));
-		$this->assertTrue(isset($data['character_name']), cs_global::debug_print($data));
+		$this->assertTrue(isset($data['character_name']), ToolBox::debug_print($data));
 		
 		$x->update('character_name', __FUNCTION__);
 		$this->assertNotEquals($data, $x->data);
@@ -155,7 +159,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_big_update() {
-		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x = new Character(__METHOD__, 1, $this->dbObj);
 		
 		$this->assertEquals(array(), $x->data);
 		
@@ -216,7 +220,7 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_character(__METHOD__, 1, $this->dbObj);
+		$x = new Character(__METHOD__, 1, $this->dbObj);
 		$charData = $x->load($this->dbObj);
 		
 		$this->assertTrue(count($charData) > 0);
@@ -231,8 +235,8 @@ class CharacterTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_gear_total_weight() {
-		$char = new csbt_character(__METHOD__, 1, $this->dbObj);
-		$gear = new csbt_gear();
+		$char = new Character(__METHOD__, 1, $this->dbObj);
+		$gear = new Gear();
 		$gear->characterId = $char->characterId;
 		
 		$createThis = array('torches', 'silk rope', 'bullseye lantern');
@@ -263,7 +267,7 @@ class CharacterTest extends testDbAbstract {
 		
 		$this->assertEquals(count($testData), count($createThis));
 		
-		$allGear = csbt_gear::get_all($this->dbObj, $char->id);
+		$allGear = Gear::get_all($this->dbObj, $char->id);
 		$this->assertEquals(count($allGear), count($testData));
 		
 		$manualWeight = 0;
@@ -280,7 +284,7 @@ class CharacterTest extends testDbAbstract {
 	
 }
 
-class _test_character extends csbt_character {
+class _test_character extends Character {
 	public $_data;
 	
 	public function _clean_data_array() {

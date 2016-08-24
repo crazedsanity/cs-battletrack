@@ -1,6 +1,15 @@
 <?php
 
-class csbt_data {
+namespace battletrack\basic;
+
+use crazedsanity\database\Database;
+
+use \battletrack\basic\Record;
+
+use \LogicException;
+use \ErrorException;
+
+class Data {
 	
 	protected $_dbTable;
 	protected $_dbPkey;
@@ -16,7 +25,7 @@ class csbt_data {
 	public $version;
 	
 	//==========================================================================
-	public function __construct($initial, $table, $seq, $pkey, cs_phpDB $dbObj = null) {
+	public function __construct($initial, $table, $seq, $pkey, Databse $dbObj = null) {
 		$this->_dbTable = $table;
 		$this->_dbPkey = $pkey;
 		$this->_dbSeq = $seq;
@@ -26,7 +35,7 @@ class csbt_data {
 				$this->_data = $initial;
 			}
 			elseif(is_numeric($initial)) {
-				$x = new csbt_basicRecord($dbObj);
+				$x = new Record($dbObj);
 				$x->id = $initial;
 				$this->_data = $x->load();
 			}
@@ -35,8 +44,8 @@ class csbt_data {
 			}
 		}
 		
-		$this->version = new cs_version();
-		$this->version->set_version_file_location(dirname(__FILE__) .'/../VERSION');
+//		$this->version = new cs_version();
+//		$this->version->set_version_file_location(dirname(__FILE__) .'/../VERSION');
 	}
 	//==========================================================================
 	
@@ -111,10 +120,9 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function save(cs_phpDB $db) {
+	public function save(Database $db) {
 		if(is_array($this->_data) && count($this->_data) > 0) {
-			//__construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array())
-			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey, $this->_data);
+			$x = new Record($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey, $this->_data);
 			$x->booleanFields = $this->booleanFields;
 			$x->id = $this->id;
 			
@@ -135,10 +143,9 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function load(cs_phpDB $db, $id=null) {
+	public function load(Database $db, $id=null) {
 		if(is_numeric($this->id) || is_numeric($id)) {
-			//__construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array())
-			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
+			$x = new Record($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
 			$x->booleanFields = $this->booleanFields;
 			if(!is_null($id) && is_numeric($id)) {
 				$this->id = $id;
@@ -157,10 +164,9 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function create(cs_phpDB $db, array $data) {
+	public function create(Database $db, array $data) {
 		if(is_array($data)) {
-			//__construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array())
-			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
+			$x = new Record($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
 			$x->booleanFields = $this->booleanFields;
 			$this->id = $x->create($data);
 //			$this->load($db);
@@ -176,9 +182,9 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function delete(cs_phpDB $db) {
+	public function delete(Database $db) {
 		if(is_array($this->_data) && count($this->_data) > 0 && is_numeric($this->id)) {
-			$x = new csbt_basicRecord($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
+			$x = new Record($db, $this->_dbTable, $this->_dbSeq, $this->_dbPkey);
 			$x->booleanFields = $this->booleanFields;
 			$x->id = $this->id;
 			$retval = $x->delete();
@@ -282,7 +288,7 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function get_sheet_data(cs_phpDb $dbObj, $characterId, $recordId=null) {
+	public function get_sheet_data(Database $dbObj, $characterId, $recordId=null) {
 		$retval = array();
 		if(!is_null($this->_sheetIdPrefix)) {
 			if(!is_null($recordId) && is_numeric($recordId)) {
@@ -358,7 +364,7 @@ class csbt_data {
 	
 	
 	//==========================================================================
-	public function update_and_get_changes(cs_phpDb $dbObj, array $updateFields, $recordId) {
+	public function update_and_get_changes(Database $dbObj, array $updateFields, $recordId) {
 		$originalData = $this->_get_sheet_data($this->load($dbObj, $recordId), true);
 		foreach($updateFields as $k=>$v) {
 			$this->update($k, $v);

@@ -1,6 +1,18 @@
 <?php 
 
-class csbt_ability extends csbt_data {
+namespace battletrack\character;
+
+
+use crazedsanity\database\Database;
+
+use battletrack\character\Ability;
+
+use LogicException;
+use ErrorException;
+use Exception;
+use InvalidArgumentException;
+
+class Ability extends \battletrack\basic\Data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_ability_table';
@@ -35,8 +47,8 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_abilities(cs_phpDB $dbObj, $byId=false) {
-		$sql = "SELECT * FROM csbt_ability_table";
+	public static function get_all_abilities(Database $dbObj, $byId=false) {
+		$sql = "SELECT * FROM ". Ability::tableName;
 		
 		try {
 			$numrows = $dbObj->run_query($sql);
@@ -63,7 +75,7 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(Database $dbObj, $characterId) {
 		if(!is_null($characterId) && $characterId > 0) {
 
 			$sql = "SELECT ca.*, a.ability_name, a.display_name "
@@ -90,7 +102,7 @@ class csbt_ability extends csbt_data {
 	
 	
 	//==========================================================================
-	public function create_defaults(cs_phpDB $db, $minScore = 6, $maxScore = 18) {
+	public function create_defaults(Database $db, $minScore = 6, $maxScore = 18) {
 		$retval = 0;
 		if (!is_null($this->characterId) && $this->characterId > 0) {
 			if (!is_numeric($minScore) || $minScore < 1) {

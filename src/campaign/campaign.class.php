@@ -1,13 +1,21 @@
 <?php 
 
-class csbt_campaign extends csbt_data	 {
+namespace battletrack\campaign;
+
+use battletrack\CampaignCharacterList;
+use battletrack\Character;
+
+
+use crazedsanity\database\Database;
+
+class Campaign extends \battletrack\basic\Data	 {
 	
 	const tableName = 'csbt_campaign_table';
 	const seqName =  'csbt_campaign_table_campaign_id_seq';
 	const pkeyField = 'campaign_id';
 	
 	//==========================================================================
-	public function __construct(array $initialData=null, cs_phpDB $db=null) {
+	public function __construct(array $initialData=null, Database $db=null) {
 		parent::__construct($initialData, self::tableName, self::seqName, self::pkeyField, $db);
 	}
 	//==========================================================================
@@ -15,7 +23,7 @@ class csbt_campaign extends csbt_data	 {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDb $dbObj, $ownerUid) {
+	public static function get_all(Database $dbObj, $ownerUid) {
 		$retval = array();
 		
 		$sql = "SELECT * FROM ". self::tableName ." WHERE owner_uid=:id ORDER BY campaign_name";
@@ -28,7 +36,7 @@ class csbt_campaign extends csbt_data	 {
 			
 			//
 			foreach(array_keys($retval) as $id) {
-				$retval[$id]['playerList'] = csbt_campaignCharacterList::get_character_list($dbObj, $id);
+				$retval[$id]['playerList'] = CampaignCharacterList::get_character_list($dbObj, $id);
 			}
 		}
 		
@@ -40,7 +48,7 @@ class csbt_campaign extends csbt_data	 {
 	
 	//==========================================================================
 	public function get_player_data($campaignId) {
-		$obj = new csbt_campaignCharacterList();
+		$obj = new CampaignCharacterList();
 		
 		return $obj->get_character_list();
 	}
@@ -49,10 +57,10 @@ class csbt_campaign extends csbt_data	 {
 	
 	
 	//==========================================================================
-	public static function add_player(cs_phpDb $dbObj, $campaignId, $playerId) {
+	public static function add_player(Database $dbObj, $campaignId, $playerId) {
 		
 		if(is_numeric($campaignId) && is_numeric($playerId)) {
-			$playerObj = new csbt_character($playerId);
+			$playerObj = new Character($playerId);
 
 			$playerObj->update('campaign_id', $campaignId);
 			$playerObj->save($dbObj);

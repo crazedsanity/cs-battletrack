@@ -1,6 +1,15 @@
 <?php 
 
-class csbt_skill extends csbt_data {
+namespace battletrack\character;
+
+use battletrack\character\Ability;
+
+use crazedsanity\database\Database;
+use crazedsanity\core\ToolBox;
+
+use ErrorException;
+
+class Skill extends \battletrack\basic\Data {
 	
 	
 	const tableName = 'csbt_character_skill_table';
@@ -21,7 +30,7 @@ class csbt_skill extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId, $basedOnAbilityId=null) {
+	public static function get_all(Database $dbObj, $characterId, $basedOnAbilityId=null) {
 		$sql = 'SELECT 
 					cs.*, a.ability_name, ca.ability_score, 
 					ca.temporary_score 
@@ -60,11 +69,11 @@ class csbt_skill extends csbt_data {
 	public static function _get_record_extras(array $recordData) {
 		
 		if(isset($recordData['ability_score'])) {
-			$recordData['ability_mod'] = csbt_ability::calculate_ability_modifier($recordData['ability_score']);
+			$recordData['ability_mod'] = Ability::calculate_ability_modifier($recordData['ability_score']);
 		}
 		$recordData['skill_mod'] = self::calculate_skill_modifier($recordData);
-		$recordData['is_class_skill_checked'] = cs_global::interpret_bool($recordData['is_class_skill'], array('', 'checked="checked"'));
-		$recordData['is_checked_checkbox'] = cs_global::interpret_bool($recordData['is_class_skill'], array("", "checked"));
+		$recordData['is_class_skill_checked'] = ToolBox::interpret_bool($recordData['is_class_skill'], array('', 'checked="checked"'));
+		$recordData['is_checked_checkbox'] = ToolBox::interpret_bool($recordData['is_class_skill'], array("", "checked"));
 		
 		return $recordData;
 	}

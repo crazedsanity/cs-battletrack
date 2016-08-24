@@ -1,16 +1,23 @@
 <?php
 
-class CharacterSheetTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\CharacterSheet;
+use battletrack\character\Gear;
+use battletrack\character\Weapon;
+use battletrack\character\Armor;
+
+class CharacterSheetTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -27,7 +34,7 @@ class CharacterSheetTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_and_manually_load_defaults() {
-		$x = new csbt_characterSheet($this->dbObj, __METHOD__, 1, false);
+		$x = new CharacterSheet($this->dbObj, __METHOD__, 1, false);
 		
 		$createdData = $x->create_defaults();
 		$this->assertTrue(is_array($createdData));
@@ -61,9 +68,9 @@ class CharacterSheetTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_total_weight() {
-		$x = new csbt_characterSheet($this->dbObj, __METHOD__, 1);
+		$x = new CharacterSheet($this->dbObj, __METHOD__, 1);
 		
-		$this->assertTrue(is_numeric($x->characterId), cs_global::debug_print($x));
+		$this->assertTrue(is_numeric($x->characterId), ToolBox::debug_print($x));
 		
 		$this->assertEquals(0, $x->get_total_weight(false));
 		$this->assertEquals($x->get_total_weight(true), $x->get_total_weight(false));
@@ -78,7 +85,7 @@ class CharacterSheetTest extends testDbAbstract {
 			array('misc',			4,		200),
 		);
 		
-		$g = new csbt_gear();
+		$g = new Gear();
 		$g->characterId = $x->characterId;
 		
 		foreach($createThis as $data) {
@@ -93,7 +100,7 @@ class CharacterSheetTest extends testDbAbstract {
 			$itemList[$id] = $xData;
 		}
 		
-		$this->assertEquals($manualWeight, csbt_gear::calculate_list_weight($itemList));
+		$this->assertEquals($manualWeight, Gear::calculate_list_weight($itemList));
 		
 		//now, at first, this should be 0 because we haven't re-loaded the sheet.
 		$this->assertEquals(0, $x->get_total_weight(false));
@@ -106,7 +113,7 @@ class CharacterSheetTest extends testDbAbstract {
 		
 		$withWeapons = $manualWeight;
 		
-		$w = new csbt_weapon();
+		$w = new Weapon();
 		$w->characterId = $x->characterId;
 		
 		$wpns = array(
@@ -137,7 +144,7 @@ class CharacterSheetTest extends testDbAbstract {
 		
 		$withArmor = $withWeapons;
 		
-		$a = new csbt_armor();
+		$a = new Armor();
 		$rmr = array(
 			'big'	=> 10,
 			'small'	=> 1,
@@ -255,7 +262,7 @@ class CharacterSheetTest extends testDbAbstract {
 		);
 		
 		foreach($scoreToMaxLoad as $score => $maxLoad) {
-			$calculatedMaxLoad = csbt_characterSheet::get_max_load($score);
+			$calculatedMaxLoad = CharacterSheet::get_max_load($score);
 			$this->assertEquals($maxLoad, $calculatedMaxLoad, "for score ". $score .", max load should be (". $maxLoad ."), but was (". $calculatedMaxLoad .")");
 		}
 	}

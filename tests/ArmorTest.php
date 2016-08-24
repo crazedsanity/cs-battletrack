@@ -1,19 +1,27 @@
 <?php
 
-class ArmorTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Character;
+use battletrack\character\Armor;
+
+class ArmorTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+//		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
+		$this->char = new Character(__CLASS__, 1, $this->dbObj);
 		$this->id = $this->char->id;
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -30,7 +38,7 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_armor();
+		$x = new Armor();
 		$x->characterId = $this->id;
 		
 		$data = array(
@@ -52,16 +60,15 @@ class ArmorTest extends testDbAbstract {
 		$dbData = $x->load($this->dbObj);
 		
 		//make sure we understand how "interpret_bool()" works..
-		$gf = new cs_globalFunctions();
-		$this->assertFalse($gf->interpret_bool('f', array(false,true)));
-		$this->assertTrue($gf->interpret_bool('t', array(false,true)));
+		$this->assertFalse(ToolBox::interpret_bool('f', array(false,true)));
+		$this->assertTrue(ToolBox::interpret_bool('t', array(false,true)));
 		
 		$this->assertTrue(is_array($dbData));
 		$this->assertTrue(count($dbData) > 0);
 		
 		foreach($data as $f=>$v) {
 			if($f == 'is_worn') {
-				$expected = cs_global::interpret_bool($v, array(false, true));
+				$expected = ToolBox::interpret_bool($v, array(false, true));
 				$this->assertEquals($expected, $dbData[$f], "field (". $f .") value doesn't match... expected (". $expected ."), got (". $dbData[$f] .")");
 			}
 			else {
@@ -75,7 +82,7 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_armor();
+		$x = new Armor();
 		$x->characterId = $this->id;
 		
 		$createData = array(
@@ -117,7 +124,7 @@ class ArmorTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_armor();
+		$x = new Armor();
 		$x->characterId = $this->id;
 		
 		$allArmor = array(

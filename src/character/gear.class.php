@@ -1,6 +1,13 @@
 <?php 
 
-class csbt_gear extends csbt_data {
+namespace battletrack\character;
+
+use crazedsanity\database\Database;
+
+use ErrorException;
+use Exception;
+
+class Gear extends \battletrack\basic\Data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_gear_table';
@@ -21,7 +28,7 @@ class csbt_gear extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId) {
+	public static function get_all(Database $dbObj, $characterId) {
 		$sql = "SELECT * FROM " . self::tableName . " WHERE character_id=:id";
 		$params = array('id' => $characterId);
 		

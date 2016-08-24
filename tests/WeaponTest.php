@@ -1,19 +1,27 @@
 <?php
 
-class WeaponTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Character;
+use battletrack\character\Weapon;
+
+class WeaponTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+//		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
+		$this->char = new Character(__CLASS__, 1, $this->dbObj);
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
@@ -29,7 +37,7 @@ class WeaponTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_and_get_all() {
-		$x = new csbt_weapon();
+		$x = new Weapon();
 		$x->characterId = $this->char->characterId;
 		
 		$createdWeapons = array();
@@ -81,7 +89,7 @@ class WeaponTest extends testDbAbstract {
 		
 		$allWeapons = $x->get_all($this->dbObj, $x->characterId);
 		$this->assertTrue(is_array($allWeapons));
-		$this->assertEquals(count($testData), count($allWeapons), cs_global::debug_print($allWeapons));
+		$this->assertEquals(count($testData), count($allWeapons), ToolBox::debug_print($allWeapons));
 		$this->assertTrue(isset($allWeapons[$id]));
 		$this->assertTrue(is_array($allWeapons[$id]));
 		$this->assertEquals($data, $allWeapons[$id]);

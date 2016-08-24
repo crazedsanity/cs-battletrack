@@ -1,6 +1,10 @@
 <?php
 
-class csbt_campaignCharacterList extends csbt_basicRecord {
+namespace battletrack;
+
+use crazedsanity\database\Database;
+
+class CampaignCharacterList extends \battletrack\basic\Record {
 	
 	private $campaignId;
 	
@@ -12,7 +16,7 @@ class csbt_campaignCharacterList extends csbt_basicRecord {
 	public $charList = array();
 	
 	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $campaignId) {
+	public function __construct(Database $dbObj, $campaignId) {
 		$this->dbObj = $dbObj;
 		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField);
 		
@@ -37,17 +41,17 @@ class csbt_campaignCharacterList extends csbt_basicRecord {
 	
 	
 	//-------------------------------------------------------------------------
-	public static function get_character_list(cs_phpDb $dbObj, $campaignId) {
+	public static function get_character_list(Database $dbObj, $campaignId) {
 		$characterList = array();
 		try {
 //			$characterList = $this->get_records(array('campaign_id'=>$this->campaignId), 'character_name');
 			
-			$sql = "SELECT * FROM csbt_character_table WHERE campaign_id=:id ORDER BY character_name";
+			$sql = "SELECT * FROM ". self::tableName ." WHERE campaign_id=:id ORDER BY character_name";
 			
 			$numrows = $dbObj->run_query($sql, array('id'=>$campaignId));
 			
 			if($numrows > 0) {
-				$characterList = $dbObj->farray_fieldnames('character_id');
+				$characterList = $dbObj->farray_fieldnames(self::pkeyField);
 			}
 		}
 		catch(exception $e) {

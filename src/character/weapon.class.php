@@ -1,6 +1,13 @@
 <?php 
 
-class csbt_weapon extends csbt_data {
+namespace battletrack\character;
+
+use crazedsanity\database\Database;
+use crazedsanity\core\ToolBox;
+
+use ErrorException;
+
+class Weapon extends \battletrack\basic\Data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_weapon_table';
@@ -28,7 +35,7 @@ class csbt_weapon extends csbt_data {
 	 * @return type
 	 * @throws ErrorException
 	 */
-	public static function get_all(cs_phpDB $dbObj, $characterId, $onlyInUse=null) {
+	public static function get_all(Database $dbObj, $characterId, $onlyInUse=null) {
 		$sql = 'SELECT * FROM '. self::tableName .' WHERE ';//'character_id=:id';
 		
 		$params = array(
@@ -36,12 +43,12 @@ class csbt_weapon extends csbt_data {
 		);
 		
 		if(!is_null($onlyInUse) && is_bool($onlyInUse)) {
-			$params['in_use'] = cs_global::interpret_bool($onlyInUse, array('f', 't'));
+			$params['in_use'] = ToolBox::interpret_bool($onlyInUse, array('f', 't'));
 		}
 		
 		$addThis = "";
 		foreach(array_keys($params) as $n) {
-			$addThis = cs_global::create_list($addThis, $n .'=:'. $n, ' AND ');
+			$addThis = ToolBox::create_list($addThis, $n .'=:'. $n, ' AND ');
 		}
 		$sql .= $addThis;
 		

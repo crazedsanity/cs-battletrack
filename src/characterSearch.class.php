@@ -1,18 +1,27 @@
 <?php
 
-class csbt_characterSearch extends csbt_character {
+namespace battletrack;
+
+use \battletrack\character\Character;
+use \battletrack\campaign\Campaign;
+
+use \crazedsanity\database\Database;
+
+use \Exception;
+
+class CharacterSearch extends Character {
 	
 	public $characterId;
 	
 	
 	
 	//-------------------------------------------------------------------------
-	public static function search(cs_phpDb $dbObj, array $criteria) {
+	public static function search(Database $dbObj, array $criteria) {
 		if(is_array($criteria) && count($criteria)) {
 			$retval = array();
 			
-			$sql = "SELECT c.*, ca.campaign_name FROM ". csbt_character::tableName ." AS c
-				LEFT OUTER JOIN ". csbt_campaign::tableName ." AS ca 
+			$sql = "SELECT c.*, ca.campaign_name FROM ". Character::tableName ." AS c
+				LEFT OUTER JOIN ". Campaign::tableName ." AS ca 
 				USING (campaign_id)
 				WHERE 
 				(LOWER(c.character_name) LIKE :character_name OR :character_name IS NULL)
@@ -40,7 +49,7 @@ class csbt_characterSearch extends csbt_character {
 				$numRows = $dbObj->run_query($sql, $criteria);
 
 				if($numRows > 0) {
-					$retval = $dbObj->farray_fieldnames(csbt_character::pkeyField);
+					$retval = $dbObj->farray_fieldnames(Character::pkeyField);
 				}
 			}
 			catch(Exception $e) {

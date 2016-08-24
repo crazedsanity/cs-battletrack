@@ -1,4 +1,11 @@
 <?php
+
+namespace battletrack\character;
+
+
+use battletrack\character\Gear;
+
+use crazedsanity\database\Database;
 /*
  * Created on Jul 13, 2009
  */
@@ -9,7 +16,7 @@
  * 	classes when the need arises.
  */
 
-class csbt_character extends csbt_data {
+class Character extends \battletrack\basic\Data {
 	
 	public $characterId;
 	protected $ownerUid;
@@ -21,14 +28,14 @@ class csbt_character extends csbt_data {
 	
 	public $gear = array();
 	//==========================================================================
-	/**
+	/** 
 	 * 
 	 * @param type $characterIdOrName
 	 * @param type $ownerUid
-	 * @param cs_phpDB $dbObj
+	 * @param Database $dbObj
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($characterIdOrName, $ownerUid=null, cs_phpDB $dbObj=null) {
+	public function __construct($characterIdOrName, $ownerUid=null, Database $dbObj=null) {
 		parent::__construct(null, self::tableName, self::seqName, self::pkeyField);
 		$this->ownerUid = $ownerUid;
 		
@@ -57,7 +64,7 @@ class csbt_character extends csbt_data {
 	
 	
 	//==========================================================================
-	public function create(cs_phpDB $db, array $data=null) {
+	public function create(Database $db, array $data=null) {
 		$this->characterId = parent::create($db, $data);
 		return $this->characterId;
 	}//end create()
@@ -66,10 +73,10 @@ class csbt_character extends csbt_data {
 	
 	
 	//==========================================================================
-	public function get_total_weight(cs_phpDB $dbObj) {
+	public function get_total_weight(Database $dbObj) {
 		$weight = 0;
 		
-		$allGear = csbt_gear::get_all($dbObj, $this->characterId);
+		$allGear = Gear::get_all($dbObj, $this->characterId);
 		
 		if(is_array($allGear) && count($allGear) > 0) {
 			foreach($allGear as $k=>$data) {

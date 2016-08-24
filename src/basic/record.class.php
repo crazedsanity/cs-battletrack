@@ -1,13 +1,20 @@
 <?php
 
-class csbt_basicRecord {
+namespace battletrack\basic;
+
+use crazedsanity\database\Database;
+use crazedsanity\core\ToolBox;
+
+use ErrorException;
+use LogicException;
+
+class Record {
 	
 	protected $_data = array();
 	
 	public $id;
 	public $characterId;
 	public $dbObj;
-	public $gfObj;
 	public $booleanFields = array();
 	
 	protected $_dbTable;
@@ -17,20 +24,20 @@ class csbt_basicRecord {
 	//==========================================================================
 	/**
 	 * 
-	 * @param cs_phpDB $dbObj
+	 * @param Database $dbObj
 	 * @param str $dbTable
 	 * @param str $dbSeq
 	 * @param str $dbPkey
 	 * @param array $initialData (optional)
 	 */
-	public function __construct(cs_phpDB $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array()) {
+	public function __construct(Database $dbObj, $dbTable, $dbSeq, $dbPkey, array $initialData=array()) {
 		$this->dbObj = $dbObj;
 		$this->_dbTable = $dbTable;
 		$this->_dbSeq = $dbSeq;
 		$this->_dbPkey = $dbPkey;
 		$this->_data = $initialData;
 		
-		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj = new cs_globalFunctions;
 	}
 	//==========================================================================
 	
@@ -100,7 +107,7 @@ class csbt_basicRecord {
 				$params = $crit;
 				$updateStr = "";
 				foreach($crit as $k=>$v) {
-					$updateStr = $this->gfObj->create_list($updateStr, $k ."=:". $k, ", ");
+					$updateStr = ToolBox::create_list($updateStr, $k ."=:". $k, ", ");
 				}
 				$sql .= $updateStr;
 			}
@@ -146,7 +153,7 @@ class csbt_basicRecord {
 
 			foreach($data as $k=>$v) {
 				if(count($this->booleanFields) && in_array($k, $this->booleanFields)) {
-					$data[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
+					$data[$k] = ToolBox::interpret_bool($v, array('f', 't'));
 				}
 				$params[] = ':'. $k;
 			}
@@ -175,9 +182,9 @@ class csbt_basicRecord {
 		$params = $this->_clean_data_array($this->_data);
 		foreach ($params as $k => $v) {
 			if (count($this->booleanFields) && in_array($k, $this->booleanFields)) {
-				$params[$k] = $this->gfObj->interpret_bool($v, array('f', 't'));
+				$params[$k] = ToolBox::interpret_bool($v, array('f', 't'));
 			}
-			$updateSql = cs_global::create_list($updateSql, $k . '=:' . $k, ',');
+			$updateSql = ToolBox::create_list($updateSql, $k . '=:' . $k, ',');
 		}
 
 		$sql = "UPDATE " . $this->_dbTable . " SET " . $updateSql . " WHERE " . $this->_dbPkey . "=:id";

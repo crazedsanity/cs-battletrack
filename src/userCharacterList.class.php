@@ -1,10 +1,17 @@
 <?php
+
+namespace battletrack;
 /*
  * Created on Jul 30, 2009
  */
 
+use battletrack\campaign\Campaign;
 
-class csbt_userCharacterList extends csbt_basicRecord {
+use crazedsanity\database\Database;
+
+use \Exception;
+
+class UserCharacterList extends \battletrack\basic\Record {
 	
 	private $uid;
 	
@@ -13,7 +20,7 @@ class csbt_userCharacterList extends csbt_basicRecord {
 	const pkeyField = 'character_id';
 	
 	//-------------------------------------------------------------------------
-	public function __construct(cs_phpDB $dbObj, $uid) {
+	public function __construct(Database $dbObj, $uid) {
 		$this->dbObj = $dbObj;
 		parent::__construct($this->dbObj, self::tableName, self::seqName, self::pkeyField);
 		
@@ -36,7 +43,7 @@ class csbt_userCharacterList extends csbt_basicRecord {
 			//$characterList = $this->get_records(array('uid'=>$this->uid));
 			
 			$sql = 'SELECT t.*, t2.campaign_name FROM '. self::tableName 
-					.' AS t LEFT OUTER JOIN '. csbt_campaign::tableName .' AS t2
+					.' AS t LEFT OUTER JOIN '. Campaign::tableName .' AS t2
 					USING (campaign_id) WHERE (uid=:uid OR :uid IS NULL)';
 			$params = array('uid' => $this->uid);
 			$this->dbObj->run_query($sql, $params);

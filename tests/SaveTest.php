@@ -1,19 +1,25 @@
 <?php
 
-class SavesTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Character;
+
+class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+//		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj->debugPrintOpt=1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
+		$this->char = new Character(__CLASS__, 1, $this->dbObj);
 		$this->id = $this->char->characterId;
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -72,7 +78,7 @@ class SavesTest extends testDbAbstract {
 		$numCreated = $x->create_character_defaults($this->dbObj);
 		$list = $x->get_all($this->dbObj, $x->characterId);
 		
-		$this->assertEquals($numCreated, count($list), cs_global::debug_print($list));
+		$this->assertEquals($numCreated, count($list), ToolBox::debug_print($list));
 		
 		foreach($list as $k=>$data) {
 			$data = $x->_get_record_extras($data);

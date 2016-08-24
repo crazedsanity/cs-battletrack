@@ -1,9 +1,26 @@
 <?php
 
+namespace battletrack;
 
 //TODO: consider optionally adding the logging system.
 
-class csbt_characterSheet {
+use crazedsanity\database\Database;
+use battletrack\character\Character;
+use battletrack\character\Ability;
+use battletrack\character\Skill;
+use battletrack\character\Save;
+use battletrack\character\Armor;
+use battletrack\character\Gear;
+use battletrack\character\SpecialAbility;
+use battletrack\character\Weapon;
+use battletrack\character\Campaign;
+
+use crazedsanity\core\ToolBox;
+
+use ErrorException;
+use InvalidArgumentException;
+
+class CharacterSheet {
 	
 	protected $characterId;
 	protected $ownerUid;
@@ -25,17 +42,17 @@ class csbt_characterSheet {
 	//==========================================================================
 	/**
 	 * 
-	 * @param cs_phpDB $db
+	 * @param Database $db
 	 * @param type $characterIdOrName
 	 * @param type $ownerUid
 	 * @param type $createOrLoad
 	 */
-	public function __construct(cs_phpDB $db, $characterIdOrName, $ownerUid=null, $createOrLoad=true) {
+	public function __construct(Database $db, $characterIdOrName, $ownerUid=null, $createOrLoad=true) {
 		$this->dbObj = $db;
 		
 		$this->ownerUid = $ownerUid;
 		
-		$this->_char = new csbt_character($characterIdOrName, $ownerUid, $this->dbObj);
+		$this->_char = new Character($characterIdOrName, $ownerUid, $this->dbObj);
 		$this->characterId = $this->_char->characterId;
 		$this->id = $this->characterId;
 		
@@ -49,8 +66,9 @@ class csbt_characterSheet {
 			}
 		}
 		
-		$this->version = new cs_version();
-		$this->version->set_version_file_location(dirname(__FILE__) .'/VERSION');
+		//TODO: re-add version code.
+//		$this->version = new cs_version();
+//		$this->version->set_version_file_location(dirname(__FILE__) .'/VERSION');
 	}
 	//==========================================================================
 	
@@ -113,14 +131,14 @@ class csbt_characterSheet {
 	
 	//==========================================================================
 	public function create_defaults() {
-		$abilities = new csbt_ability();
+		$abilities = new Ability();
 		$abilities->characterId = $this->characterId;
 		
 		$abilities->create_defaults($this->dbObj);
 		
 		
 		$abilityCache = $abilities->get_all_abilities($this->dbObj);
-		$skills = new csbt_skill();
+		$skills = new Skill();
 		$skills->characterId = $this->characterId;
 		foreach($this->get_default_skill_list() as $k=>$v) {
 			$xData = array(
@@ -131,12 +149,13 @@ class csbt_characterSheet {
 			$skills->create($this->dbObj, $xData);
 		}
 		
-		$saves = new csbt_save();
+		$saves = new Save();
 		$saves->characterId = $this->characterId;
 		$saves->create_character_defaults($this->dbObj);
 		
-		$log = new cs_webdblogger($this->dbObj, "Character", false);
-		$log->log_by_class("loaded defaults", "create");
+		//TODO: re-add logging
+//		$log = new cs_webdblogger($this->dbObj, "Character", false);
+//		$log->log_by_class("loaded defaults", "create");
 		
 		return $this->load();
 	}
@@ -149,29 +168,28 @@ class csbt_characterSheet {
 		$retval = array();
 		
 		if(is_numeric($this->characterId) && $this->characterId > 0) {
-			$this->_char = new csbt_character($this->characterId, $this->ownerUid, $this->dbObj);
+			$this->_char = new Character($this->characterId, $this->ownerUid, $this->dbObj);
 			$this->_char->load($this->dbObj);
 			
-			$this->_abilities = csbt_ability::get_all($this->dbObj, $this->characterId);
+			$this->_abilities =Ability::get_all($this->dbObj, $this->characterId);
 			$retval['abilities'] = $this->_abilities;
 			
-			$this->_armor = csbt_armor::get_all($this->dbObj, $this->characterId);
+			$this->_armor = Armor::get_all($this->dbObj, $this->characterId);
 			$retval['armor'] = $this->_armor;
 			
-			$this->_gear = csbt_gear::get_all($this->dbObj, $this->characterId);
+			$this->_gear = Gear::get_all($this->dbObj, $this->characterId);
 			$retval['gear'] = $this->_gear;
 			
-			$this->_saves = csbt_save::get_all($this->dbObj, $this->characterId);
+			$this->_saves = Save::get_all($this->dbObj, $this->characterId);
 			$retval['saves'] = $this->_saves;
 			
-			$this->_skills = csbt_skill::get_all($this->dbObj, $this->characterId);
+			$this->_skills = Skill::get_all($this->dbObj, $this->characterId);
 			$retval['skills'] = $this->_skills;
 			
-			$this->_specialAbilities = csbt_specialAbility::get_all($this->dbObj, $this->characterId);
+			$this->_specialAbilities = SpecialAbility::get_all($this->dbObj, $this->characterId);
 			$retval['specialAbilities'] = $this->_specialAbilities;
 			
-			//TODO: load weapons...
-			$this->_weapons = csbt_weapon::get_all($this->dbObj, $this->characterId);
+			$this->_weapons = Weapon::get_all($this->dbObj, $this->characterId);
 			$retval['weapons'] = $this->_weapons;
 		}
 		else {
@@ -185,7 +203,7 @@ class csbt_characterSheet {
 	
 	//==========================================================================
 	public function get_worn_armor() {
-		return csbt_armor::get_all($this->dbObj, $this->characterId);
+		return Armor::get_all($this->dbObj, $this->characterId);
 	}
 	//==========================================================================
 	
@@ -195,16 +213,16 @@ class csbt_characterSheet {
 	public function get_total_weight($includeWornItems=false) {
 		$weight = 0;
 		if(is_array($this->_gear) && count($this->_gear) > 0) {
-			$weight = csbt_gear::calculate_list_weight($this->_gear);
+			$weight = Gear::calculate_list_weight($this->_gear);
 		}
 		
 		//TODO: this accounts for ALL weapons + armor, whether it is_worn/in_use or not; see #41
 		if($includeWornItems === true) {
 			if(is_array($this->_weapons) && count($this->_weapons) > 0) {
-				$weight += csbt_gear::calculate_list_weight($this->_weapons);
+				$weight += Gear::calculate_list_weight($this->_weapons);
 			}
 			if(is_array($this->_armor) && count($this->_armor) > 0) {
-				$weight += csbt_gear::calculate_list_weight($this->_armor);
+				$weight += Gear::calculate_list_weight($this->_armor);
 			}
 		}
 		
@@ -375,7 +393,7 @@ class csbt_characterSheet {
 		$cDesc = "";
 		
 		if(is_numeric($this->_char->campaign_id)) {
-			$campaign = new csbt_campaign();
+			$campaign = new Campaign();
 			$campaign->id = $this->_char->campaign_id;
 			$campaign->load($this->dbObj);
 			
@@ -428,7 +446,7 @@ class csbt_characterSheet {
 			if ($type == 'ranged') {
 				$abilityName = 'dex';
 			}
-			$atkBonus += csbt_ability::calculate_ability_modifier($this->_abilities[$abilityName]['ability_score']);
+			$atkBonus += Ability::calculate_ability_modifier($this->_abilities[$abilityName]['ability_score']);
 		}
 		else {
 			throw new ErrorException(__METHOD__ .": invalid type (". $type .")");
@@ -446,7 +464,7 @@ class csbt_characterSheet {
 		$bonus = 0;
 		
 		$bonus += $c['initiative_misc'];
-		$bonus += csbt_ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
+		$bonus += Ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
 		
 		return $bonus;
 	}
@@ -479,7 +497,7 @@ class csbt_characterSheet {
 			}
 			
 			if(is_null($type) || !preg_match('/^flat/i', $type)) {
-				$totalAc += csbt_ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
+				$totalAc += Ability::calculate_ability_modifier($this->_abilities['dex']['ability_score']);
 			}
 		}
 		
@@ -507,32 +525,32 @@ class csbt_characterSheet {
 		$retval = array_merge($retval, $this->get_misc_data());
 		
 		
-		$sk = new csbt_skill();
-		$retval[csbt_skill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
+		$sk = new Skill();
+		$retval[Sskill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$_saves = new csbt_save();
+		$_saves = new Save();
 		$retval[$_saves::sheetIdPrefix] = $_saves->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$ab = new csbt_ability();
-		$retval[csbt_ability::sheetIdPrefix] = $ab->get_sheet_data($this->dbObj, $this->characterId);
+		$ab = new Ability();
+		$retval[Ability::sheetIdPrefix] = $ab->get_sheet_data($this->dbObj, $this->characterId);
 		foreach($this->_abilities as $k=>$data) {
-			$retval[csbt_ability::sheetIdPrefix .'__'. $k .'_score'] = $data['ability_score'];
-			$retval[csbt_ability::sheetIdPrefix .'__'. $k .'_modifier'] = csbt_ability::calculate_ability_modifier($data['ability_score']);
+			$retval[Ability::sheetIdPrefix .'__'. $k .'_score'] = $data['ability_score'];
+			$retval[Ability::sheetIdPrefix .'__'. $k .'_modifier'] = Ability::calculate_ability_modifier($data['ability_score']);
 		}
 		
-		$armor = new csbt_armor;
+		$armor = new Armor;
 		$retval['characterArmor'] = $armor->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$wpn = new csbt_weapon;
+		$wpn = new Weapon;
 		$retval[$wpn::sheetIdPrefix] = $wpn->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$specialAbilities = new csbt_specialAbility();
+		$specialAbilities = new SpecialAbility();
 		$retval[$specialAbilities::sheetIdPrefix] = $specialAbilities->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$gear = new csbt_gear();
+		$gear = new Gear();
 		$retval[$gear::sheetIdPrefix] = $gear->get_sheet_data($this->dbObj, $this->characterId);
 		
-		$retval[$gear::sheetIdPrefix .'__total_weight__generated'] = csbt_gear::calculate_list_weight($gear->get_all($this->dbObj, $this->characterId));
+		$retval[$gear::sheetIdPrefix .'__total_weight__generated'] = Gear::calculate_list_weight($gear->get_all($this->dbObj, $this->characterId));
 		
 		
 		foreach($this->get_strength_stats() as $k=>$v) {
@@ -582,7 +600,7 @@ class csbt_characterSheet {
 						
 						$subArray[$name .'_id'] = $id;
 						
-						$parsedRows .= cs_global::mini_parser($myBlockRow, $subArray, '{', '}');
+						$parsedRows .= ToolBox::mini_parser($myBlockRow, $subArray, '{', '}');
 						$rowsParsed++;
 						$parsedSlots[$blockRowName] = $rowsParsed;
 					}
@@ -604,8 +622,8 @@ class csbt_characterSheet {
 	
 	//==========================================================================
 	public function create_ability_select(cs_genericPage $page, $skillId = null, $selectThis = null) {
-		$abilityList = csbt_ability::get_all_abilities($this->dbObj, true);
-		$abilityOptionList = cs_global::array_as_option_list($abilityList, $selectThis);
+		$abilityList = Ability::get_all_abilities($this->dbObj, true);
+		$abilityOptionList = ToolBox::array_as_option_list($abilityList, $selectThis);
 		if (is_null($skillId)) {
 			$skillId = 'new';
 		}
@@ -622,7 +640,7 @@ class csbt_characterSheet {
 			$optionListRepArr['skillNum'] = 'new';
 			$optionListRepArr['skill_id'] = 'new';
 		}
-		$retval = cs_global::mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
+		$retval = ToolBox::mini_parser($page->templateRows['skills__selectAbility'], $optionListRepArr, '%%', '%%');
 		return($retval);
 	}
 	//==========================================================================
@@ -646,16 +664,16 @@ class csbt_characterSheet {
 		$debug = "realName=(". $realName ."), id=(". $recordId .")";
 		
 		
-		$log = new cs_webdblogger($this->dbObj, "Character");
+//		$log = new cs_webdblogger($this->dbObj, "Character");
 		
 		switch($prefix) {
-			case csbt_ability::sheetIdPrefix:
+			case Ability::sheetIdPrefix:
 				
 				if(is_numeric($recordId)) {
 					
-					$allAbilities = csbt_ability::get_all_abilities($this->dbObj, true);
+					$allAbilities = Ability::get_all_abilities($this->dbObj, true);
 					
-					$obj = new csbt_ability();
+					$obj = new Ability();
 					if(!is_null($value) && strlen($value) == 0) {
 						$fieldsToUpdate[$realName] = null;
 					}
@@ -676,16 +694,16 @@ class csbt_characterSheet {
 							$changesByKey[$this->create_sheet_id($prefix, $abilityName .'_modifier')] = $obj->get_modifier();
 							
 							//Updating skill info is NEW.
-							$depSkills = csbt_skill::get_all($this->dbObj, $this->characterId, $obj->ability_id);
+							$depSkills = Skill::get_all($this->dbObj, $this->characterId, $obj->ability_id);
 							foreach($depSkills as $k=>$v) {
-								$changesByKey[$this->create_sheet_id(csbt_skill::sheetIdPrefix, 'ability_mod', $k)] = $obj->get_modifier();
-								$changesByKey[$this->create_sheet_id(csbt_skill::sheetIdPrefix, 'skill_mod', $k)] = csbt_skill::calculate_skill_modifier($v);
+								$changesByKey[$this->create_sheet_id(Skill::sheetIdPrefix, 'ability_mod', $k)] = $obj->get_modifier();
+								$changesByKey[$this->create_sheet_id(Skill::sheetIdPrefix, 'skill_mod', $k)] = Skill::calculate_skill_modifier($v);
 							}
 							
-							$saveList = csbt_save::get_all($this->dbObj, $this->characterId, $obj->ability_id);
+							$saveList = Save::get_all($this->dbObj, $this->characterId, $obj->ability_id);
 							foreach($saveList as $k=>$v) {
-								$changesByKey[$this->create_sheet_id(csbt_save::sheetIdPrefix, 'ability_mod', $k)] = $v['ability_mod'];
-								$changesByKey[$this->create_sheet_id(csbt_save::sheetIdPrefix, 'total', $k)] = $v['total_mod'];
+								$changesByKey[$this->create_sheet_id(Save::sheetIdPrefix, 'ability_mod', $k)] = $v['ability_mod'];
+								$changesByKey[$this->create_sheet_id(Save::sheetIdPrefix, 'total', $k)] = $v['total_mod'];
 							}
 							
 							//TODO: update misc fields...
@@ -711,8 +729,8 @@ class csbt_characterSheet {
 				
 				break;
 			
-			case csbt_character::sheetIdPrefix:
-				$char = new csbt_character($this->characterId, $this->ownerUid, $this->dbObj);
+			case Character::sheetIdPrefix:
+				$char = new Character($this->characterId, $this->ownerUid, $this->dbObj);
 				$char->load($this->dbObj);
 				if($realName == 'xp_change') {
 					$xpCurrent = $char->xp_current;
@@ -729,45 +747,45 @@ class csbt_characterSheet {
 				}
 				break;
 				
-			case csbt_save::sheetIdPrefix:
-				$x = new csbt_save();
+			case Save::sheetIdPrefix:
+				$x = new Save();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
-			case csbt_skill::sheetIdPrefix:
-				$x = new csbt_skill();
+			case Skill::sheetIdPrefix:
+				$x = new Skill();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
-			case csbt_weapon::sheetIdPrefix:
-				$x = new csbt_weapon();
+			case Weapon::sheetIdPrefix:
+				$x = new Weapon();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
-			case csbt_armor::sheetIdPrefix:
-				$x = new csbt_armor();
+			case Armor::sheetIdPrefix:
+				$x = new Armor();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 
-			case csbt_specialAbility::sheetIdPrefix:
-				$x = new csbt_specialAbility();
+			case SpecialAbility::sheetIdPrefix:
+				$x = new SpecialAbility();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				break;
 			
-			case csbt_gear::sheetIdPrefix:
-				$x = new csbt_gear();
+			case Gear::sheetIdPrefix:
+				$x = new Gear();
 				$changesByKey = $x->update_and_get_changes($this->dbObj, $fieldsToUpdate, $recordId);
 				$changesByKey[$x::sheetIdPrefix .'__total_weight__generated'] = csbt_gear::calculate_list_weight($x->get_all($this->dbObj, $this->characterId));
 				break;
 			
 			default:
 				$details = __METHOD__ .": invalid prefix (". $prefix .") or unable to update field (". $realName .")";
-				$log->log_by_class($details, "exception in code");
+//				$log->log_by_class($details, "exception in code");
 				
 				throw new InvalidArgumentException($details);
 		}
 		
-		$log->log_by_class("Updating characterId=". $this->characterId .", ". $name ."=(". $value .")", "update");
+//		$log->log_by_class("Updating characterId=". $this->characterId .", ". $name ."=(". $value .")", "update");
 		
 		$retval = array(
 			'debug'			=> $debug,
@@ -791,33 +809,33 @@ class csbt_characterSheet {
 		$log = new cs_webdblogger($this->dbObj, "Character");
 		
 		switch($type) {
-			case csbt_weapon::sheetIdPrefix:
-				$x = new csbt_weapon();
+			case Weapon::sheetIdPrefix:
+				$x = new Weapon();
 				$extraData['weapon_name'] = $name;
 				
 				$result = $x->create($this->dbObj, $extraData);
 				break;
 				
-			case csbt_armor::sheetIdPrefix:
-				$x = new csbt_armor();
+			case Armor::sheetIdPrefix:
+				$x = new Armor();
 				$extraData['armor_name'] = $name;
 				$result = $x->create($this->dbObj, $extraData);
 				break;
 			
-			case csbt_specialAbility::sheetIdPrefix:
-				$x = new csbt_specialAbility();
+			case SpecialAbility::sheetIdPrefix:
+				$x = new SpecialAbility();
 				$extraData['special_ability_name'] = $name;
 				$result = $x->create($this->dbObj, $extraData);
 				break;
 			
-			case csbt_gear::sheetIdPrefix:
-				$x = new csbt_gear();
+			case Gear::sheetIdPrefix:
+				$x = new Gear();
 				$extraData['gear_name'] = $name;
 				$result = $x->create($this->dbObj, $extraData);
 				break;
 			
-			case csbt_skill::sheetIdPrefix:
-				$x = new csbt_skill();
+			case Skill::sheetIdPrefix:
+				$x = new Skill();
 				$extraData['skill_name'] = $name;
 				$result = $x->create($this->dbObj, $extraData);
 				break;
@@ -844,47 +862,47 @@ class csbt_characterSheet {
 	public function handle_delete($type, $recordId) {
 		$retval = "Invalid section... type=(". $type ."), recordId=(". $recordId .")";
 		
-		$log = new cs_webdblogger($this->dbObj, "Character");
+//		$log = new cs_webdblogger($this->dbObj, "Character");
 		
 		switch($type) {
 			case 'weapon':
-			case csbt_weapon::sheetIdPrefix:
-				$x = new csbt_weapon();
+			case Weapon::sheetIdPrefix:
+				$x = new Weapon();
 				$x->load($this->dbObj, $recordId);
 				$retval = $x->delete($this->dbObj);
 				break;
 			
 			case 'armor':
-			case csbt_armor::sheetIdPrefix:
-				$x = new csbt_armor();
+			case Armor::sheetIdPrefix:
+				$x = new Armor();
 				$x->load($this->dbObj, $recordId);
 				$retval = $x->delete($this->dbObj);
 				break;
 			
 			case 'skill':
-			case csbt_skill::sheetIdPrefix:
-				$x = new csbt_skill();
+			case Skill::sheetIdPrefix:
+				$x = new Skill();
 				$x->load($this->dbObj, $recordId);
 				$retval = $x->delete($this->dbObj);
 				break;
 			
 			case 'feat':
 			case 'specialAbility':
-			case csbt_specialAbility::sheetIdPrefix:
-				$x = new csbt_specialAbility();
+			case SpecialAbility::sheetIdPrefix:
+				$x = new SpecialAbility();
 				$x->load($this->dbObj, $recordId);
 				$retval = $x->delete($this->dbObj);
 				break;
 			
 			case 'gear':
-			case csbt_gear::sheetIdPrefix:
-				$x = new csbt_gear();
+			case Gear::sheetIdPrefix:
+				$x = new Gear();
 				$x->load($this->dbObj, $recordId);
 				$retval = $x->delete($this->dbObj);
 				break;
 		}
 		
-		$log->log_by_class("type=(". $type ."), recordId=(". $recordId ."), result::: ". $retval, "delete");
+//		$log->log_by_class("type=(". $type ."), recordId=(". $recordId ."), result::: ". $retval, "delete");
 		
 		return $retval;
 	}

@@ -1,6 +1,11 @@
 <?php
 
-class testOfCSBattleTrack extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Character;
+
+class testOfCSBattleTrack extends TestDbAbstract {
 	
 	
 	public $autoSkills = array();
@@ -9,15 +14,17 @@ class testOfCSBattleTrack extends testDbAbstract {
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+//		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
+		$this->char = new Character(__CLASS__, 1, $this->dbObj);
 		
 		
 		// list of default skills...
@@ -102,7 +109,7 @@ class testOfCSBattleTrack extends testDbAbstract {
 		foreach($this->autoSkills as $id=>$theData) {
 			$name = $theData[0];
 			$attribute = $theData[1];
-			$this->assertTrue(isset($cache[$attribute]), "missing attribute '". $attribute ."' in cache... ". cs_global::debug_print($cache,0));
+			$this->assertTrue(isset($cache[$attribute]), "missing attribute '". $attribute ."' in cache... ". ToolBox::debug_print($cache,0));
 			$this->assertTrue(isset($cache[$attribute]['ability_id']));
 			
 			$insertData = array(

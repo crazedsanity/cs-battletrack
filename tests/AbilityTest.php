@@ -1,19 +1,26 @@
 <?php
 
-class AbilityTest extends testDbAbstract {
+use crazedsanity\database\TestDbAbstract;
+use crazedsanity\core\ToolBox;
+
+use battletrack\character\Ability;
+use battletrack\character\Character;
+
+class AbilityTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
 		
-		$this->gfObj = new cs_globalFunctions;
-		$this->gfObj->debugPrintOpt=1;
+//		$this->gfObj = new cs_globalFunctions;
+//		$this->gfObj->debugPrintOpt=1;
+		ToolBox::$debugPrintOpt = 1;
 		
 		parent::setUp();
 		$this->reset_db();
-		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
+		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
-		$this->char = new csbt_character(__CLASS__, 1, $this->dbObj);
+		$this->char = new Character(__CLASS__, 1, $this->dbObj);
 		$this->id = $this->char->characterId;
 	}//end setUp()
 	//--------------------------------------------------------------------------
@@ -30,7 +37,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_ability_list() {
-		$myCache = csbt_ability::get_all_abilities($this->dbObj);
+		$myCache = Ability::get_all_abilities($this->dbObj);
 		
 		$requiredStats = array('str', 'con', 'dex', 'wis', 'int', 'cha');
 		
@@ -51,7 +58,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_creation() {
-		$x = new csbt_ability();
+		$x = new Ability();
 		$cache = $x->get_all_abilities($this->dbObj);
 		
 		$list = array();
@@ -61,7 +68,7 @@ class AbilityTest extends testDbAbstract {
 				'character_id'	=> $this->id,
 				'ability_id'	=> $abilityId,
 			);
-			$test = new csbt_ability($initialData);
+			$test = new Ability($initialData);
 			
 			$this->assertEquals($initialData, $test->data);
 			$this->assertEquals(null, $test->id);
@@ -88,7 +95,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_character_defaults() {
-		$x = new csbt_ability();
+		$x = new Ability();
 		$x->characterId = $this->id;
 		
 		$abCache = $x->get_all_abilities($this->dbObj);
@@ -122,7 +129,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_character_defaults_specify_minmax() {
-		$x = new csbt_ability();
+		$x = new Ability();
 		$x->characterId = $this->id;
 		
 		$minScore = rand(1,10);
@@ -161,7 +168,7 @@ class AbilityTest extends testDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_ability();
+		$x = new Ability();
 		$x->characterId = $this->id;
 		$x->create_defaults($this->dbObj);
 		

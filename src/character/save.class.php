@@ -1,6 +1,14 @@
 <?php 
 
-class csbt_save extends csbt_data {
+namespace battletrack\character;
+
+use crazedsanity\database\Database;
+
+use ErrorException;
+use Exception;
+use LogicException;
+
+class Save extends battletrack\basic\Data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_save_table';
@@ -19,7 +27,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all(cs_phpDB $dbObj, $characterId, $byAbilityId=null) {
+	public static function get_all(Database $dbObj, $characterId, $byAbilityId=null) {
 		if(!is_null($characterId) && $characterId > 0) { 
 			$sql = "SELECT 
 					cs.*, 
@@ -65,7 +73,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public static function get_all_saves(cs_phpDB $dbObj, $byId=false) {
+	public static function get_all_saves(Database $dbObj, $byId=false) {
 		$sql = "SELECT s.*, a.* FROM csbt_save_table AS s 
 			INNER JOIN csbt_ability_table AS a ON (s.ability_id=a.ability_id)";
 		
@@ -94,7 +102,7 @@ class csbt_save extends csbt_data {
 	
 	
 	//==========================================================================
-	public function create_character_defaults(cs_phpDB $dbObj) {
+	public function create_character_defaults(Database $dbObj) {
 		$result = 0;
 		
 		if(!is_null($this->characterId) && is_numeric($this->characterId) && $this->characterId > 0) {
