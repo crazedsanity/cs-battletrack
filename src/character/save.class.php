@@ -3,12 +3,13 @@
 namespace battletrack\character;
 
 use crazedsanity\database\Database;
+use battletrack\basic\Data;
 
 use ErrorException;
 use Exception;
 use LogicException;
 
-class Save extends battletrack\basic\Data {
+class Save extends Data {
 	
 	/** Did you notice "{tableName}_{pkeyField}_seq"? PostgreSQL makes that simple, others don't.*/
 	const tableName = 'csbt_character_save_table';

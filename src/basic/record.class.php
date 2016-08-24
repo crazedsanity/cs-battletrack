@@ -5,6 +5,7 @@ namespace battletrack\basic;
 use crazedsanity\database\Database;
 use crazedsanity\core\ToolBox;
 
+use Exception;
 use ErrorException;
 use LogicException;
 

@@ -10,14 +10,8 @@ class WeaponTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-//		$this->gfObj = new cs_globalFunctions;
-//		$this->gfObj->debugPrintOpt=1;
-		ToolBox::$debugPrintOpt = 1;
-		
 		parent::setUp();
 		$this->reset_db();
-//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
@@ -116,7 +110,7 @@ class WeaponTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_and_delete() {
-		$x = new csbt_weapon();
+		$x = new Weapon();
 		$x->characterId = $this->char->characterId;
 		
 		$wpns = array('long sword', 'short sword', 'testing');

@@ -4,18 +4,15 @@ use crazedsanity\database\TestDbAbstract;
 use crazedsanity\core\ToolBox;
 
 use battletrack\character\Character;
+use battletrack\character\Save;
+use battletrack\character\Ability;
 
 class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-//		$this->gfObj = new cs_globalFunctions;
-//		$this->gfObj->debugPrintOpt=1;
-		
 		parent::setUp();
 		$this->reset_db();
-//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
@@ -36,9 +33,9 @@ class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_creation() {
-		$x = new csbt_save();
+		$x = new Save();
 		$x->characterId = $this->id;
-		$y = new csbt_ability();
+		$y = new Ability();
 		
 		$allSaves = $x->get_all_saves($this->dbObj);
 		foreach($allSaves as $k=>$v) {
@@ -67,8 +64,8 @@ class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create_character_defaults_and_modifier() {
-		$x = new csbt_save();
-		$y = new csbt_ability();
+		$x = new Save();
+		$y = new Ability();
 		
 		$y->characterId = $this->id;
 		$x->characterId = $this->id;
@@ -92,10 +89,10 @@ class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_updates() {
-		$x = new csbt_save();
+		$x = new Save();
 		$x->characterId = $this->id;
 		
-		$y = new csbt_ability();
+		$y = new Ability();
 		$y->characterId = $this->id;
 		$y->create_defaults($this->dbObj);
 		
@@ -149,9 +146,9 @@ class SavesTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_save();
+		$x = new Save();
 		$x->characterId = $this->id;
-		$y = new csbt_ability();
+		$y = new Ability();
 		$y->characterId = $this->id;
 		
 		$y->create_defaults($this->dbObj);

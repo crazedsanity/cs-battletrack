@@ -12,9 +12,6 @@ class CharacterSheetTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-		ToolBox::$debugPrintOpt = 1;
-		
 		parent::setUp();
 		$this->reset_db();
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');

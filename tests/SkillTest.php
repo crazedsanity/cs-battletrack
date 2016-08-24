@@ -4,6 +4,8 @@ use crazedsanity\database\TestDbAbstract;
 use crazedsanity\core\ToolBox;
 
 use battletrack\character\Character;
+use battletrack\character\Skill;
+use battletrack\character\Ability;
 
 class testOfCSBattleTrack extends TestDbAbstract {
 	
@@ -13,14 +15,8 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-//		$this->gfObj = new cs_globalFunctions;
-//		$this->gfObj->debugPrintOpt=1;
-		ToolBox::$debugPrintOpt = 1;
-		
 		parent::setUp();
 		$this->reset_db();
-//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
@@ -90,10 +86,10 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_skill();
+		$x = new Skill();
 		$x->characterId = $this->char->characterId;
 		
-		$a = new csbt_ability();
+		$a = new Ability();
 		$a->characterId = $this->char->characterId;
 		$a->create_defaults($this->dbObj);
 		$cache = $a->get_all($this->dbObj, $this->char->id);
@@ -141,10 +137,10 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update_and_delete() {
-		$x = new csbt_skill();
+		$x = new Skill();
 		$x->characterId = $this->char->characterId;
 		
-		$a = new csbt_ability();
+		$a = new Ability();
 		$a->characterId = $x->characterId;
 		$a->create_defaults($this->dbObj);
 		$cache = $a->get_all($this->dbObj, $this->char->id);
@@ -193,7 +189,7 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_calculate_skill_modifier() {
-		$x = new csbt_skill();
+		$x = new Skill();
 		
 		$this->assertEquals(0, $x->calculate_skill_modifier(array()));
 		$this->assertEquals(0, $x->calculate_skill_modifier(array('ability_mod'=>0)));
@@ -234,9 +230,9 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_load() {
-		$x = new csbt_skill();
+		$x = new Skill();
 		$x->characterId = $this->char->characterId;
-		$a = new csbt_ability();
+		$a = new Ability();
 		$a->characterId = $x->characterId;
 		$a->create_defaults($this->dbObj);
 		
@@ -271,10 +267,10 @@ class testOfCSBattleTrack extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_all() {
-		$x = new csbt_skill();
+		$x = new Skill();
 		$x->characterId = $this->char->characterId;
 		
-		$a = new csbt_ability();
+		$a = new Ability();
 		$a->characterId = $this->char->characterId;
 		$a->create_defaults($this->dbObj);
 		

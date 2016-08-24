@@ -4,19 +4,14 @@ use crazedsanity\database\TestDbAbstract;
 use crazedsanity\core\ToolBox;
 
 use battletrack\character\Character;
+use battletrack\character\Gear;
 
 class GearTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	function setUp() {
-		
-//		$this->gfObj = new cs_globalFunctions;
-//		$this->gfObj->debugPrintOpt=1;
-		ToolBox::$debugPrintOpt = 1;
-		
 		parent::setUp();
 		$this->reset_db();
-//		$this->dbObj->load_schema($this->dbObj->get_dbtype(), $this->dbObj);
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
 		
@@ -37,7 +32,7 @@ class GearTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_create() {
-		$x = new csbt_gear();
+		$x = new Gear();
 		$x->characterId = $this->id;
 		
 		$insertData = array(
@@ -94,7 +89,7 @@ class GearTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_update() {
-		$x = new csbt_gear();
+		$x = new Gear();
 		$x->characterId = $this->id;
 		
 		$initial = array(
@@ -145,7 +140,7 @@ class GearTest extends TestDbAbstract {
 			'character_id'	=> $this->id,
 			'gear_name'		=> "Specially invalid",
 		);
-		$x = new csbt_gear($initial);
+		$x = new Gear($initial);
 		
 		$this->assertEquals(null, $x->id);
 		
@@ -169,7 +164,7 @@ class GearTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_delete() {
-		$x = new csbt_gear();
+		$x = new Gear();
 		$x->characterId = $this->id;
 		
 		$allGear = array('torch', 'silk rope', 'bullseye lantern');
@@ -212,7 +207,7 @@ class GearTest extends TestDbAbstract {
 	
 	//--------------------------------------------------------------------------
 	public function test_get_all() {
-		$x = new csbt_gear();
+		$x = new Gear();
 		$x->characterId = $this->id;
 		
 		$createThis = array('torches', 'silk rope', 'bullseye lantern');
