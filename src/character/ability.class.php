@@ -48,7 +48,7 @@ class Ability extends \battletrack\basic\Data {
 	
 	//==========================================================================
 	public static function get_all_abilities(Database $dbObj, $byId=false) {
-		$sql = "SELECT * FROM ". Ability::tableName;
+		$sql = "SELECT * FROM csbt_ability_table";
 		
 		try {
 			$numrows = $dbObj->run_query($sql);

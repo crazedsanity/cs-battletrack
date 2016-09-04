@@ -57,7 +57,7 @@ class AbilityTest extends TestDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_creation() {
+	public function txest_creation() {
 		$x = new Ability();
 		$cache = $x->get_all_abilities($this->dbObj);
 		
@@ -94,7 +94,7 @@ class AbilityTest extends TestDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_create_character_defaults() {
+	public function txest_create_character_defaults() {
 		$x = new Ability();
 		$x->characterId = $this->id;
 		
@@ -128,7 +128,7 @@ class AbilityTest extends TestDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_create_character_defaults_specify_minmax() {
+	public function txest_create_character_defaults_specify_minmax() {
 		$x = new Ability();
 		$x->characterId = $this->id;
 		
@@ -167,7 +167,7 @@ class AbilityTest extends TestDbAbstract {
 	
 	
 	//--------------------------------------------------------------------------
-	public function test_delete() {
+	public function texst_delete() {
 		$x = new Ability();
 		$x->characterId = $this->id;
 		$x->create_defaults($this->dbObj);
