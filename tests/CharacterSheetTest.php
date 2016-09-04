@@ -16,6 +16,7 @@ class CharacterSheetTest extends TestDbAbstract {
 		$this->reset_db();
 		$this->dbObj->run_sql_file(__DIR__ .'/../vendor/crazedsanity/database/setup/schema.pgsql.sql');
 		$this->dbObj->run_sql_file(dirname(__FILE__) .'/../docs/sql/tables.sql');
+		ToolBox::$debugPrintOpt = 0;
 	}//end setUp()
 	//--------------------------------------------------------------------------
 	
