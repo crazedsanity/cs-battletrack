@@ -3,6 +3,10 @@
  * Created on Jul 18, 2009
  */
 
+use battletrack\CharacterSheet;
+use battletrack\campaign\Campaign;
+use crazedsanity\core\ToolBox;
+
 $page->rip_all_block_rows('content');
 
 //TODO: this may conflict with other systems if they have template variables that begin with "sheet__" and have block rows defined
@@ -15,7 +19,7 @@ foreach($page->templateVars as $k=>$v) {
 $obfuscator = new cs_idObfuscator();
 
 if(strlen($charId)) {
-	$char = new csbt_characterSheet($page->db, $charId, $playerUid);
+	$char = new CharacterSheet($page->db, $charId, $playerUid);
 	$data = $char->get_sheet_data();
 //cs_global::debug_print($data,1);
 //exit;
@@ -32,22 +36,22 @@ else {
 	
 	try {
 		$page->db->beginTrans();
-		$char = new csbt_characterSheet($page->db, 'Set character name...', $playerUid);
+		$char = new CharacterSheet($page->db, 'Set character name...', $playerUid);
 		$charId = $char->characterId;
 		
 		if(isset($_GET['campaignId']) && is_numeric($_GET['campaignId'])) {
-			csbt_campaign::add_player($page->db, $_GET['campaignId'], $charId);
+			Campaign::add_player($page->db, $_GET['campaignId'], $charId);
 		} 
 		
 		$page->db->commitTrans();
 		
 		$newId = $obfuscator->encode($charId);
-		$page->conditional_header("?id=". $newId);
+		ToolBox::conditional_header("?id=". $newId);
 	}
 	catch(Exception $ex) {
 		$page->db->rollbackTrans();
 		
-		cs_genericPage::set_message(
+		GenericPage::set_message(
 				"Error Creating Character", 
 				"There was an error creating your character... ". $ex->getMessage(), 
 				null, 
@@ -56,7 +60,7 @@ else {
 		
 		$uriBits = preg_split('~/sheet~', $_SERVER['REQUEST_URI']);
 		
-		$page->conditional_header($uriBits[0]);
+		ToolBox::conditional_header($uriBits[0]);
 	}
 }
 

@@ -1,9 +1,10 @@
 <?php
 
+use battletrack\CharacterSheet;
+
 
 if(count($_POST) && is_numeric($_POST['character_id'])) {
-	$char = new csbt_characterSheet($page->db, $_POST['character_id']);
-	#$char->characterObj->logger->log_by_class("Testing... ". $page->gfObj->debug_print($_POST,0), 'debug');
+	$char = new CharacterSheet($page->db, $_POST['character_id']);
 	
 	$xmlData = array(
 		'character_id_was'	=> $_POST['character_id'],

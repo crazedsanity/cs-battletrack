@@ -3,6 +3,8 @@
  * Created on Jul 18, 2009
  */
 
+use crazedsanity\core\ToolBox;
+
 if($_POST) {
 	
 	if(!is_numeric($charId) && strtolower($charId) == 'new') {
@@ -23,5 +25,5 @@ if($_POST) {
 	//now create all those attributes.
 	$char->update_character_data($_POST);
 }
-$page->gfObj->conditional_header('sheet?id='. $charId);
-?>
+ToolBox::conditional_header('sheet?id='. $charId);
+

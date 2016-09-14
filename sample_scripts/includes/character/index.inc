@@ -3,9 +3,11 @@
  * Created on Jul 20, 2009
  */
 
+use battletrack\UserCharacterList;
+use crazedsanity\core\ToolBox;
 
 
-$userChar = new csbt_userCharacterList($page->db, $playerUid);
+$userChar = new UserCharacterList($page->db, $playerUid);
 $charData = $userChar->get_character_list();
 
 $page->rip_all_block_rows();
@@ -44,7 +46,7 @@ if(isset($page->templateRows[$rowName])) {
 				}
 				$repArr2 = $info;
 				$repArr2['id']	= $idObfuscator->encode($id);
-				$parsedRows .= $page->gfObj->mini_parser($page->templateRows[$rowName], $repArr2, '{', '}');
+				$parsedRows .= ToolBox::mini_parser($page->templateRows[$rowName], $repArr2, '{', '}');
 			}
 			
 			
@@ -52,7 +54,7 @@ if(isset($page->templateRows[$rowName])) {
 				'campaign_name'	=> $campaignName,
 				$rowName		=> $parsedRows
 			);
-			$campaignRow .= $page->gfObj->mini_parser($page->templateRows[$outerTemplate], $repArr, '{', '}');
+			$campaignRow .= ToolBox::mini_parser($page->templateRows[$outerTemplate], $repArr, '{', '}');
 			
 		}
 		
@@ -64,4 +66,3 @@ if(isset($page->templateRows[$rowName])) {
 else {
 	throw new exception(__METHOD__ .": missing template row");
 }
-?>

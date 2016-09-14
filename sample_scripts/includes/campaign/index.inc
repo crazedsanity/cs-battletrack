@@ -1,12 +1,14 @@
 <?php
 
-$campaign = new csbt_campaign(null, $page->db);
+use battletrack\campaign\Campaign;
+use crazedsanity\core\ToolBox;
+
+$campaign = new Campaign(null, $page->db);
 if($_POST) {
 	$urlAppend = "invalid";
 	switch($_POST['action']) {
 		case 'newCampaign':
 			try {
-//				$res = $campaign->create_campaign($_POST['name'], $_POST['description']);
 				$createData = array(
 					'owner_uid'		=> $_SESSION['uid'],
 					'campaign_name'	=> $_POST['name'],
@@ -22,7 +24,7 @@ if($_POST) {
 
 		case 'addPlayer':
 			try {
-				$res = csbt_campaign::add_player($page->db, $_POST['campaignId'], $_POST['playerId']);
+				$res = Campaign::add_player($page->db, $_POST['campaignId'], $_POST['playerId']);
 				$urlAppend = $res;
 			}
 			catch(Exception $e) {
@@ -38,7 +40,7 @@ if($_POST) {
 		default:
 			$urlAppend .= ";action=". $_POST['action'];
 	}
-	$page->gfObj->conditional_header("#Posted;". $urlAppend);
+	ToolBox::conditional_header("#Posted;". $urlAppend);
 	exit;
 }
 else {

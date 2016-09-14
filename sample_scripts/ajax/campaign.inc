@@ -1,5 +1,13 @@
 <?php
 
+use battletrack\CharacterSheet;
+use battletrack\campaign\Campaign;
+use battletrack\CharacterSearch;
+
+use crazedsanity\core\ToolBox;
+
+use Exception;
+
 define('JSON_ENCODE', 1);
 
 $xmlData['errorCode'] = "Invalid action... sectionArr count=(". count($sectionArr) .")";
@@ -17,7 +25,7 @@ if(count($sectionArr) >= 5) {
 		case "playerData":
 			$tCharId = $sectionArr[5];
 			try {
-				$charObj = new csbt_characterSheet($page->db, $tCharId, $_SESSION['uid']);
+				$charObj = new CharacterSheet($page->db, $tCharId, $_SESSION['uid']);
 				$sheetData = $charObj->get_sheet_data();
 				$xmlStatus = 1;
 				$returnData = array(
@@ -33,10 +41,10 @@ if(count($sectionArr) >= 5) {
 			
 		case "addPlayer":
 			$tCharId = $sectionArr[5];
-				$charObj = new csbt_characterSheet($page->db, $tCharId, $_SESSION['uid']);
+				$charObj = new CharacterSheet($page->db, $tCharId, $_SESSION['uid']);
 				$sheetData = $charObj->load($page->db);
 				if(isset($sheetData['campaign_id']) && !is_numeric($sheetData['campaign_id'])) {
-					$cObj = new csbt_campaign();
+					$cObj = new Campaign();
 				}
 				else {
 					$xmlStatus = 0;
@@ -44,12 +52,11 @@ if(count($sectionArr) >= 5) {
 			break;
 			
 		case "charSearch":
-//			$searchObj = new csbt_characterSearch($page->db);
 			try {
 				$searchCrit = array(
 					'character_name'	=> $_GET['term']
 				);
-				$res = csbt_characterSearch::search($page->db, $searchCrit); //$searchObj->search($searchCrit);
+				$res = CharacterSearch::search($page->db, $searchCrit); //$searchObj->search($searchCrit);
 				if(is_array($res) && count($res)) {
 					$xmlData = array();
 					foreach($res as $id=>$cData) {
@@ -64,11 +71,8 @@ if(count($sectionArr) >= 5) {
 					
 				}
 				else {
-					$gf = new cs_globalFunctions;
-					$xmlData['errorCode'] .= " --- no result... ". strip_tags($gf->debug_var_dump($res));
+					$xmlData['errorCode'] .= " --- no result... ". strip_tags(ToolBox::debug_var_dump($res));
 				}
-				#print(json_encode($xmlData));
-				#exit;
 			}
 			catch(Exception $e) {
 				$xmlData['errorCode'] = "Fatal error: ". $e->getMessage();
@@ -85,6 +89,4 @@ if(count($sectionArr) >= 5) {
 	}
 	$xmlData['status'] = $xmlStatus;
 }
-
-
 
