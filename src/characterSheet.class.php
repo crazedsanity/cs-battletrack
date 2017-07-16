@@ -526,7 +526,7 @@ class CharacterSheet {
 		
 		
 		$sk = new Skill();
-		$retval[Sskill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
+		$retval[skill::sheetIdPrefix] = $sk->get_sheet_data($this->dbObj, $this->characterId);
 		
 		$_saves = new Save();
 		$retval[$_saves::sheetIdPrefix] = $_saves->get_sheet_data($this->dbObj, $this->characterId);
@@ -564,7 +564,7 @@ class CharacterSheet {
 	
 	
 	//==========================================================================
-	public function build_sheet(cs_genericPage $page) {
+	public function build_sheet($page) {
 		$data = $this->get_sheet_data();
 		
 		$blockRows = $page->rip_all_block_rows('content');
@@ -621,7 +621,7 @@ class CharacterSheet {
 	
 	
 	//==========================================================================
-	public function create_ability_select(cs_genericPage $page, $skillId = null, $selectThis = null) {
+	public function create_ability_select($page, $skillId = null, $selectThis = null) {
 		$abilityList = Ability::get_all_abilities($this->dbObj, true);
 		$abilityOptionList = ToolBox::array_as_option_list($abilityList, $selectThis);
 		if (is_null($skillId)) {
