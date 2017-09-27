@@ -13,7 +13,7 @@ use battletrack\character\Armor;
 use battletrack\character\Gear;
 use battletrack\character\SpecialAbility;
 use battletrack\character\Weapon;
-use battletrack\character\Campaign;
+use battletrack\campaign\Campaign;
 
 use crazedsanity\core\ToolBox;
 
