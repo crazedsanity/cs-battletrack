@@ -25,7 +25,7 @@ class Data {
 	public $version;
 	
 	//==========================================================================
-	public function __construct($initial, $table, $seq, $pkey, Databse $dbObj = null) {
+	public function __construct($initial, $table, $seq, $pkey, Database $dbObj = null) {
 		$this->_dbTable = $table;
 		$this->_dbPkey = $pkey;
 		$this->_dbSeq = $seq;
