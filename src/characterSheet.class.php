@@ -806,7 +806,6 @@ class CharacterSheet {
 		}
 		$extraData['character_id'] = $this->characterId;
 		
-		$log = new cs_webdblogger($this->dbObj, "Character");
 		
 		switch($type) {
 			case Weapon::sheetIdPrefix:
@@ -850,7 +849,14 @@ class CharacterSheet {
 		if(is_array($details) && count($extraData) > 0) {
 			$details .= implode(", ", $extraData);
 		}
-		$log->log_by_class($details, "create");
+		
+//		try {
+//			$log = new cs_webdblogger($this->dbObj, "Character");
+//			$log->log_by_class($details, "create");
+//		}
+//		catch(ErrorException $ex) {
+//			
+//		}
 		
 		return $result;
 	}

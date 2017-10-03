@@ -3,7 +3,7 @@
 namespace battletrack\campaign;
 
 use battletrack\CampaignCharacterList;
-use battletrack\Character;
+use battletrack\character\Character;
 
 
 use crazedsanity\database\Database;
